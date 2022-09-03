@@ -1,0 +1,35 @@
+{
+    "name": "juneszh/alight-admin",
+    "description": "Alight Admin is a quick admin panel extension based on the Alight framework.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "php",
+        "lightweight",
+        "framework",
+        "restful",
+        "fast-route",
+        "medoo",
+        "simplecache",
+        "psr-16",
+        "monolog",
+        "whoops",
+        "job-scheduler"
+    ],
+    "authors": [
+        {
+            "name": "June So",
+            "email": "alight@juneszh.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Alight\\": "src/"
+        }
+    },
+    "require": {
+        "juneszh/alight": "^1.1.0",
+        "gregwar/captcha": "^1.1",
+        "symfony/var-exporter": ">=5.4"
+    }
+}

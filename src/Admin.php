@@ -16,6 +16,7 @@ namespace Alight;
 use Alight\Admin\Auth;
 use Alight\Admin\Config as AdminConfig;
 use Alight\Admin\Controller;
+use Composer\InstalledVersions;
 use Exception;
 use Symfony\Component\VarExporter\Exception\ExceptionInterface;
 use InvalidArgumentException;
@@ -76,11 +77,15 @@ class Admin
      */
     public static function globalScript(string $component, array $config = [])
     {
-        $global = AdminConfig::get();
+        $admin = AdminConfig::get();
 
-        $global['path'] = self::url();
-        $global['component'] = $component;
-        $global['config'] = $config;
+        $global = [
+            'title' => $admin['title'],
+            'locale' => $admin['locale'],
+            'path' => self::url(),
+            'component' => $component,
+            'config' => $config,
+        ];
 
         $return = '<script>';
         $return .= 'window.$global=' . json_encode($global, JSON_UNESCAPED_UNICODE);
@@ -365,6 +370,7 @@ class Admin
      */
     public static function download()
     {
-        // TODO
+        $version = InstalledVersions::getVersion('juneszh/alight');
+        echo $version;
     }
 }

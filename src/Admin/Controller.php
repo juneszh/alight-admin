@@ -132,57 +132,7 @@ class Controller
         if (!Request::isAjax()) {
             Model::userLog($userId);
 
-            $userInfo = Model::getUserInfo($userId);
-
-            $avatarDomain = Config::get('cravatar') ? 'cravatar.cn' : 'www.gravatar.com';
-            $avatar = $userInfo['email'] ? 'https://' . $avatarDomain . '/avatar/' . md5(strtolower(trim($userInfo['email']))) . '?s=100&d=mp' : '';
-
-            $roleEnum = Model::getRoleEnumList(['id' => $userInfo['role_id']]);
-            $roleName = $roleEnum ? reset($roleEnum)['name'] : '';
-
-            Response::render('public/alight-admin/index.html', ['title' => Config::get('title'), 'script' => Admin::globalScript('Console', [
-                'user' => [
-                    'id' => $userId,
-                    'avatar' => $avatar,
-                    'account' => $userInfo['account'],
-                    'name' => $userInfo['name'],
-                    'role' => $roleName,
-                ],
-                'chart' => [
-                    0 => [
-                        'component'  => 'Heatmap',
-                        'api' => '/admin/console',
-                        'config' => [
-                            'width' => '100%',
-                            'height' => 200,
-                            'yField' => 'date',
-                            'xField' => 'time',
-                            'shape' => 'circle',
-                            'colorField' => 'action',
-                            'sizeField' => 'size',
-                            'sizeRatio' => 0.5,
-                            'reflect' => 'y',
-                            'xAxis' => [
-                                'position' => 'top',
-                                'grid' => null,
-                            ],
-                            'tooltip' => [
-                                'title' => 'title',
-                                'domStyles' => [
-                                    'g2-tooltip-list' => ['display' => 'none']
-                                ]
-                            ],
-                        ],
-                        'grid' => [
-                            'xs' => 24,
-                            'sm' => 12,
-                            'md' => 16,
-                            'lg' => 18,
-                            'xxl' => 20,
-                        ]
-                    ]
-                ]
-            ])]);
+            Response::render('public/alight-admin/index.html', ['title' => Config::get('title'), 'script' => Admin::globalScript('Console', Console::build($userId))]);
         } else {
             $resData = [];
 

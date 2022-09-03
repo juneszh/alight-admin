@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { Row, Col, Card, Avatar, Modal } from 'antd';
-import { UserOutlined, EditOutlined, LockOutlined, PoweroffOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { EditOutlined, LockOutlined, PoweroffOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import Plots from '@ant-design/plots';
 import global, { localeInit, localeValue, redirect, ModelKit, notEmpty, ajax } from '../global';
 
@@ -173,7 +173,7 @@ const Console = props => {
                         ]}
                     >
                         <Card.Meta
-                            avatar={<Avatar src={global.config.user.avatar ?? undefined} size={94} icon={<UserOutlined />} />}
+                            avatar={<Avatar src={global.config.user.avatar} size={94} />}
                             title={global.config.user.name}
                             description={<><p>{global.config.user.account}</p><p>{global.config.user.role}</p></>}
                             style={{ height: 103 }}

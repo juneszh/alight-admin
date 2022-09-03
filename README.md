@@ -20,6 +20,7 @@ $ composer create-project juneszh/alight-project {PROJECT_DIRECTORY}
 The following commands will build the runtime environment required by **Alight Admin**, such as installing composer package, inserting configuration options, creating database tables, and downloading front-end resources. Please make sure the [database has been configured](https://github.com/juneszh/alight#database).
 ```bash
 $ cd {PROJECT_DIRECTORY} 
+$ composer require juneszh/alight-admin
 $ composer run-script admin-install
 ```
 

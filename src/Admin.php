@@ -21,6 +21,7 @@ use Exception;
 use Symfony\Component\VarExporter\Exception\ExceptionInterface;
 use InvalidArgumentException;
 use PDOException;
+use PharData;
 use Symfony\Component\VarExporter\VarExporter;
 
 class Admin
@@ -104,6 +105,10 @@ class Admin
      */
     public static function install()
     {
+        if (PHP_SAPI !== 'cli') {
+            throw new Exception('Php-cli mode required.');
+        }
+
         $configFile = realpath('config/app.php');
         if (!$configFile) {
             throw new Exception('Missing configuration file: config/app.php');
@@ -370,7 +375,34 @@ class Admin
      */
     public static function download()
     {
-        $version = InstalledVersions::getVersion('juneszh/alight');
-        echo $version;
+        if (PHP_SAPI !== 'cli') {
+            throw new Exception('Php-cli mode required.');
+        }
+
+        $package = 'juneszh/alight-admin';
+        $version = InstalledVersions::getPrettyVersion($package);
+        echo $version . PHP_EOL;
+
+        if ($version[0] !== 'v') {
+            echo 'Unable to download about version: ', $version, PHP_EOL;
+        } else {
+            $url = 'https://github.com/' . $package . '/releases/download/' . $version . '/build.tar.gz';
+            $dir = App::root('storage/admin/');
+            $file = $dir . '/build.tar.gz';
+
+            if (!is_dir($dir)) {
+                if (!mkdir($dir, 0777, true)) {
+                    throw new Exception('Failed to create download directory.');
+                }
+            } else {
+                exec('rm -rf ' . $dir . '/*');
+            }
+
+            if (copy($url, $file)) {
+                $phar = new PharData($file);
+                $phar->decompress();
+                $phar->extractTo($dir);
+            }
+        }
     }
 }

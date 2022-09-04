@@ -1,0 +1,39 @@
+name: Build and Upload
+
+on:
+  release:
+    types: [published]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+       run:
+         working-directory: ./npm/
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js 16.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+        cache: npm
+        cache-dependency-path: npm/package-lock.json
+    - run: echo 'BUILD_PATH=' > .env.production.local
+    - run: npm ci
+    - run: npm run build --if-present
+    - name: Archive Release
+      uses: thedoctor0/zip-release@main
+      with:
+        type: tar
+        filename: build.tar.gz
+        directory: ./npm/
+        path: build
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./npm/build.tar.gz
+        asset_name: build.tar.gz
+        asset_content_type: application/gzip

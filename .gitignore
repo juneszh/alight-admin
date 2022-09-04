@@ -14,5 +14,3 @@ yarn-error.log*
 /npm/node_modules
 /npm/coverage
 /npm/build
-/npm/package-lock.json
-/npm/map.html

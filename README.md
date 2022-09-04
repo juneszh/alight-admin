@@ -2,7 +2,9 @@
 Alight Admin is a quick admin panel extension based on the  [Alight framework](https://github.com/juneszh/alight).
 
 ![desktop screenshot](example/image/screenshot_1.png)
+
 ![desktop screenshot](example/image/screenshot_2.png)
+
 ## Features
 * **No front-end coding required**. Built-in **Ant Design UI** (React) components and driven by PHP interface.
 * Quickly build and easily configure **CRUD** pages with Table/From render.

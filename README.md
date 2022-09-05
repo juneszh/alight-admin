@@ -1,4 +1,4 @@
-# Alight Admin
+# Alight-Admin
 Alight Admin is a quick admin panel extension based on the  [Alight framework](https://github.com/juneszh/alight).
 
 ![desktop screenshot](example/image/screenshot_1.png)
@@ -11,15 +11,26 @@ Alight Admin is a quick admin panel extension based on the  [Alight framework](h
 * Includes **authorization**, **permissions** and **user management**.
 * Customizable **Charts** displayed in the console by PHP, such as **Line**, **Column**, **Pie**, etc.
 
+## Alight Family
+
+| Project     | Description     |
+| --- | --- |
+| [Alight](https://github.com/juneszh/alight)  | Basic framework built-in routing, database, caching, etc. |
+| [Alight-Admin](https://github.com/juneszh/alight-admin)  | A full admin panel extension based on Alight. No front-end coding required.|
+| [Alight-Project](https://github.com/juneszh/alight-project) | A template for beginner to easily create web applications by Alight/Alight-Admin. |
+
+## Requirements
+PHP 7.4+
+
 ## Usage
-Alight Admin can be quickly built using [Alight Project](https://github.com/juneszh/alight-project).
+Alight Admin can be quickly built using [Alight-Project](https://github.com/juneszh/alight-project).
 ### Creating Project
 ```bash
 $ composer create-project juneszh/alight-project {PROJECT_DIRECTORY} 
 ```
 
 ### Initialize Admin
-The following commands will build the runtime environment required by **Alight Admin**, such as installing composer package, inserting configuration options, creating database tables, and downloading front-end resources. Please make sure the [database has been configured](https://github.com/juneszh/alight#database).
+The following commands will build the runtime environment required by **Alight-Admin**, such as installing composer package, inserting configuration options, creating database tables, and downloading front-end resources. Please make sure the [database has been configured](https://github.com/juneszh/alight#database).
 ```bash
 $ cd {PROJECT_DIRECTORY} 
 $ composer require juneszh/alight-admin

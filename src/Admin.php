@@ -106,7 +106,7 @@ class Admin
     public static function install()
     {
         if (PHP_SAPI !== 'cli') {
-            throw new Exception('Php-cli mode required.');
+            throw new Exception('PHP-CLI required.');
         }
 
         $configFile = realpath('config/app.php');
@@ -376,12 +376,11 @@ class Admin
     public static function download()
     {
         if (PHP_SAPI !== 'cli') {
-            throw new Exception('Php-cli mode required.');
+            throw new Exception('PHP-CLI required.');
         }
 
         $package = 'juneszh/alight-admin';
         $version = InstalledVersions::getPrettyVersion($package);
-        echo $version . PHP_EOL;
 
         if ($version[0] !== 'v') {
             echo 'Unable to download about version: ', $version, PHP_EOL;
@@ -398,7 +397,9 @@ class Admin
                 exec('rm -rf ' . $dir . '/*');
             }
 
-            if (copy($url, $file)) {
+            exec('wget -O ' . $file . ' ' . $url);
+
+            if (file_exists($file)) {
                 $phar = new PharData($file);
                 $phar->decompress();
                 $phar->extractTo($dir);

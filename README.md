@@ -1,5 +1,5 @@
 # Alight-Admin
-Alight Admin is a quick admin panel extension based on the  [Alight framework](https://github.com/juneszh/alight).
+Alight-Admin is a quick admin panel extension based on the  [Alight framework](https://github.com/juneszh/alight).
 
 ![desktop screenshot](example/image/screenshot_1.png)
 
@@ -23,7 +23,7 @@ Alight Admin is a quick admin panel extension based on the  [Alight framework](h
 PHP 7.4+
 
 ## Usage
-Alight Admin can be quickly built using [Alight-Project](https://github.com/juneszh/alight-project).
+Alight-Admin can be quickly built using [Alight-Project](https://github.com/juneszh/alight-project).
 ### Creating Project
 ```bash
 $ composer create-project juneszh/alight-project {PROJECT_DIRECTORY} 
@@ -35,6 +35,7 @@ The following commands will build the runtime environment required by **Alight-A
 $ cd {PROJECT_DIRECTORY} 
 $ composer require juneszh/alight-admin
 $ composer run-script admin-install
+$ composer run-script admin-download
 ```
 
 ## Credits

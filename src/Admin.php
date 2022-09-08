@@ -128,7 +128,7 @@ class Admin
     {
         $configData = require Config::$configFile;
         if (is_array($configData)) {
-            $routeAdmin = 'config/routes/admin.php';
+            $routeAdmin = 'config/route/admin.php';
             if ($configData['route']) {
                 $configRoute = is_string($configData['route']) ? [$configData['route']] : $configData['route'];
                 $associative = false;

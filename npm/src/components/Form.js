@@ -92,10 +92,10 @@ const Form = props => {
     );
 
     const columns = [];
-    let rowJustify = 'start';
-    let visibleColumnlength = 0;
+    let layout = 'horizontal';
     if (notEmpty(global.config.field)) {
         let column = {};
+
         for (const [fieldKey, fieldValue] of Object.entries(global.config.field)) {
             column = {
                 dataIndex: fieldKey,
@@ -111,10 +111,11 @@ const Form = props => {
                 if (fieldValue.type === 'upload') {
                     column.initialValue = [];
                     if (notEmpty(fieldValue.value)) {
+                        let basicUrl = fieldValue?.typeProps?.basicUrl ?? window.location.origin;
                         for (const value of Object.values(fieldValue.value)) {
                             let fileUrl = value;
                             if (fileUrl.substring(0, 4) !== 'http') {
-                                fileUrl = window.location.origin + (fileUrl[0] === '/' ? '' : '/') + fileUrl;
+                                fileUrl = basicUrl + (fileUrl[0] === '/' ? '' : '/') + fileUrl;
                             }
                             column.initialValue.push({
                                 status: 'done',
@@ -128,8 +129,22 @@ const Form = props => {
                 }
             }
 
-            if (['select', 'treeSelect', 'checkbox', 'radio', 'radioButton', 'cascader'].indexOf(fieldValue.type) !== -1) {
-                column.valueEnum = fieldValue.enum;
+            if (fieldValue.enum) {
+                if (fieldValue.locale) {
+                    column.valueEnum = {};
+                    for (const [enumKey, enumValue] of Object.entries(fieldValue.enum)) {
+                        if (typeof enumValue === 'string') {
+                            column.valueEnum[enumKey] = localeValue(enumValue);
+                        } else {
+                            column.valueEnum[enumKey] = enumValue;
+                            if (enumValue.text) {
+                                column.valueEnum[enumKey].text = localeValue(enumValue.text);
+                            }
+                        }
+                    }
+                } else {
+                    column.valueEnum = fieldValue.enum;
+                }
             }
 
             if (fieldValue.tooltip) {
@@ -187,30 +202,21 @@ const Form = props => {
 
             if (fieldValue.hide) {
                 column.formItemProps.hidden = fieldValue.hide;
-            } else {
-                ++visibleColumnlength;
             }
 
             if (fieldValue.readonly) {
                 column.proFieldProps.readonly = fieldValue.readonly;
             }
 
-            if (fieldValue.span) {
-                column.colProps.sm = fieldValue.span;
+            if (fieldValue.type === 'richText') {
+                layout = 'vertical';
             } else {
-                if (['textarea', 'code', 'jsonCode', 'upload', 'richText'].indexOf(fieldValue.type) !== -1) {
-                    column.colProps.sm = 24;
-                } else {
-                    column.colProps.sm = 12;
-                }
+                column.formItemProps.labelCol = { sm: 6 }
+                column.formItemProps.wrapperCol = fieldValue.grid ?? { sm: 14 }
             }
 
             columns.push(column);
         }
-    }
-
-    if (visibleColumnlength === 1) {
-        rowJustify = 'center';
     }
 
 
@@ -231,9 +237,10 @@ const Form = props => {
                 <BetaSchemaForm
                     shouldUpdate={false}
                     layoutType='Form'
-                    layout='vertical'
+                    layout={layout}
+                    labelWrap={true}
                     grid={true}
-                    rowProps={{ gutter: 24, justify: rowJustify }}
+                    rowProps={{ gutter: 24, justify: 'start' }}
                     columns={columns}
                     submitter={{
                         resetButtonProps: false,

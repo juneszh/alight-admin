@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Button, Space, Modal, message, Card, Row, Col, Statistic } from 'antd';
+import { Button, Space, Modal, message, Card, Grid, Row, Col, Statistic } from 'antd';
 import moment from 'moment';
 import { ProTable } from '@ant-design/pro-components';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
@@ -21,8 +21,11 @@ const Table = props => {
         refreshRate: 50
     });
 
+    const screens = Grid.useBreakpoint();
+
     const columns = [];
     let tableSearch;
+    let columnEllipsis;
     if (notEmpty(global.config.column)) {
         let column = {};
         for (const [columnKey, columnValue] of Object.entries(global.config.column)) {
@@ -56,19 +59,26 @@ const Table = props => {
                     column.search = true;
                 }
 
-                if (columnValue.enum) {
-                    if (columnValue.locale) {
-                        column.valueEnum = {};
-                        for (const [enumKey, enumValue] of Object.entries(columnValue.enum)) {
-                            column.valueEnum[enumKey] = localeValue(enumValue);
-                        }
-                    } else {
-                        column.valueEnum = columnValue.enum;
-                    }
-                }
-
                 if (columnValue.searchProps) {
                     column.fieldProps = columnValue.searchProps;
+                }
+            }
+
+            if (columnValue.enum) {
+                if (columnValue.locale) {
+                    column.valueEnum = {};
+                    for (const [enumKey, enumValue] of Object.entries(columnValue.enum)) {
+                        if (typeof enumValue === 'string') {
+                            column.valueEnum[enumKey] = localeValue(enumValue);
+                        } else {
+                            column.valueEnum[enumKey] = enumValue;
+                            if (enumValue.text) {
+                                column.valueEnum[enumKey].text = localeValue(enumValue.text);
+                            }
+                        }
+                    }
+                } else {
+                    column.valueEnum = columnValue.enum;
                 }
             }
 
@@ -95,11 +105,20 @@ const Table = props => {
                 column.tooltip = columnValue.tooltip;
             }
 
-            if (columnValue.ellipsis) {
-                column.ellipsis = columnValue.ellipsis;
+            if (columnValue.copyable) {
+                column.copyable = columnValue.copyable;
             }
 
-            if (columnValue.button) {
+            if (columnValue.ellipsis) {
+                column.ellipsis = columnValue.ellipsis;
+                columnEllipsis = true;
+            }
+
+            if (columnValue.html) {
+                column.render = (text, record, index, action) => {
+                    return <div dangerouslySetInnerHTML={{ __html: text }} />;
+                }
+            } else if (columnValue.button) {
                 column.render = (text, record, index, action) => {
                     let buttons = [];
                     if (notEmpty(columnValue.button)) {
@@ -275,6 +294,7 @@ const Table = props => {
             <ProTable
                 style={{ padding: 24 }}
                 cardBordered
+                scroll={(columnEllipsis && screens.xs) ? { x: 'max-content' } : undefined}
                 columns={columns}
                 actionRef={actionRef}
                 request={async (params = {}, sort, filter) => {
@@ -294,7 +314,7 @@ const Table = props => {
                 pagination={{
                     hideOnSinglePage: false,
                     defaultPageSize: 10,
-                    pageSizeOptions: [10, 20, 50, 100],
+                    pageSizeOptions: [10, 25, 50, 100],
                 }}
                 dateFormatter='string'
                 toolbar={{

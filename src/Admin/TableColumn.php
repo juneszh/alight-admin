@@ -137,16 +137,15 @@ class TableColumn
     /**
      * Set enum to replace value
      *
-     * @param array $keyValues [id=>name]|[[keyName=>x, valueName=>y], [keyName=>x, valueName=>y]]
-     * @param string $keyName
-     * @param string $valueName
+     * @param array $keyValues
      * @return TableColumn
+     * 
+     * @example Basic [key=>value, key=>value]
+     * @example Badge [key=>[text=>value, status=>status], key=>[text=>value, status=>status]]
+     * @see https://ant.design/components/badge/#Badge
      */
-    public function enum(array $keyValues, string $keyName = '', string $valueName = ''): TableColumn
+    public function enum(array $keyValues): TableColumn
     {
-        if ($keyName && $valueName) {
-            $keyValues = array_column($keyValues, $valueName, $keyName);
-        }
         Table::$config['column'][$this->key][__FUNCTION__] = $keyValues;
         return $this;
     }
@@ -215,11 +214,33 @@ class TableColumn
     }
 
     /**
+     * Set copyable
+     * 
+     * @return TableColumn 
+     */
+    public function copyable(): TableColumn
+    {
+        Table::$config['column'][$this->key][__FUNCTION__] = true;
+        return $this;
+    }
+
+    /**
      * Set ellipsis
      * 
      * @return TableColumn 
      */
     public function ellipsis(): TableColumn
+    {
+        Table::$config['column'][$this->key][__FUNCTION__] = true;
+        return $this;
+    }
+
+    /**
+     * Set html
+     * 
+     * @return TableColumn 
+     */
+    public function html(): TableColumn
     {
         Table::$config['column'][$this->key][__FUNCTION__] = true;
         return $this;

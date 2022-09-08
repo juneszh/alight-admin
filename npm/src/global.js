@@ -1,4 +1,4 @@
-import React, { useState, useImperativeHandle, forwardRef } from 'react';
+import React, { useState, useImperativeHandle, forwardRef, useCallback } from 'react';
 import { Modal, message } from 'antd';
 
 const $global = window.$global ?? {};
@@ -102,7 +102,7 @@ const ModelKit = forwardRef((props, ref) => {
         setIsModalVisible(false);
     };
 
-    const modalMessage = event => {
+    const modalMessage = useCallback(event => {
         if (event.origin === window.location.origin) {
             if (event.data.error === 0) {
                 modalClose();
@@ -113,7 +113,7 @@ const ModelKit = forwardRef((props, ref) => {
                 setIsModalHeight(event.data.height);
             }
         }
-    };
+    }, []);
 
     return (
         <Modal title={modalConfig.title}

@@ -66,7 +66,7 @@ class FormField
      * Set field (ProComponents) valueType
      *
      * @param string $value password|money|textarea|date|dateTime|dateWeek|dateMonth|dateQuarter|dateYear|dateRange|dateTimeRange|time|timeRange|text|select|treeSelect|checkbox|rate|radio|radioButton|progress|percent|digit|second|avatar|code|switch|fromNow|image|jsonCode|color|cascader|upload|richText
-     * @param array $props Props for Ant Design components. e.g. multiple select:['mode' => 'multiple'] or upload:['action' => 'api url', 'multiple' => true, 'data' => ['path' => 'test'], 'accept' => 'image/*,.pdf']
+     * @param array $props Props for Ant Design components. e.g. multiple select:['mode' => 'multiple'] or upload:['action' => 'api url', 'multiple' => true, 'data' => ['path' => 'test'], 'accept' => 'image/*,.pdf', 'basicUrl' => 'https://alight.cc']
      * @return FormField
      * 
      * @see https://procomponents.ant.design/en-US/components/schema#valuetype-%E5%88%97%E8%A1%A8
@@ -166,16 +166,15 @@ class FormField
     /**
      * Set enum to replace value
      *
-     * @param array $keyValues [id=>name]|[[keyName=>x, valueName=>y], [keyName=>x, valueName=>y]]
-     * @param string $keyName
-     * @param string $valueName
+     * @param array $keyValues
      * @return FormField
+     * 
+     * @example Basic [key=>value, key=>value]
+     * @example Badge [key=>[text=>value, status=>status], key=>[text=>value, status=>status]]
+     * @see https://ant.design/components/badge/#Badge
      */
-    public function enum(array $keyValues, string $keyName = '', string $valueName = ''): FormField
+    public function enum(array $keyValues): FormField
     {
-        if ($keyName && $valueName) {
-            $keyValues = array_column($keyValues, $valueName, $keyName);
-        }
         Form::$config[$this->form][$this->key][__FUNCTION__] = $keyValues;
 
         return $this;
@@ -264,12 +263,12 @@ class FormField
     }
 
     /**
-     * Set the grid span
+     * Set the grid
      * 
-     * @param int $value 1-24
+     * @param array $value
      * @return FormField 
      */
-    public function span(int $value): FormField
+    public function grid(array $value): FormField
     {
         Form::$config[$this->form][$this->key][__FUNCTION__] = $value;
         return $this;

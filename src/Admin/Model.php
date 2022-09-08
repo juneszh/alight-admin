@@ -28,7 +28,9 @@ class Model
     /**
      * Get role enum list
      * 
-     * @param array $filter 
+     * @param null|array $filter 
+     * @param null|string $enumKey 
+     * @param null|string $enumValue 
      * @return array 
      * @throws Exception 
      * @throws ErrorException 
@@ -37,7 +39,7 @@ class Model
      * @throws InvalidArgumentException 
      * @throws PDOException 
      */
-    public static function getRoleEnumList(array $filter = []): array
+    public static function getRoleEnumList(?array $filter = [], ?string $enumKey = null, ?string $enumValue = null): array
     {
         $cache = Cache::init();
         $cacheKey = 'admin_role_enum_list';
@@ -51,9 +53,7 @@ class Model
             $cache->set($cacheKey, $result, 86400);
         }
 
-        if ($filter) {
-            $result = Utility::arrayFilter($result, $filter);
-        }
+        $result = Utility::arrayFilter($result, $filter, $enumKey, $enumValue);
 
         return $result;
     }

@@ -74,6 +74,8 @@ const redirect = url => {
     }
 };
 
+let successCallback = undefined;
+
 const ModelKit = forwardRef((props, ref) => {
     const [modalVisible, setIsModalVisible] = useState(false);
     const [modalHeight, setIsModalHeight] = useState(136);
@@ -83,8 +85,6 @@ const ModelKit = forwardRef((props, ref) => {
         modalOpen,
         modalClose
     }))
-
-    let successCallback = undefined;
 
     const modalOpen = (button, params, success) => {
         successCallback = success;
@@ -96,24 +96,24 @@ const ModelKit = forwardRef((props, ref) => {
         });
         setIsModalVisible(true);
     };
-
-    const modalClose = () => {
-        window.removeEventListener('message', modalMessage);
-        setIsModalVisible(false);
-    };
-
+    
     const modalMessage = useCallback(event => {
         if (event.origin === window.location.origin) {
             if (event.data.error === 0) {
                 modalClose();
                 if (successCallback !== undefined) {
-                    successCallback(event);
+                    successCallback(event.data);
                 }
             } else if (event.data.height) {
                 setIsModalHeight(event.data.height);
             }
         }
     }, []);
+
+    const modalClose = () => {
+        window.removeEventListener('message', modalMessage);
+        setIsModalVisible(false);
+    };
 
     return (
         <Modal title={modalConfig.title}

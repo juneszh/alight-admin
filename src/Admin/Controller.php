@@ -46,7 +46,7 @@ class Controller
 
         $title = Config::get('title');
         $roleId = Auth::checkRole([]);
-        $menu = Menu::build($title, $roleId);
+        $menu = Menu::build($roleId);
 
         Response::render('public/alight-admin/index.html', ['title' => $title, 'script' => Admin::globalScript('Home', ['menu' => $menu])]);
     }
@@ -274,12 +274,12 @@ class Controller
     {
         Auth::checkRole([1]);
 
-        $roleEnum = Model::getRoleEnumList();
-        $statusEnum = [1 => ':enable', 2 => ':disable'];
+        $roleEnum = Model::getRoleEnumList(null, 'id', 'name');
+        $statusEnum = [1 => ['text' => ':enable', 'status' => 'Success'], 2 => ['text' => ':disable', 'status' => 'Error']];
 
         Table::column('id')->title('ID')->sort('ascend');
         Table::column('account')->title(':account')->search()->sort();
-        Table::column('role_id')->title(':role')->search('select')->enum($roleEnum, 'id', 'name');
+        Table::column('role_id')->title(':role')->search('select')->enum($roleEnum);
         Table::column('name')->title(':name')->search();
         Table::column('email')->title(':email')->search();
         Table::column('status')->title(':status')->search('select')->enum($statusEnum);
@@ -289,9 +289,6 @@ class Controller
         Table::button('add')->title(':add')->toolbar();
         Table::button('edit')->title(':edit');
         Table::button('password')->title(':password')->danger();
-        Table::button('status')->title(':enable')->column('status')->action('confirm')->param(['status' => 2])->if(['status' => 1])->type('primary');
-        Table::button('status')->title(':disable')->column('status')->action('confirm')->param(['status' => 1])->if(['status' => 2])->type('primary')->danger();
-        Table::button('status')->title(':disable')->batch()->param(['status' => 1]);
 
         Table::render('admin_user');
     }
@@ -317,11 +314,12 @@ class Controller
 
         Auth::checkRole($role);
 
-        $roleEnum = Model::getRoleEnumList();
+        $roleEnum = Model::getRoleEnumList(null, 'id', 'name');
+        $statusEnum = [1 => ':enable', 2 => ':disable'];
 
         Form::create('add');
         Form::field('account')->title(':account')->required();
-        Form::field('role_id')->title(':role')->type('select')->enum($roleEnum, 'id', 'name')->required()->default('1');
+        Form::field('role_id')->title(':role')->type('select')->enum($roleEnum)->required()->default('1');
         Form::field('name')->title(':name')->required();
         Form::field('email')->title(':email');
         Form::field('password')->title(':password')->type('password')->required();
@@ -330,19 +328,18 @@ class Controller
         Form::create('edit')->copy('add');
         Form::field('password')->delete();
         Form::field('confirm_password')->delete();
+        Form::field('status')->title(':status')->type('radio')->enum($statusEnum);
 
         Form::create('my_profile')->copy('edit');
         Form::field('account')->delete();
         Form::field('role_id')->delete();
+        Form::field('status')->delete();
 
         Form::create('password');
         Form::field('password')->title(':password')->type('password')->required();
         Form::field('confirm_password')->title(':confirm_password')->type('password')->required()->confirm('password');
 
         Form::create('my_password')->copy('password');
-
-        Form::create('status');
-        Form::field('status')->title(':status');
 
         Form::render('admin_user', function ($action, &$return) {
             if ($action == 'filter') {

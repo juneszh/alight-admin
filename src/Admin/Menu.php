@@ -67,7 +67,6 @@ class Menu
     /**
      * Get full menu configuration based on user role
      * 
-     * @param string $title 
      * @param int $roleId 
      * @return array 
      * @throws Exception 
@@ -75,7 +74,7 @@ class Menu
      * @throws InvalidArgumentException 
      * @throws InvalidArgumentException 
      */
-    public static function build(string $title, int $roleId): array
+    public static function build(int $roleId): array
     {
         $menuFile = App::root(Config::get('menu'));
         if ($menuFile && file_exists($menuFile)) {

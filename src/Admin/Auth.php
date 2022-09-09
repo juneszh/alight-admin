@@ -75,14 +75,14 @@ class Auth
         }
 
         if ($auth && $session) {
-            $userId = Model::getUserIdByHash($auth);
+            $userId = Model::getUserIdByKey($auth);
             if ($userId) {
                 $cache = Cache::init();
                 $cacheKey = 'admin_user_auth_' . $userId;
                 $authInfo = $cache->get($cacheKey);
                 if ($authInfo && $authInfo['session'] == $session) {
                     $userInfo = Model::getUserInfo($userId);
-                    if ($userInfo['status'] == 1 && ($authInfo['auth'] ?? '') == $userInfo['auth_hash']) {
+                    if ($userInfo['status'] == 1 && ($authInfo['auth'] ?? '') == $userInfo['auth_key']) {
                         return (int) $userId;
                     }
                 }
@@ -109,8 +109,8 @@ class Auth
             $session = trim(strip_tags($_COOKIE['admin_session'] ?? ''));
         } else {
             $userInfo = Model::getUserInfo($userId);
-            $auth = $userInfo['auth_hash'];
-            $session = Utility::uid();
+            $auth = $userInfo['auth_key'];
+            $session = Utility::randomHex();
         }
 
         $authInfo = [

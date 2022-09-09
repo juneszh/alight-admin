@@ -203,7 +203,7 @@ class Controller
         $builder = new \Gregwar\Captcha\CaptchaBuilder(null, $phraseBuilder);
         $code = $builder->build(130, 40)->getPhrase();
 
-        $captchaHash = Utility::uid();
+        $captchaHash = Utility::randomHex();
 
         $cache = Cache::init();
         $cache->set('admin_captcha_' . $captchaHash, $code, 300);
@@ -344,7 +344,7 @@ class Controller
         Form::render('admin_user', function ($action, &$return) {
             if ($action == 'filter') {
                 if (in_array(Request::$data['_form'], ['add', 'password', 'my_password'])) {
-                    $return['auth_hash'] = Utility::uid();
+                    $return['auth_key'] = Utility::randomHex();
                 }
             }
         });

@@ -205,7 +205,7 @@ class Admin
     private static function createTable()
     {
         $alightAccount = 'alight';
-        $alightPassword = Utility::uid(16);
+        $alightPassword = Utility::randomHex(16);
 
         $db = Database::init();
         $roleCreate = $db->create('admin_role', [
@@ -281,7 +281,7 @@ class Admin
                 "NOT NULL",
                 "DEFAULT '1'",
             ],
-            'auth_hash' => [
+            'auth_key' => [
                 "VARCHAR(32)",
                 "NOT NULL",
                 "DEFAULT ''",
@@ -293,7 +293,7 @@ class Admin
             ],
             'PRIMARY KEY (<id>)',
             'UNIQUE INDEX <account> (<account>)',
-            'INDEX <auth_hash> (<auth_hash>)',
+            'INDEX <auth_key> (<auth_key>)',
         ], [
             "ENGINE" => "InnoDB",
             "DEFAULT CHARSET" => "utf8mb4",
@@ -308,7 +308,7 @@ class Admin
                         'password' => password_hash($alightPassword, PASSWORD_DEFAULT),
                         'name' => 'Alight',
                         'role_id' => 1,
-                        'auth_hash' => Utility::uid(),
+                        'auth_key' => Utility::randomHex(),
                     ],
                 ]);
 

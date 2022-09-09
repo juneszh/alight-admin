@@ -61,7 +61,9 @@ class Model
     /**
      * Get user enum list
      * 
-     * @param array $filter 
+     * @param null|array $filter 
+     * @param null|string $enumKey 
+     * @param null|string $enumValue 
      * @return array 
      * @throws Exception 
      * @throws ErrorException 
@@ -70,7 +72,7 @@ class Model
      * @throws InvalidArgumentException 
      * @throws PDOException 
      */
-    public static function getUserEnumList(array $filter = []): array
+    public static function getUserEnumList(?array $filter = [], ?string $enumKey = null, ?string $enumValue = null): array
     {
         $cache = Cache::init();
         $cacheKey = 'admin_user_enum_list';
@@ -84,9 +86,7 @@ class Model
             $cache->set($cacheKey, $result, 86400);
         }
 
-        if ($filter) {
-            $result = Utility::arrayFilter($result, $filter);
-        }
+        $result = Utility::arrayFilter($result, $filter, $enumKey, $enumValue);
 
         return $result;
     }
@@ -123,24 +123,24 @@ class Model
     /**
      * Get user id by auth hash
      * 
-     * @param string $hash 
+     * @param string $key 
      * @return int 
      * @throws Exception 
      * @throws ErrorException 
      * @throws ExceptionInvalidArgumentException 
      * @throws ExceptionInvalidArgumentException 
      */
-    public static function getUserIdByHash(string $hash): int
+    public static function getUserIdByKey(string $key): int
     {
         $cache = Cache::init();
-        $cacheKey = 'admin_user_id_by_hash_' . $hash;
+        $cacheKey = 'admin_user_id_by_key_' . $key;
 
         if ($cache->has($cacheKey)) {
             return $cache->get($cacheKey);
         }
 
         $db = Database::init();
-        $result = $db->get('admin_user', 'id', ['auth_hash' => $hash]);
+        $result = $db->get('admin_user', 'id', ['auth_key' => $key]);
 
         if ($result) {
             $cache->set($cacheKey, (int) $result, 3600);

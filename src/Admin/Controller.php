@@ -275,7 +275,7 @@ class Controller
         Auth::checkRole([1]);
 
         $roleEnum = Model::getRoleEnumList(null, 'id', 'name');
-        $statusEnum = [1 => ['text' => ':enable', 'status' => 'Success'], 2 => ['text' => ':disable', 'status' => 'Error']];
+        $statusEnum = [1 => ['text' => ':enable', 'status' => 'success'], 2 => ['text' => ':disable', 'status' => 'error']];
 
         Table::column('id')->title('ID')->sort('ascend');
         Table::column('account')->title(':account')->search()->sort();

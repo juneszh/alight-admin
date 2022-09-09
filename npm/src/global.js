@@ -108,6 +108,7 @@ const ModelKit = forwardRef((props, ref) => {
                 setIsModalHeight(event.data.height);
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const modalClose = () => {

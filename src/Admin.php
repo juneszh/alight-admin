@@ -37,6 +37,8 @@ class Admin
         Route::beforeHandler([AdminConfig::class, 'init'], [$configKey]);
         Route::authHandler([Auth::class, 'verify']);
         Route::setAnyMethods(['GET', 'POST']);
+
+        AdminConfig::init($configKey);
         Route::group(AdminConfig::get('path'));
 
         Route::get('', [Controller::class, 'index'])->auth();

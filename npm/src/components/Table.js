@@ -231,7 +231,7 @@ const Table = props => {
         const action = button.action ?? (arrayRecord ? 'confirm' : 'modal');
         switch (action) {
             case 'modal':
-                modelRef.current?.modalOpen(button, params, () => {
+                modelRef.current?.modalShow(button, params, () => {
                     message.success(localeValue(':success'));
                     actionRef.current?.reload();
                 });

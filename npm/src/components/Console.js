@@ -18,7 +18,7 @@ const Console = props => {
     const [chartData, setChartData] = useState(chartDataInit);
 
     const editProfile = () => {
-        modelRef.current?.modalOpen({
+        modelRef.current?.modalShow({
             title: localeValue(':user_profile'),
             url: global.path + '/user/form'
         }, {
@@ -29,7 +29,7 @@ const Console = props => {
     };
 
     const changePassword = () => {
-        modelRef.current?.modalOpen({
+        modelRef.current?.modalShow({
             title: localeValue(':change_password'),
             url: global.path + '/user/form'
         }, {

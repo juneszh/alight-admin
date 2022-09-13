@@ -254,7 +254,7 @@ const Form = props => {
                         if (notEmpty(global.config.field)) {
                             for (const [key, value] of Object.entries(values)) {
                                 if (global.config.field[key].type === 'upload') {
-                                    values[key] = value.map(x => x['name']);
+                                    values[key] = value.map(e => e['name']);
                                 }
                             }
                         }

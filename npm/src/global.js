@@ -77,16 +77,17 @@ const redirect = url => {
 let successCallback = undefined;
 
 const ModelKit = forwardRef((props, ref) => {
-    const [modalVisible, setIsModalVisible] = useState(false);
+    const [modalOpen, setIsModalOpen] = useState(false);
+    const [modalDestroy, setIsModalDestroy] = useState(false);
     const [modalHeight, setIsModalHeight] = useState(136);
     const [modalConfig, setIsModalConfig] = useState({ title: '', url: '', width: 800 });
 
     useImperativeHandle(ref, () => ({
-        modalOpen,
-        modalClose
+        modalShow,
+        modalHide
     }))
 
-    const modalOpen = (button, params, success) => {
+    const modalShow = (button, params, success) => {
         successCallback = success;
         window.addEventListener('message', modalMessage);
         setIsModalConfig({
@@ -94,13 +95,15 @@ const ModelKit = forwardRef((props, ref) => {
             url: button.url + (params ? (button.url.indexOf('?') !== -1 ? '&' : '?') + new URLSearchParams(params).toString() : ''),
             width: button.width ?? 800,
         });
-        setIsModalVisible(true);
+        setIsModalDestroy(false);
+        setIsModalOpen(true);
     };
     
     const modalMessage = useCallback(event => {
         if (event.origin === window.location.origin) {
             if (event.data.error === 0) {
-                modalClose();
+                setIsModalDestroy(true);
+                modalHide();
                 if (successCallback !== undefined) {
                     successCallback(event.data);
                 }
@@ -111,17 +114,18 @@ const ModelKit = forwardRef((props, ref) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const modalClose = () => {
+    const modalHide = () => {
         window.removeEventListener('message', modalMessage);
-        setIsModalVisible(false);
+        setIsModalOpen(false);
     };
 
     return (
         <Modal title={modalConfig.title}
             centered
-            visible={modalVisible}
+            open={modalOpen}
+            destroyOnClose = {modalDestroy}
             footer={false}
-            onCancel={modalClose}
+            onCancel={modalHide}
             bodyStyle={{ display: 'flex', padding: 0, maxHeight: 'calc(90vh - 55px)', height: modalHeight, transition: 'height .2s ease-out' }}
             width={modalConfig.width}
         >

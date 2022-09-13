@@ -21,7 +21,7 @@ const Home = props => {
         e.preventDefault();
         switch (item.action ?? 'iframe') {
             case 'modal':
-                modelRef.current?.modalOpen(item);
+                modelRef.current?.modalShow(item);
                 break;
             case 'location':
                 window.location.assign(item.url);

@@ -189,7 +189,7 @@ class Form
                     } elseif (is_array($data[$k])) {
                         $return[$k] = join($separator, $data[$k]);
                     } else {
-                        $return[$k] = $data[$k];
+                        $return[$k] = isset($v['raw']) ? $data[$k] : trim($data[$k]);
                     }
                 }
             }

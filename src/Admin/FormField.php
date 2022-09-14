@@ -20,7 +20,6 @@ class FormField
     private string $form;
     private string $key;
 
-
     /**
      * Define the configuration index
      * 
@@ -271,6 +270,17 @@ class FormField
     public function grid(array $value): FormField
     {
         Form::$config[$this->form][$this->key][__FUNCTION__] = $value;
+        return $this;
+    }
+
+    /**
+     * Keep the raw data when submit (trim default)
+     *
+     * @return FormField
+     */
+    public function raw(): FormField
+    {
+        Form::$config[$this->form][$this->key][__FUNCTION__] = true;
         return $this;
     }
 

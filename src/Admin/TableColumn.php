@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Alight\Admin;
 
-use Alight\Admin;
 use Exception;
 
 class TableColumn
@@ -92,12 +91,13 @@ class TableColumn
      *
      * @param string $value password|money|textarea|date|dateTime|dateWeek|dateMonth|dateQuarter|dateYear|dateRange|dateTimeRange|time|timeRange|text|select|treeSelect|checkbox|rate|radio|radioButton|progress|percent|digit|second|avatar|code|switch|fromNow|image|jsonCode|color|cascader
      * @param array $props $props Props for Ant Design components. e.g. multiple select:['mode' => 'multiple']
+     * @param bool $raw
      * @return TableColumn
      * 
      * @see https://procomponents.ant.design/en-US/components/schema#valuetype-%E5%88%97%E8%A1%A8
      * @see https://ant.design/components/overview/
      */
-    public function search(string $valueType = 'text[~]', array $props = []): TableColumn
+    public function search(string $valueType = 'text[~]', array $props = [], bool $raw = false): TableColumn
     {
         $valueTypeLimit = [
             'money',
@@ -130,7 +130,15 @@ class TableColumn
         }
 
         Table::$config['column'][$this->key][__FUNCTION__] = $valueType;
-        Table::$config['column'][$this->key][__FUNCTION__ . 'Props'] = $props;
+
+        if ($props) {
+            Table::$config['column'][$this->key][__FUNCTION__ . 'Props'] = $props;
+        }
+
+        if ($raw) {
+            Table::$config['column'][$this->key][__FUNCTION__ . 'Raw'] = $raw;
+        }
+
         return $this;
     }
 

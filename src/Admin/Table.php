@@ -230,7 +230,7 @@ class Table
         if ($column) {
             foreach ($column as $k => $v) {
                 if ($v['database'] && isset($v['search']) && isset($data[$k])) {
-                    $_v = trim($data[$k]);
+                    $_v = isset($v['searchRaw']) ? $data[$k] : trim($data[$k]);
                     if ($_v || is_numeric($_v)) {
                         if ($v['search'] === 'text[~]') {
                             $return[$k . '[~]'] = $_v;

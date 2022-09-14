@@ -82,12 +82,18 @@ class Form
      */
     public static function render(string $table, ?callable $middleware = null)
     {
-        Request::$data['_id'] = trim(strip_tags(Request::$data['_id'] ?? ''));
-        Request::$data['_form'] = trim(strip_tags(Request::$data['_form'] ?? ''));
-        Request::$data['_title'] = trim(strip_tags(Request::$data['_title'] ?? ''));
+        Request::$data['_id'] = (int) (Request::$data['_id'] ?? 0);
+        Request::$data['_form'] = trim(Request::$data['_form'] ?? '');
+        Request::$data['_title'] = trim(Request::$data['_title'] ?? '');
 
-        if (strpos(Request::$data['_id'], '|') !== false) {
-            Request::$data['_id'] = explode('|', Request::$data['_id']);
+        $separator = (string) Config::get('join');
+        if (isset(Request::$data['_ids'])) {
+            if (is_string(Request::$data['_ids'])) {
+                Request::$data['_ids'] = explode($separator, Request::$data['_ids']);
+            }
+            if (Request::$data['_ids']) {
+                Request::$data['_ids'] = array_values(array_filter(array_map('intval', Request::$data['_ids'])));
+            }
         }
 
         $userId = Auth::getUserId();
@@ -102,15 +108,15 @@ class Form
 
         if (!Request::isAjax()) {
             $value = [];
-            if ($table && Request::$data['_id'] && !is_array(Request::$data['_id'])) {
-                $value = Model::formGet($table, (int) Request::$data['_id']);
+            if ($table && Request::$data['_id']) {
+                $value = Model::formGet($table, Request::$data['_id']);
             }
             foreach ($field as $k => $v) {
                 if ($value && isset($value[$k]) && $field[$k]['type'] !== 'password') {
                     $field[$k]['value'] = $value[$k];
                 }
                 if (isset($field[$k]['value']) && (in_array($field[$k]['type'], ['checkbox', 'upload']) || ($field[$k]['typeProps']['mode'] ?? '') === 'multiple')) {
-                    $field[$k]['value'] = explode('|', $field[$k]['value']);
+                    $field[$k]['value'] = explode($separator, $field[$k]['value']);
                 }
             }
 
@@ -133,7 +139,9 @@ class Form
 
             $rsId = 0;
             if ($table && $sqlData) {
-                if (Request::$data['_id']) {
+                if (isset(Request::$data['_ids']) && Request::$data['_ids']) {
+                    $rsId = Model::formUpdateMultiple($table, $sqlData, Request::$data['_ids']);
+                } elseif (Request::$data['_id']) {
                     $rsId = Model::formUpdate($table, $sqlData, Request::$data['_id']);
                 } else {
                     $rsId = Model::formInsert($table, $sqlData);
@@ -167,6 +175,7 @@ class Form
     private static function dataFilter(array $field, array $data): array
     {
         $return = [];
+        $separator = (string) Config::get('join');
         foreach ($field as $k => $v) {
             if ($v['database'] && !isset($v['disabled'])) {
                 if (isset($data[$k])) {
@@ -177,10 +186,8 @@ class Form
                         }
                     } elseif ($v['type'] === 'password') {
                         $return[$k] = password_hash($data[$k], PASSWORD_DEFAULT);
-                    } elseif (in_array($v['type'], ['checkbox', 'upload']) && is_array($data[$k])) {
-                        $return[$k] = join('|', $data[$k]);
-                    } elseif ($v['type'] === 'select' && ($v['typeProps']['mode'] ?? '') === 'multiple') {
-                        $return[$k] = join('|', $data[$k]);
+                    } elseif (is_array($data[$k])) {
+                        $return[$k] = join($separator, $data[$k]);
                     } else {
                         $return[$k] = $data[$k];
                     }

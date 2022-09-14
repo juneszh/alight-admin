@@ -210,7 +210,7 @@ const Table = props => {
         params._form = button.form;
         if (notEmpty(record)) {
             if (arrayRecord) {
-                params._id = record.join('|');
+                params._ids = record.join(global.join);
             } else {
                 params._id = record.id;
             }

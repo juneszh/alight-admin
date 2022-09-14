@@ -350,8 +350,8 @@ class Model
      * 
      * @param string $table 
      * @param array $data 
-     * @param mixed $id 
-     * @return mixed 
+     * @param int $id 
+     * @return int 
      * @throws Exception 
      * @throws InvalidArgumentException 
      * @throws PDOException 
@@ -359,25 +359,48 @@ class Model
      * @throws ExceptionInvalidArgumentException 
      * @throws ExceptionInvalidArgumentException 
      */
-    public static function formUpdate(string $table, array $data, $id)
+    public static function formUpdate(string $table, array $data, int $id): int
     {
         $db = Database::init();
         $result = $db->update($table, $data, ['id' => $id]);
 
         if ($result->rowCount()) {
             $cache = Cache::init();
-            if (is_array($id)) {
-                $cacheKey = [];
-                foreach ($id as $_id) {
-                    $cacheKey[] = $table . '_info_' . $_id;
-                }
-                $cache->deleteMultiple($cacheKey);
-            } else {
-                $cacheKey = $table . '_info_' . $id;
-                $cache->delete($cacheKey);
-            }
+            $cacheKey = $table . '_info_' . $id;
+            $cache->delete($cacheKey);
         }
 
-        return $result->rowCount() ? $id : (!$db->error ? $id : null);
+        return $result->rowCount() ? $id : (!$db->error ? $id : 0);
+    }
+
+    /**
+     * Update multiple data for Form
+     * 
+     * @param string $table 
+     * @param array $data 
+     * @param array $id 
+     * @return array 
+     * @throws Exception 
+     * @throws InvalidArgumentException 
+     * @throws PDOException 
+     * @throws ErrorException 
+     * @throws ExceptionInvalidArgumentException 
+     * @throws ExceptionInvalidArgumentException 
+     */
+    public static function formUpdateMultiple(string $table, array $data, array $id): array
+    {
+        $db = Database::init();
+        $result = $db->update($table, $data, ['id' => $id]);
+
+        if ($result->rowCount()) {
+            $cache = Cache::init();
+            $cacheKey = [];
+            foreach ($id as $_id) {
+                $cacheKey[] = $table . '_info_' . $_id;
+            }
+            $cache->deleteMultiple($cacheKey);
+        }
+
+        return $result->rowCount() ? $id : (!$db->error ? $id : []);
     }
 }

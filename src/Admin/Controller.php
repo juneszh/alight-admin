@@ -64,9 +64,9 @@ class Controller
     public static function login()
     {
         if (Request::method() === 'POST') {
-            $account = trim(strip_tags(Request::$body['account'] ?? ''));
-            $password = trim(Request::$body['password'] ?? '');
-            $captchaCode = trim(strip_tags(Request::$body['captcha'] ?? ''));
+            $account = Request::$body['account'] ?? '';
+            $password = Request::$body['password'] ?? '';
+            $captchaCode = Request::$body['captcha'] ?? '';
 
             if (!$account || !$password || !$captchaCode) {
                 Response::api(1001, ':missing_param');
@@ -284,7 +284,6 @@ class Controller
         Table::column('email')->title(':email')->search();
         Table::column('status')->title(':status')->search('select')->enum($statusEnum);
         Table::column('create_time')->title(':create_time');
-        Table::column('_action')->database(false)->title(':action')->fixed('right');
 
         Table::button('add')->title(':add')->toolbar();
         Table::button('edit')->title(':edit');
@@ -357,7 +356,7 @@ class Controller
      */
     public static function upload()
     {
-        $path = trim(strip_tags(Request::$data['path'] ?? ''));
+        $path = trim(Request::$data['path'] ?? '');
         $local = (int) (Request::$data['local'] ?? 0);
         $keepName = (int) (Request::$data['keep'] ?? 0);
         $tinymce = (int) (Request::$data['tinymce'] ?? 0);

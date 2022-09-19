@@ -27,7 +27,6 @@ class Table
 {
     public static array $config = [];
     private static int $buttonIndex = 0;
-    private static int $statisticIndex = 0;
 
     /**
      * Create a colum
@@ -69,21 +68,34 @@ class Table
     }
 
     /**
-     * Create a statistic
+     * Create a column summary
      * 
      * @param string $key 
-     * @return TableStatistic 
+     * @return TableSummary 
      */
-    public static function statistic(string $key): TableStatistic
+    public static function summary(string $key): TableSummary
     {
-        ++self::$statisticIndex;
-        self::$config[__FUNCTION__][self::$statisticIndex] = [
-            'key' => $key,
-            'title' => ':sum',
+        self::$config[__FUNCTION__][$key] = [
             'type' => 'sum',
         ];
 
-        return new TableStatistic(self::$statisticIndex);
+        return new TableSummary($key);
+    }
+
+    /**
+     * Create a statistic
+     * 
+     * @param string $key 
+     * @return TableStatistic
+     */
+    public static function statistic(string $key): TableStatistic
+    {
+        self::$config[__FUNCTION__][$key] = [
+            'key' => $key,
+            'title' => $key,
+        ];
+
+        return new TableStatistic($key);
     }
 
     /**
@@ -100,16 +112,6 @@ class Table
      */
     public static function render(string $table, ?callable $middleware = null)
     {
-
-        $page = (int) (Request::$data['current'] ?? 1);
-        $limit = (int) (Request::$data['pageSize'] ?? 20);
-        $limit = $limit < 100 ? $limit : 100;
-        $order = trim(Request::$data['_order'] ?? '') ?: 'id';
-        $sort = trim(Request::$data['_sort'] ?? '') ?: 'asc';
-
-        $sortLimit = ['ascend' => 'asc', 'descend' => 'desc'];
-        $sort = $sortLimit[$sort] ?? 'asc';
-
         $userId = Auth::getUserId();
         $userInfo = Model::getUserInfo($userId);
 
@@ -156,11 +158,11 @@ class Table
                 }
             }
 
-            $statistic = [];
-            if (isset(Table::$config['statistic'])) {
-                foreach (Table::$config['statistic'] as $v) {
-                    if (isset($column[$v['key']])) {
-                        $statistic[] = $v;
+            $summary = [];
+            if (isset(Table::$config['summary'])) {
+                foreach (Table::$config['summary'] as $k => $v) {
+                    if (isset($column[$k])) {
+                        $summary[$k] = $v;
                     }
                 }
             }
@@ -169,7 +171,8 @@ class Table
                 'column' => $column,
                 'toolbar' => $toolbar,
                 'batch' => $batch,
-                'statistic' => $statistic,
+                'summary' => $summary,
+                'statistic' => Table::$config['statistic'] ?? [],
             ];
 
             if (is_callable($middleware)) {
@@ -180,6 +183,15 @@ class Table
 
             Response::render('public/alight-admin/index.html', ['title' => Request::$data['_title'] ?? '', 'script' => Admin::globalScript('Table', $renderData)]);
         } else {
+            $page = (int) (Request::$data['current'] ?? 1);
+            $limit = (int) (Request::$data['pageSize'] ?? 20);
+            $limit = $limit < 100 ? $limit : 100;
+            $order = trim(Request::$data['_order'] ?? '') ?: 'id';
+            $sort = trim(Request::$data['_sort'] ?? '') ?: 'asc';
+
+            $sortLimit = ['ascend' => 'asc', 'descend' => 'desc'];
+            $sort = $sortLimit[$sort] ?? 'asc';
+
             $column = [];
             if (isset(Table::$config['column'])) {
                 foreach (Table::$config['column'] as $k => $v) {
@@ -210,7 +222,7 @@ class Table
             ];
 
             if (is_callable($middleware)) {
-                $middleware('return', $resData);
+                $middleware('api', $resData);
             }
 
             Response::api(0, $resData);

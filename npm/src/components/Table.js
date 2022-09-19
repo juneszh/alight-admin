@@ -13,7 +13,8 @@ const Table = props => {
     const actionRef = useRef();
     const modelRef = useRef();
 
-    const [statJustify, setStatJustify] = useState('space-evenly');
+    const [requestStatistic, setRequestStatistic] = useState({});
+    const [statisticJustify, setStatisticJustify] = useState('space-evenly');
 
     const statSize = useResizeDetector({
         handleWidth: false,
@@ -178,12 +179,13 @@ const Table = props => {
                                         danger={buttonValue.danger ?? undefined}
                                         size='small'
                                         onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, record); }}
-                                    >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
+                                        children={buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}
+                                    />
                                 );
                             }
                         }
                     }
-                    return buttons ? <Space wrap>{buttons}</Space> : null;
+                    return buttons ? <Space wrap children={buttons} /> : null;
                 };
             }
 
@@ -275,16 +277,17 @@ const Table = props => {
                 href={buttonHref(buttonValue)}
                 danger={buttonValue.danger ?? undefined}
                 onClick={(e) => { e.preventDefault(); buttonAction(buttonValue); }}
-            >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>);
+                children={buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}
+            />);
         }
     }
 
     useEffect(() => {
         if (statSize.height) {
             if (statSize.height > 100) {
-                setStatJustify('space-between');
+                setStatisticJustify('start');
             } else {
-                setStatJustify('space-evenly');
+                setStatisticJustify('space-evenly');
             }
         }
     }, [statSize.height]);
@@ -303,12 +306,23 @@ const Table = props => {
                         params._sort = sort[params._order];
                     }
                     const result = await ajax(window.location.pathname + '?' + new URLSearchParams(params).toString());
-                    return (result && result.error === 0) ? {
-                        success: true,
-                        data: result.data.list,
-                        total: result.data.count,
-                    } : false;
+                    if (result && result.error === 0) {
+                        setRequestStatistic(result.data.statistic ?? {});
+                        return {
+                            success: true,
+                            data: result.data.list,
+                            total: result.data.count,
+                        };
+                    } else {
+                        setRequestStatistic({});
+                        return {
+                            success: false,
+                            data: [],
+                            total: 0,
+                        };
+                    }
                 }}
+                revalidateOnFocus={false}
                 rowKey='id'
                 search={tableSearch ? { labelWidth: 'auto' } : false}
                 pagination={{
@@ -332,45 +346,102 @@ const Table = props => {
                                     href={buttonHref(buttonValue, selectedRowKeys)}
                                     danger={buttonValue.danger ?? undefined}
                                     onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, selectedRowKeys); }}
-                                >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
+                                    children={buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}
+                                />
                             );
                         }
                     }
-                    return <Space wrap>{buttons}</Space>;
+                    return <Space wrap children={buttons} />;
                 }}
-                columnsState={{
-                    persistenceKey: window.location.pathname,
-                    persistenceType: 'sessionStorage',
+                options={{
+                    setting: false
                 }}
+                summary={notEmpty(global.config.summary) ? pageData => {
+                    let sumVisible = false;
+                    let avgVisible = false;
+                    let sumCells = [];
+                    let avgCells = [];
+
+                    if (notEmpty(columns) && notEmpty(pageData)) {
+                        let titleIndex = '0';
+                        let summaryColumns = [];
+
+                        if (notEmpty(global.config.batch.button)) {
+                            titleIndex = '1';
+                            summaryColumns.push('_batch')
+                        }
+                        for (const column of Object.values(columns)) {
+                            summaryColumns.push(column.dataIndex)
+                        }
+
+                        for (const [index, key] of Object.entries(summaryColumns)) {
+                            if (global.config.summary[key]) {
+                                let precision = global.config.summary[key].precision ?? 2;
+                                let sum = pageData.reduce((pre, cur) => +cur[key] + pre, 0);
+                                let result = sum.toFixed(precision);
+                                sumVisible = true;
+                                sumCells.push(
+                                    <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
+                                        {index === titleIndex ? <><span style={{ float: 'left' }} children={localeValue(':sum')} />{result}</> : result}
+                                    </ProTable.Summary.Cell>
+                                );
+                                if (global.config.summary[key].type === 'sum') {
+                                    avgCells.push(
+                                        <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
+                                            {index === titleIndex ? <span style={{ float: 'left' }} children={localeValue(':avg')} /> : undefined}
+                                        </ProTable.Summary.Cell>
+                                    );
+                                } else {
+                                    avgVisible = true;
+                                    result = (sum / pageData.length).toFixed(precision);
+                                    avgCells.push(
+                                        <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
+                                            {index === titleIndex ? <><span style={{ float: 'left' }} children={localeValue(':avg')} />{result}</> : result}
+                                        </ProTable.Summary.Cell>
+                                    );
+                                }
+                            } else {
+                                sumCells.push(
+                                    <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
+                                        {index === titleIndex ? <span style={{ float: 'left' }} children={localeValue(':sum')} /> : undefined}
+                                    </ProTable.Summary.Cell>
+                                );
+                                avgCells.push(
+                                    <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
+                                        {index === titleIndex ? <span style={{ float: 'left' }} children={localeValue(':avg')} /> : undefined}
+                                    </ProTable.Summary.Cell>
+                                );
+                            }
+                        }
+                    }
+
+                    return sumVisible || avgVisible ? (
+                        <ProTable.Summary>
+                            {sumVisible ? (<ProTable.Summary.Row style={{ textAlign: 'right' }} children={sumCells} />) : undefined}
+                            {avgVisible ? (<ProTable.Summary.Row style={{ textAlign: 'right' }} children={avgCells} />) : undefined}
+                        </ProTable.Summary>
+                    ) : undefined;
+                } : undefined}
                 tableExtraRender={notEmpty(global.config.statistic) ? (_, pageData) => {
                     const statistic = [];
-                    for (const value of Object.values(global.config.statistic)) {
-                        let result = pageData.reduce((pre, cur) => +cur[value.key] + pre, 0);
-                        if (value.type === 'avg') {
-                            result = result / pageData.length;
+                    for (const [key, value] of Object.entries(global.config.statistic)) {
+                        let statValue = value.value ?? undefined;
+                        if (notEmpty(requestStatistic)) {
+                            statValue = requestStatistic[key] ?? statValue;
                         }
-                        let columnTitle = localeValue(global.config.column[value.key].title);
-                        let statisticTitle = localeValue(value.title).replace('{{field}}', columnTitle);
                         statistic.push(
                             <Col>
                                 <Statistic
-                                    valueStyle={{ textAlign: 'center' }}
-                                    title={statisticTitle}
-                                    value={result}
-                                    precision={(value.precision && value.precision > -1) ? value.precision : undefined}
-                                    prefix={(value.prefix) ?? undefined}
-                                    suffix={(value.suffix) ?? undefined}
-                                    groupSeparator={(value.thousandsSeparator) ?? undefined}
-                                    decimalSeparator={(value.decimalSeparator) ?? undefined}
+                                    style={{ textAlign: 'center' }}
+                                    title={value.title}
+                                    value={statValue}
                                 />
                             </Col>
                         );
                     }
                     return (
                         <Card>
-                            <Row gutter={[16, 16]} justify={statJustify} ref={statSize.ref}>
-                                {statistic}
-                            </Row>
+                            <Row gutter={[16, 16]} justify={statisticJustify} ref={statSize.ref} children={statistic} />
                         </Card>
                     );
                 } : undefined}

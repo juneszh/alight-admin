@@ -41,8 +41,8 @@ const i18n = {
     ':success': '操作成功',
     ':confirm_password': '确认密码',
     ':confirm_field': '与{{field}}不一致',
-    ':sum': '{{field}}合计',
-    ':avg': '{{field}}平均',
+    ':sum': '合计',
+    ':avg': '平均',
     ':upload_failed': '上传失败',
 };
 

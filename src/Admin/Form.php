@@ -154,7 +154,7 @@ class Form
                 $cache->delete($table . '_enum_list');
 
                 if (is_callable($middleware)) {
-                    $middleware('return', $rsId);
+                    $middleware('api', $rsId);
                 }
 
                 Model::userLog($userId, true);

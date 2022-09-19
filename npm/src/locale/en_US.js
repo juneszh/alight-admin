@@ -41,8 +41,8 @@ const i18n = {
     ':success': 'Success',
     ':confirm_password': 'Confirm password',
     ':confirm_field': 'Different from {{field}}',
-    ':sum': 'Sum of {{field}}',
-    ':avg': 'Avg of {{field}}',
+    ':sum': 'Sum',
+    ':avg': 'Avg',
     ':upload_failed': 'Upload failed',
 };
 

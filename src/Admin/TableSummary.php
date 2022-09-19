@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace Alight\Admin;
 
-class TableStatistic
+class TableSummary
 {
     private string $key;
 
     /**
      * Define the configuration index
      * 
-     * @param string $key
-     * @return TableStatistic 
+     * @param string $key 
+     * @return TableSummary 
      */
     public function __construct(string $key)
     {
@@ -30,26 +30,25 @@ class TableStatistic
     }
 
     /**
-     * Set title
+     * Set average value
      * 
-     * @param string $value 
-     * @return TableStatistic 
+     * @return TableSummary 
      */
-    public function title(string $value): TableStatistic
+    public function avg(): TableSummary
     {
-        Table::$config['statistic'][$this->key][__FUNCTION__] = $value;
+        Table::$config['summary'][$this->key]['type'] = __FUNCTION__;
         return $this;
     }
 
     /**
-     * Set value
+     * Set precision
      * 
-     * @param mixed $value 
-     * @return TableStatistic 
+     * @param int $number 
+     * @return TableSummary 
      */
-    public function value($value): TableStatistic
+    public function precision(int $number): TableSummary
     {
-        Table::$config['statistic'][$this->key][__FUNCTION__] = $value;
+        Table::$config['summary'][$this->key][__FUNCTION__] = $number;
         return $this;
     }
 }

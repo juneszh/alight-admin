@@ -129,6 +129,8 @@ class Admin
      */
     private static function insertConfig()
     {
+        exec('cp -rn ' . App::root('vendor/juneszh/alight-admin/example/config/*') . ' ' . App::root('config/'));
+
         $configData = require Config::$configFile;
         if (is_array($configData)) {
             $routeAdmin = 'config/route/admin.php';
@@ -389,7 +391,8 @@ class Admin
             echo 'Unable to download about version: ', $version, PHP_EOL;
         } else {
             $url = 'https://github.com/' . $package . '/releases/download/' . $version . '/build.tar.gz';
-            $dir = App::root('storage/admin/');
+            $storagePath = Config::get('app', 'storagePath') ?: 'storage';
+            $dir = App::root($storagePath . '/admin/');
             $file = $dir . '/build.tar.gz';
 
             if (!is_dir($dir)) {
@@ -405,7 +408,11 @@ class Admin
             if (file_exists($file)) {
                 $phar = new PharData($file);
                 $phar->decompress();
-                $phar->extractTo($dir);
+                $result = $phar->extractTo($dir);
+
+                if ($result) {
+                    exec('rm -rf ' . App::root('public/alight-admin/') . ' && mkdir ' . App::root('public/alight-admin/') . ' && cp -r ' . App::root($storagePath . '/admin/build/*') . ' ' . App::root('public/alight-admin/'));
+                }
             }
         }
     }

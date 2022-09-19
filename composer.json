@@ -29,7 +29,7 @@
     },
     "require": {
         "php": ">=7.4",
-        "juneszh/alight": "^1.1",
+        "juneszh/alight": "*",
         "gregwar/captcha": "^1.1",
         "symfony/var-exporter": ">=5.4"
     }

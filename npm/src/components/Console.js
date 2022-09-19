@@ -132,9 +132,7 @@ const Console = props => {
             for (const [chartKey, chartValue] of Object.entries(global.config.chart)) {
                 return (
                     <Col {...chartValue.grid}>
-                        <Card>
-                            {chartComponent(chartKey, chartValue.component, chartValue.config)}
-                        </Card>
+                        <Card children={chartComponent(chartKey, chartValue.component, chartValue.config)} />
                     </Col>
                 );
             }

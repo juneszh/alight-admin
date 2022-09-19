@@ -72,9 +72,8 @@ const Home = props => {
                                 href={subValue.url + (subValue.url.indexOf('?') !== -1 ? '&' : '?') + '_title=' + (itemKey === '1' ? localeValue(subValue.title) : subValue.title)}
                                 rel='noopener noreferrer'
                                 onClick={e => menuAction(e, subValue)}
-                            >
-                                {itemKey === '1' ? localeValue(subValue.title) : subValue.title}
-                            </a>
+                                children={itemKey === '1' ? localeValue(subValue.title) : subValue.title}
+                            />
                         );
                     }
                     item.children.push(children);
@@ -87,9 +86,8 @@ const Home = props => {
                             href={itemValue.url + (itemValue.url.indexOf('?') !== -1 ? '&' : '?') + '_title=' + itemValue.title}
                             rel='noopener noreferrer'
                             onClick={e => menuAction(e, itemValue)}
-                        >
-                            {itemValue.title}
-                        </a>
+                            children={itemValue.title}
+                        />
                     );
                 }
             }

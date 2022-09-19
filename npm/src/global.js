@@ -98,7 +98,7 @@ const ModelKit = forwardRef((props, ref) => {
         setIsModalDestroy(false);
         setIsModalOpen(true);
     };
-    
+
     const modalMessage = useCallback(event => {
         if (event.origin === window.location.origin) {
             if (event.data.error === 0) {
@@ -123,7 +123,7 @@ const ModelKit = forwardRef((props, ref) => {
         <Modal title={modalConfig.title}
             centered
             open={modalOpen}
-            destroyOnClose = {modalDestroy}
+            destroyOnClose={modalDestroy}
             footer={false}
             onCancel={modalHide}
             bodyStyle={{ display: 'flex', padding: 0, maxHeight: 'calc(90vh - 55px)', height: modalHeight, transition: 'height .2s ease-out' }}
@@ -133,7 +133,7 @@ const ModelKit = forwardRef((props, ref) => {
                 title='modalFrame'
                 src={modalConfig.url}
                 style={{ border: 'none', flex: '1 1 auto' }}
-            ></iframe>
+            />
         </Modal>
     );
 });

@@ -39,9 +39,7 @@ const Login = props => {
             style={{ minHeight: '100vh', height: 'auto', backgroundColor: '#f0f2f5' }}
         >
             <Col style={{ width: '320px' }}>
-                <h1 style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '40px' }} >
-                    {global.title}
-                </h1>
+                <h1 style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '40px' }} children={global.title} />
                 <Form
                     form={form}
                     initialValues={{
@@ -111,18 +109,15 @@ const Login = props => {
                             type='primary'
                             htmlType='submit'
                             block
-                        >
-                            {localeValue(':login')}
-                        </Button>
+                            children={localeValue(':login')}
+                        />
                     </Form.Item>
                     <Form.Item
                         name='remember'
                         valuePropName='checked'
                         style={{ textAlign: 'right' }}
                     >
-                        <Checkbox>
-                            {localeValue(':remember')}
-                        </Checkbox>
+                        <Checkbox children={localeValue(':remember')} />
                     </Form.Item>
                 </Form>
             </Col>

@@ -19,9 +19,11 @@ const Error = props => {
             }
         }, 1000);
         return (
-            <Button type='primary' onClick={() => { redirect(global.path + '/login'); }} >
-                {localeValue(':login') + ' (' + countDown + ')'}
-            </Button>
+            <Button
+                type='primary'
+                onClick={() => { redirect(global.path + '/login'); }}
+                children={localeValue(':login') + ' (' + countDown + ')'}
+            />
         );
     };
 

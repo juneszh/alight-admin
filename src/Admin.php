@@ -115,11 +115,11 @@ class Admin
         $configFile = realpath('config/app.php');
         if (!$configFile) {
             throw new Exception('Missing configuration file: config/app.php');
-        } else {
-            Config::init($configFile);
-            self::insertConfig();
-            self::createTable();
         }
+
+        Config::init($configFile);
+        self::insertConfig();
+        self::createTable();
     }
 
     /**
@@ -383,6 +383,13 @@ class Admin
         if (PHP_SAPI !== 'cli') {
             throw new Exception('PHP-CLI required.');
         }
+
+        $configFile = realpath('config/app.php');
+        if (!$configFile) {
+            throw new Exception('Missing configuration file: config/app.php');
+        }
+        
+        Config::init($configFile);
 
         $package = 'juneszh/alight-admin';
         $version = InstalledVersions::getPrettyVersion($package);

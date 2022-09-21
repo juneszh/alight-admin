@@ -78,7 +78,7 @@ class Controller
             $cacheKey = 'admin_captcha_' . $captchaHash;
             $captchaCodeCache = $cache->get($cacheKey);
             $cache->delete($cacheKey);
-            setcookie('admin_captcha', '', 0, '/' . trim(Config::get('path'), '/'), '.' . Request::host());
+            setcookie('admin_captcha', '', 0, '/' . Config::get('path'), '.' . Request::host());
 
             if (!$captchaCodeCache || $captchaCode != $captchaCodeCache) {
                 Response::api(1002, ':invalid_captcha');
@@ -208,7 +208,7 @@ class Controller
         $cache = Cache::init();
         $cache->set('admin_captcha_' . $captchaHash, $code, 300);
 
-        setcookie('admin_captcha', $captchaHash, time() + 300, '/' . trim(Config::get('path'), '/'), '.' . Request::host());
+        setcookie('admin_captcha', $captchaHash, time() + 300, '/' . Config::get('path'), '.' . Request::host());
 
         header('Content-type: image/jpeg');
         $builder->output();
@@ -356,7 +356,7 @@ class Controller
      */
     public static function upload()
     {
-        $path = trim(Request::$data['path'] ?? '');
+        $path = trim((string) Request::$data['path'] ?? '', '/');
         $local = (int) (Request::$data['local'] ?? 0);
         $keepName = (int) (Request::$data['keep'] ?? 0);
         $tinymce = (int) (Request::$data['tinymce'] ?? 0);
@@ -364,7 +364,7 @@ class Controller
 
         $fileName = '';
         $now = time();
-        $filePath = 'upload/' . (trim($path, '/') ? trim($path, '/') : 'file') . '/' . date('ym', $now) . '/' . date('d', $now);
+        $filePath = 'upload/' . ($path ?: 'file') . '/' . date('ym', $now) . '/' . date('d', $now);
         $localPath = App::root('public' . '/' . $filePath);
         if (!is_dir($localPath)) {
             mkdir($localPath, 0775, true);

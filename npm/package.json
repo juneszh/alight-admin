@@ -10,7 +10,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@tinymce/tinymce-react": "^4.2.0",
-    "antd": "^4.23.1",
+    "antd": "^4.23.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-resize-detector": "^7.1.2",

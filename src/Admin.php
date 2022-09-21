@@ -66,7 +66,7 @@ class Admin
             return $url;
         } else {
             $url = trim($url, '/');
-            return '/' . trim(AdminConfig::get('path'), '/') . ($url ? '/' . $url : '');
+            return '/' . AdminConfig::get('path') . ($url ? '/' . $url : '');
         }
     }
 
@@ -213,25 +213,25 @@ class Admin
         $db = Database::init();
         $roleCreate = $db->create('admin_role', [
             'id' => [
-                "TINYINT",
-                "UNSIGNED",
-                "NOT NULL",
-                "AUTO_INCREMENT",
+                'TINYINT',
+                'UNSIGNED',
+                'NOT NULL',
+                'AUTO_INCREMENT',
             ],
             'name' => [
-                "VARCHAR(32)",
-                "NOT NULL",
-                "DEFAULT ''",
+                'VARCHAR(32)',
+                'NOT NULL',
+                'DEFAULT \'\'',
             ],
             'create_time' => [
-                "TIMESTAMP",
-                "NOT NULL",
-                "DEFAULT CURRENT_TIMESTAMP",
+                'TIMESTAMP',
+                'NOT NULL',
+                'DEFAULT CURRENT_TIMESTAMP',
             ],
             'PRIMARY KEY (<id>)',
         ], [
-            "ENGINE" => "InnoDB",
-            "DEFAULT CHARSET" => "utf8mb4",
+            'ENGINE' => 'InnoDB',
+            'DEFAULT CHARSET' => 'utf8mb4',
         ]);
 
         if ($roleCreate) {
@@ -247,59 +247,59 @@ class Admin
 
         $userCreate = $db->create('admin_user', [
             'id' => [
-                "SMALLINT",
-                "UNSIGNED",
-                "NOT NULL",
-                "AUTO_INCREMENT",
+                'SMALLINT',
+                'UNSIGNED',
+                'NOT NULL',
+                'AUTO_INCREMENT',
             ],
             'account' => [
-                "VARCHAR(32)",
-                "NOT NULL",
-                "DEFAULT ''",
+                'VARCHAR(32)',
+                'NOT NULL',
+                'DEFAULT \'\'',
             ],
             'password' => [
-                "VARCHAR(255)",
-                "NOT NULL",
-                "DEFAULT ''",
+                'VARCHAR(255)',
+                'NOT NULL',
+                'DEFAULT \'\'',
             ],
             'name' => [
-                "VARCHAR(32)",
-                "NOT NULL",
-                "DEFAULT ''",
+                'VARCHAR(32)',
+                'NOT NULL',
+                'DEFAULT \'\'',
             ],
             'email' => [
-                "VARCHAR(255)",
-                "NOT NULL",
-                "DEFAULT ''",
+                'VARCHAR(255)',
+                'NOT NULL',
+                'DEFAULT \'\'',
             ],
             'role_id' => [
-                "TINYINT",
-                "UNSIGNED",
-                "NOT NULL",
-                "DEFAULT '0'",
+                'TINYINT',
+                'UNSIGNED',
+                'NOT NULL',
+                'DEFAULT \'0\'',
             ],
             'status' => [
-                "TINYINT(1)",
-                "UNSIGNED",
-                "NOT NULL",
-                "DEFAULT '1'",
+                'TINYINT(1)',
+                'UNSIGNED',
+                'NOT NULL',
+                'DEFAULT \'1\'',
             ],
             'auth_key' => [
-                "VARCHAR(32)",
-                "NOT NULL",
-                "DEFAULT ''",
+                'VARCHAR(32)',
+                'NOT NULL',
+                'DEFAULT \'\'',
             ],
             'create_time' => [
-                "TIMESTAMP",
-                "NOT NULL",
-                "DEFAULT CURRENT_TIMESTAMP",
+                'TIMESTAMP',
+                'NOT NULL',
+                'DEFAULT CURRENT_TIMESTAMP',
             ],
             'PRIMARY KEY (<id>)',
             'UNIQUE INDEX <account> (<account>)',
             'INDEX <auth_key> (<auth_key>)',
         ], [
-            "ENGINE" => "InnoDB",
-            "DEFAULT CHARSET" => "utf8mb4",
+            'ENGINE' => 'InnoDB',
+            'DEFAULT CHARSET' => 'utf8mb4',
         ]);
 
         if ($userCreate) {
@@ -323,55 +323,55 @@ class Admin
 
         $db->create('admin_log', [
             'id' => [
-                "INT",
-                "UNSIGNED",
-                "NOT NULL",
-                "AUTO_INCREMENT",
+                'INT',
+                'UNSIGNED',
+                'NOT NULL',
+                'AUTO_INCREMENT',
             ],
             'user_id' => [
-                "SMALLINT",
-                "UNSIGNED",
-                "NOT NULL",
-                "DEFAULT '0'",
+                'SMALLINT',
+                'UNSIGNED',
+                'NOT NULL',
+                'DEFAULT \'0\'',
             ],
             'date' => [
-                "DATE",
-                "NOT NULL",
-                "DEFAULT '2022-08-02'",
+                'DATE',
+                'NOT NULL',
+                'DEFAULT \'2022-08-02\'',
             ],
             'hour' => [
-                "TINYINT",
-                "UNSIGNED",
-                "NOT NULL",
-                "DEFAULT '0'",
+                'TINYINT',
+                'UNSIGNED',
+                'NOT NULL',
+                'DEFAULT \'0\'',
             ],
             'view' => [
-                "SMALLINT",
-                "UNSIGNED",
-                "NOT NULL",
-                "DEFAULT '0'",
+                'SMALLINT',
+                'UNSIGNED',
+                'NOT NULL',
+                'DEFAULT \'0\'',
             ],
             'edit' => [
-                "SMALLINT",
-                "UNSIGNED",
-                "NOT NULL",
-                "DEFAULT '0'",
+                'SMALLINT',
+                'UNSIGNED',
+                'NOT NULL',
+                'DEFAULT \'0\'',
             ],
             'ip' => [
-                "VARCHAR(45)",
-                "NOT NULL",
-                "DEFAULT ''",
+                'VARCHAR(45)',
+                'NOT NULL',
+                'DEFAULT \'\'',
             ],
             'create_time' => [
-                "TIMESTAMP",
-                "NOT NULL",
-                "DEFAULT CURRENT_TIMESTAMP",
+                'TIMESTAMP',
+                'NOT NULL',
+                'DEFAULT CURRENT_TIMESTAMP',
             ],
             'PRIMARY KEY (<id>)',
             'UNIQUE INDEX <user_id_date_hour> (<user_id>, <date>, <hour>)',
         ], [
-            "ENGINE" => "InnoDB",
-            "DEFAULT CHARSET" => "utf8mb4",
+            'ENGINE' => 'InnoDB',
+            'DEFAULT CHARSET' => 'utf8mb4',
         ]);
     }
 

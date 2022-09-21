@@ -67,11 +67,11 @@ class Auth
         }
 
         if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
-            $auth = trim(strip_tags($_SERVER['PHP_AUTH_USER']));
-            $session = trim(strip_tags($_SERVER['PHP_AUTH_PW']));
+            $auth = $_SERVER['PHP_AUTH_USER'];
+            $session = $_SERVER['PHP_AUTH_PW'];
         } else {
-            $auth = trim(strip_tags($_COOKIE['admin_auth'] ?? ''));
-            $session = trim(strip_tags($_COOKIE['admin_session'] ?? ''));
+            $auth = $_COOKIE['admin_auth'] ?? '';
+            $session = $_COOKIE['admin_session'] ?? '';
         }
 
         if ($auth && $session) {
@@ -105,8 +105,8 @@ class Auth
     public static function store(int $userId, bool $renew = false)
     {
         if ($renew) {
-            $auth = trim(strip_tags($_COOKIE['admin_auth'] ?? ''));
-            $session = trim(strip_tags($_COOKIE['admin_session'] ?? ''));
+            $auth = $_COOKIE['admin_auth'] ?? '';
+            $session = $_COOKIE['admin_session'] ?? '';
         } else {
             $userInfo = Model::getUserInfo($userId);
             $auth = $userInfo['auth_key'];
@@ -122,8 +122,8 @@ class Auth
         $cacheTime = Config::get('remember');
         $cache->set($cacheKey, $authInfo, $cacheTime);
 
-        setcookie('admin_auth', $auth, time() + $cacheTime, '/' . trim(Config::get('path'), '/'), '.' . Request::host());
-        setcookie('admin_session', $session, time() + $cacheTime, '/' . trim(Config::get('path'), '/'), '.' . Request::host());
+        setcookie('admin_auth', $auth, time() + $cacheTime, '/' . Config::get('path'), '.' . Request::host());
+        setcookie('admin_session', $session, time() + $cacheTime, '/' . Config::get('path'), '.' . Request::host());
     }
 
     /**
@@ -143,8 +143,8 @@ class Auth
             $cache->delete($cacheKey);
         }
 
-        setcookie('admin_auth', '', 0, '/' . trim(Config::get('path'), '/'), '.' . Request::host());
-        setcookie('admin_session', '', 0, '/' . trim(Config::get('path'), '/'), '.' . Request::host());
+        setcookie('admin_auth', '', 0, '/' . Config::get('path'), '.' . Request::host());
+        setcookie('admin_session', '', 0, '/' . Config::get('path'), '.' . Request::host());
     }
 
     /**

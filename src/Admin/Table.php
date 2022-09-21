@@ -186,8 +186,8 @@ class Table
             $page = (int) (Request::$data['current'] ?? 1);
             $limit = (int) (Request::$data['pageSize'] ?? 20);
             $limit = $limit < 100 ? $limit : 100;
-            $order = trim(Request::$data['_order'] ?? '') ?: 'id';
-            $sort = trim(Request::$data['_sort'] ?? '') ?: 'asc';
+            $order = (Request::$data['_order'] ?? '') ?: 'id';
+            $sort = (Request::$data['_sort'] ?? '') ?: 'asc';
 
             $sortLimit = ['ascend' => 'asc', 'descend' => 'desc'];
             $sort = $sortLimit[$sort] ?? 'asc';
@@ -242,7 +242,7 @@ class Table
         if ($column) {
             foreach ($column as $k => $v) {
                 if ($v['database'] && isset($v['search']) && isset($data[$k])) {
-                    $_v = isset($v['searchRaw']) ? $data[$k] : trim($data[$k]);
+                    $_v = isset($v['searchRaw']) ? $data[$k] : trim((string) $data[$k]);
                     if ($_v || is_numeric($_v)) {
                         if ($v['search'] === 'text[~]') {
                             $return[$k . '[~]'] = $_v;

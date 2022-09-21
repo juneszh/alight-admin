@@ -83,8 +83,8 @@ class Form
     public static function render(string $table, ?callable $middleware = null)
     {
         Request::$data['_id'] = (int) (Request::$data['_id'] ?? 0);
-        Request::$data['_form'] = trim(Request::$data['_form'] ?? '');
-        Request::$data['_title'] = trim(Request::$data['_title'] ?? '');
+        Request::$data['_form'] = Request::$data['_form'] ?? '';
+        Request::$data['_title'] = Request::$data['_title'] ?? '';
 
         $separator = (string) Config::get('join');
         if (isset(Request::$data['_ids'])) {
@@ -189,7 +189,7 @@ class Form
                     } elseif (is_array($data[$k])) {
                         $return[$k] = join($separator, $data[$k]);
                     } else {
-                        $return[$k] = isset($v['raw']) ? $data[$k] : trim($data[$k]);
+                        $return[$k] = isset($v['raw']) ? $data[$k] : trim((string) $data[$k]);
                     }
                 }
             }

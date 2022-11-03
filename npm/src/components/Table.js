@@ -16,16 +16,10 @@ const Table = props => {
     const [requestStatistic, setRequestStatistic] = useState({});
     const [statisticJustify, setStatisticJustify] = useState('space-evenly');
 
-    const rootSize = useResizeDetector({
-        handleWidth: false,
-        refreshMode: 'debounce',
-        refreshRate: 50
-    });
-
     const statSize = useResizeDetector({
         handleWidth: false,
         refreshMode: 'debounce',
-        refreshRate: 50
+        refreshRate: 100
     });
 
     const screens = Grid.useBreakpoint();
@@ -290,9 +284,9 @@ const Table = props => {
 
     useEffect(() => {
         if (inIframe()) {
-            postMessage({ height: rootSize.height });
+            postMessage({ size: { height: -1, width: -1 } });
         }
-    }, [rootSize.height]);
+    }, []);
 
     useEffect(() => {
         if (statSize.height) {
@@ -306,161 +300,159 @@ const Table = props => {
 
     return (
         <div style={{ minHeight: '100vh', height: 'auto', backgroundColor: '#f0f2f5' }}>
-            <div ref={rootSize.ref}>
-                <ProTable
-                    style={{ padding: 24 }}
-                    cardBordered
-                    scroll={(columnEllipsis && screens.xs) ? { x: 'max-content' } : undefined}
-                    columns={columns}
-                    actionRef={actionRef}
-                    request={async (params = {}, sort, filter) => {
-                        if (notEmpty(sort)) {
-                            params._order = Object.keys(sort)[0];
-                            params._sort = sort[params._order];
+            <ProTable
+                style={{ padding: 24 }}
+                cardBordered
+                scroll={(columnEllipsis && screens.xs) ? { x: 'max-content' } : undefined}
+                columns={columns}
+                actionRef={actionRef}
+                request={async (params = {}, sort, filter) => {
+                    if (notEmpty(sort)) {
+                        params._order = Object.keys(sort)[0];
+                        params._sort = sort[params._order];
+                    }
+                    const result = await ajax(window.location.pathname + '?' + new URLSearchParams(params).toString());
+                    if (result && result.error === 0) {
+                        setRequestStatistic(result.data.statistic ?? {});
+                        return {
+                            success: true,
+                            data: result.data.list,
+                            total: result.data.count,
+                        };
+                    } else {
+                        setRequestStatistic({});
+                        return {
+                            success: false,
+                            data: [],
+                            total: 0,
+                        };
+                    }
+                }}
+                revalidateOnFocus={false}
+                rowKey='id'
+                search={tableSearch ? { labelWidth: 'auto' } : false}
+                pagination={{
+                    hideOnSinglePage: false,
+                    defaultPageSize: 10,
+                    pageSizeOptions: [10, 25, 50, 100],
+                }}
+                dateFormatter='string'
+                toolbar={{
+                    actions: toolbarActions
+                }}
+                rowSelection={notEmpty(global.config.batch.button) ? true : undefined}
+                tableAlertRender={({ selectedRowKeys, selectedRows, onCleanSelected }) => {
+                    const buttons = [];
+                    if (notEmpty(global.config.batch.button)) {
+                        for (const [buttonKey, buttonValue] of Object.entries(global.config.batch.button)) {
+                            buttons.push(
+                                <Button
+                                    key={`batch-botton-${buttonKey}`}
+                                    type={buttonValue.type ?? 'primary'}
+                                    href={buttonHref(buttonValue, selectedRowKeys)}
+                                    danger={buttonValue.danger ?? undefined}
+                                    onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, selectedRowKeys); }}
+                                    children={buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}
+                                />
+                            );
                         }
-                        const result = await ajax(window.location.pathname + '?' + new URLSearchParams(params).toString());
-                        if (result && result.error === 0) {
-                            setRequestStatistic(result.data.statistic ?? {});
-                            return {
-                                success: true,
-                                data: result.data.list,
-                                total: result.data.count,
-                            };
-                        } else {
-                            setRequestStatistic({});
-                            return {
-                                success: false,
-                                data: [],
-                                total: 0,
-                            };
-                        }
-                    }}
-                    revalidateOnFocus={false}
-                    rowKey='id'
-                    search={tableSearch ? { labelWidth: 'auto' } : false}
-                    pagination={{
-                        hideOnSinglePage: false,
-                        defaultPageSize: 10,
-                        pageSizeOptions: [10, 25, 50, 100],
-                    }}
-                    dateFormatter='string'
-                    toolbar={{
-                        actions: toolbarActions
-                    }}
-                    rowSelection={notEmpty(global.config.batch.button) ? true : undefined}
-                    tableAlertRender={({ selectedRowKeys, selectedRows, onCleanSelected }) => {
-                        const buttons = [];
+                    }
+                    return <Space wrap children={buttons} />;
+                }}
+                options={{
+                    setting: false
+                }}
+                summary={notEmpty(global.config.summary) ? pageData => {
+                    let sumVisible = false;
+                    let avgVisible = false;
+                    let sumCells = [];
+                    let avgCells = [];
+
+                    if (notEmpty(columns) && notEmpty(pageData)) {
+                        let titleIndex = '0';
+                        let summaryColumns = [];
+
                         if (notEmpty(global.config.batch.button)) {
-                            for (const [buttonKey, buttonValue] of Object.entries(global.config.batch.button)) {
-                                buttons.push(
-                                    <Button
-                                        key={`batch-botton-${buttonKey}`}
-                                        type={buttonValue.type ?? 'primary'}
-                                        href={buttonHref(buttonValue, selectedRowKeys)}
-                                        danger={buttonValue.danger ?? undefined}
-                                        onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, selectedRowKeys); }}
-                                        children={buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}
-                                    />
-                                );
-                            }
+                            titleIndex = '1';
+                            summaryColumns.push('_batch')
                         }
-                        return <Space wrap children={buttons} />;
-                    }}
-                    options={{
-                        setting: false
-                    }}
-                    summary={notEmpty(global.config.summary) ? pageData => {
-                        let sumVisible = false;
-                        let avgVisible = false;
-                        let sumCells = [];
-                        let avgCells = [];
+                        for (const column of Object.values(columns)) {
+                            summaryColumns.push(column.dataIndex)
+                        }
 
-                        if (notEmpty(columns) && notEmpty(pageData)) {
-                            let titleIndex = '0';
-                            let summaryColumns = [];
-
-                            if (notEmpty(global.config.batch.button)) {
-                                titleIndex = '1';
-                                summaryColumns.push('_batch')
-                            }
-                            for (const column of Object.values(columns)) {
-                                summaryColumns.push(column.dataIndex)
-                            }
-
-                            for (const [index, key] of Object.entries(summaryColumns)) {
-                                if (global.config.summary[key]) {
-                                    let precision = global.config.summary[key].precision ?? 2;
-                                    let sum = pageData.reduce((pre, cur) => +cur[key] + pre, 0);
-                                    let result = sum.toFixed(precision);
-                                    sumVisible = true;
-                                    sumCells.push(
-                                        <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
-                                            {index === titleIndex ? <><span style={{ float: 'left' }} children={localeValue(':sum')} />{result}</> : result}
-                                        </ProTable.Summary.Cell>
-                                    );
-                                    if (global.config.summary[key].type === 'sum') {
-                                        avgCells.push(
-                                            <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
-                                                {index === titleIndex ? <span style={{ float: 'left' }} children={localeValue(':avg')} /> : undefined}
-                                            </ProTable.Summary.Cell>
-                                        );
-                                    } else {
-                                        avgVisible = true;
-                                        result = (sum / pageData.length).toFixed(precision);
-                                        avgCells.push(
-                                            <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
-                                                {index === titleIndex ? <><span style={{ float: 'left' }} children={localeValue(':avg')} />{result}</> : result}
-                                            </ProTable.Summary.Cell>
-                                        );
-                                    }
-                                } else {
-                                    sumCells.push(
-                                        <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
-                                            {index === titleIndex ? <span style={{ float: 'left' }} children={localeValue(':sum')} /> : undefined}
-                                        </ProTable.Summary.Cell>
-                                    );
+                        for (const [index, key] of Object.entries(summaryColumns)) {
+                            if (global.config.summary[key]) {
+                                let precision = global.config.summary[key].precision ?? 2;
+                                let sum = pageData.reduce((pre, cur) => +cur[key] + pre, 0);
+                                let result = sum.toFixed(precision);
+                                sumVisible = true;
+                                sumCells.push(
+                                    <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
+                                        {index === titleIndex ? <><span style={{ float: 'left' }} children={localeValue(':sum')} />{result}</> : result}
+                                    </ProTable.Summary.Cell>
+                                );
+                                if (global.config.summary[key].type === 'sum') {
                                     avgCells.push(
                                         <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
                                             {index === titleIndex ? <span style={{ float: 'left' }} children={localeValue(':avg')} /> : undefined}
                                         </ProTable.Summary.Cell>
                                     );
+                                } else {
+                                    avgVisible = true;
+                                    result = (sum / pageData.length).toFixed(precision);
+                                    avgCells.push(
+                                        <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
+                                            {index === titleIndex ? <><span style={{ float: 'left' }} children={localeValue(':avg')} />{result}</> : result}
+                                        </ProTable.Summary.Cell>
+                                    );
                                 }
+                            } else {
+                                sumCells.push(
+                                    <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
+                                        {index === titleIndex ? <span style={{ float: 'left' }} children={localeValue(':sum')} /> : undefined}
+                                    </ProTable.Summary.Cell>
+                                );
+                                avgCells.push(
+                                    <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
+                                        {index === titleIndex ? <span style={{ float: 'left' }} children={localeValue(':avg')} /> : undefined}
+                                    </ProTable.Summary.Cell>
+                                );
                             }
                         }
+                    }
 
-                        return sumVisible || avgVisible ? (
-                            <ProTable.Summary>
-                                {sumVisible ? (<ProTable.Summary.Row style={{ textAlign: 'right' }} children={sumCells} />) : undefined}
-                                {avgVisible ? (<ProTable.Summary.Row style={{ textAlign: 'right' }} children={avgCells} />) : undefined}
-                            </ProTable.Summary>
-                        ) : undefined;
-                    } : undefined}
-                    tableExtraRender={notEmpty(global.config.statistic) ? (_, pageData) => {
-                        const statistic = [];
-                        for (const [key, value] of Object.entries(global.config.statistic)) {
-                            let statValue = value.value ?? undefined;
-                            if (notEmpty(requestStatistic)) {
-                                statValue = requestStatistic[key] ?? statValue;
-                            }
-                            statistic.push(
-                                <Col>
-                                    <Statistic
-                                        style={{ textAlign: 'center' }}
-                                        title={value.title}
-                                        value={statValue}
-                                    />
-                                </Col>
-                            );
+                    return sumVisible || avgVisible ? (
+                        <ProTable.Summary>
+                            {sumVisible ? (<ProTable.Summary.Row style={{ textAlign: 'right' }} children={sumCells} />) : undefined}
+                            {avgVisible ? (<ProTable.Summary.Row style={{ textAlign: 'right' }} children={avgCells} />) : undefined}
+                        </ProTable.Summary>
+                    ) : undefined;
+                } : undefined}
+                tableExtraRender={notEmpty(global.config.statistic) ? (_, pageData) => {
+                    const statistic = [];
+                    for (const [key, value] of Object.entries(global.config.statistic)) {
+                        let statValue = value.value ?? undefined;
+                        if (notEmpty(requestStatistic)) {
+                            statValue = requestStatistic[key] ?? statValue;
                         }
-                        return (
-                            <Card>
-                                <Row gutter={[16, 16]} justify={statisticJustify} ref={statSize.ref} children={statistic} />
-                            </Card>
+                        statistic.push(
+                            <Col>
+                                <Statistic
+                                    style={{ textAlign: 'center' }}
+                                    title={value.title}
+                                    value={statValue}
+                                />
+                            </Col>
                         );
-                    } : undefined}
-                />
-                <ModelKit ref={modelRef} />
-            </div>
+                    }
+                    return (
+                        <Card>
+                            <Row gutter={[16, 16]} justify={statisticJustify} ref={statSize.ref} children={statistic} />
+                        </Card>
+                    );
+                } : undefined}
+            />
+            <ModelKit ref={modelRef} />
         </div>
     );
 };

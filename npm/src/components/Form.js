@@ -13,7 +13,7 @@ const Form = props => {
     const rootSize = useResizeDetector({
         handleWidth: false,
         refreshMode: 'debounce',
-        refreshRate: 50
+        refreshRate: 100
     });
 
     const screens = Grid.useBreakpoint();
@@ -222,7 +222,11 @@ const Form = props => {
 
     useEffect(() => {
         if (inIframe()) {
-            postMessage({ height: editorFullScreen ? 4096 : rootSize.height });
+            if (editorFullScreen) {
+                postMessage({ size: { height: -1 } });
+            } else if (rootSize.height) {
+                postMessage({ size: { height: rootSize.height } });
+            }
         }
     }, [editorFullScreen, rootSize.height]);
 

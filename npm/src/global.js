@@ -80,7 +80,8 @@ const ModelKit = forwardRef((props, ref) => {
     const [modalOpen, setIsModalOpen] = useState(false);
     const [modalDestroy, setIsModalDestroy] = useState(false);
     const [modalHeight, setIsModalHeight] = useState(136);
-    const [modalConfig, setIsModalConfig] = useState({ title: '', url: '', width: 800 });
+    const [modalWidth, setIsModalWidth] = useState(800);
+    const [modalConfig, setIsModalConfig] = useState({ title: '', url: '' });
 
     useImperativeHandle(ref, () => ({
         modalShow,
@@ -93,7 +94,6 @@ const ModelKit = forwardRef((props, ref) => {
         setIsModalConfig({
             title: localeValue(button.title),
             url: button.url + (params ? (button.url.indexOf('?') !== -1 ? '&' : '?') + new URLSearchParams(params).toString() : ''),
-            width: button.width ?? 800,
         });
         setIsModalDestroy(false);
         setIsModalOpen(true);
@@ -107,8 +107,21 @@ const ModelKit = forwardRef((props, ref) => {
                 if (successCallback !== undefined) {
                     successCallback(event.data);
                 }
-            } else if (event.data.height) {
-                setIsModalHeight(event.data.height);
+            } else if (event.data.size) {
+                if (event.data.size.height) {
+                    if (event.data.size.height === -1) {
+                        event.data.size.height = '100vh';
+                    }
+                    setIsModalHeight(event.data.size.height);
+                }
+                if (event.data.size.width) {
+                    if (event.data.size.width === -1) {
+                        event.data.size.width = '100vw';
+                    }
+                    setIsModalWidth(event.data.size.width);
+                } else {
+                    setIsModalWidth(800);
+                }
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -126,8 +139,9 @@ const ModelKit = forwardRef((props, ref) => {
             destroyOnClose={modalDestroy}
             footer={false}
             onCancel={modalHide}
-            bodyStyle={{ display: 'flex', padding: 0, maxHeight: 'calc(90vh - 55px)', height: modalHeight, transition: 'height .2s ease-out' }}
-            width={modalConfig.width}
+            bodyStyle={{ display: 'flex', padding: 0, maxHeight: 'calc(96vh - 55px)', height: modalHeight, transition: 'height .2s ease' }}
+            width={modalWidth}
+            style={{ transition: 'width .2s ease' }}
         >
             <iframe
                 title='modalFrame'

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Space, Grid, message } from 'antd';
 import { BetaSchemaForm, ProFormUploadDragger } from '@ant-design/pro-components';
-import global, { localeInit, localeValue, notEmpty, postMessage, ajax } from '../global';
+import global, { localeInit, localeValue, inIframe, notEmpty, postMessage, ajax } from '../global';
 import { useResizeDetector } from 'react-resize-detector';
 import { Editor } from '@tinymce/tinymce-react';
 
@@ -221,7 +221,9 @@ const Form = props => {
 
 
     useEffect(() => {
-        postMessage({ height: editorFullScreen ? 4096 : rootSize.height });
+        if (inIframe()) {
+            postMessage({ height: editorFullScreen ? 4096 : rootSize.height });
+        }
     }, [editorFullScreen, rootSize.height]);
 
     return (

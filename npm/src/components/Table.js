@@ -4,7 +4,7 @@ import moment from 'moment';
 import { ProTable } from '@ant-design/pro-components';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import '@ant-design/pro-table/dist/table.css';
-import global, { localeInit, localeValue, notEmpty, ajax, ModelKit } from '../global';
+import global, { localeInit, localeValue, inIframe, notEmpty, ajax, ModelKit } from '../global';
 import { useResizeDetector } from 'react-resize-detector';
 
 const Table = props => {
@@ -15,6 +15,12 @@ const Table = props => {
 
     const [requestStatistic, setRequestStatistic] = useState({});
     const [statisticJustify, setStatisticJustify] = useState('space-evenly');
+
+    const rootSize = useResizeDetector({
+        handleWidth: false,
+        refreshMode: 'debounce',
+        refreshRate: 50
+    });
 
     const statSize = useResizeDetector({
         handleWidth: false,
@@ -283,6 +289,12 @@ const Table = props => {
     }
 
     useEffect(() => {
+        if (inIframe()) {
+            postMessage({ height: editorFullScreen ? 4096 : rootSize.height });
+        }
+    }, [rootSize.height]);
+
+    useEffect(() => {
         if (statSize.height) {
             if (statSize.height > 100) {
                 setStatisticJustify('start');
@@ -293,7 +305,7 @@ const Table = props => {
     }, [statSize.height]);
 
     return (
-        <div style={{ minHeight: '100vh', height: 'auto', backgroundColor: '#f0f2f5' }}>
+        <div ref={rootSize.ref} style={{ minHeight: '100vh', height: 'auto', backgroundColor: '#f0f2f5' }}>
             <ProTable
                 style={{ padding: 24 }}
                 cardBordered

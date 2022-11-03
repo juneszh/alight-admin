@@ -61,11 +61,14 @@ class TableColumn
     /**
      * Set sort order
      *
-     * @param string $order ascend|descend
+     * @param string $order asc|desc
      * @return TableColumn
      */
     public function sort(string $initOrder = ''): TableColumn
     {
+        if ($initOrder === 'asc' || $initOrder === 'desc') {
+            $initOrder .= 'end';
+        }
         Table::$config['column'][$this->key][__FUNCTION__] = $initOrder ? $initOrder : true;
         return $this;
     }

@@ -290,7 +290,7 @@ const Table = props => {
 
     useEffect(() => {
         if (inIframe()) {
-            postMessage({ height: editorFullScreen ? 4096 : rootSize.height });
+            postMessage({ height: rootSize.height });
         }
     }, [rootSize.height]);
 

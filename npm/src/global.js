@@ -92,7 +92,7 @@ const ModelKit = forwardRef((props, ref) => {
         successCallback = success;
         window.addEventListener('message', modalMessage);
         setIsModalConfig({
-            title: localeValue(button.title),
+            title: params?._title ? params?._title : localeValue(button.title),
             url: button.url + (params ? (button.url.indexOf('?') !== -1 ? '&' : '?') + new URLSearchParams(params).toString() : ''),
         });
         setIsModalDestroy(false);

@@ -311,7 +311,7 @@ const Table = props => {
                         params._order = Object.keys(sort)[0];
                         params._sort = sort[params._order];
                     }
-                    const result = await ajax(window.location.pathname + '?' + new URLSearchParams(params).toString());
+                    const result = await ajax(window.location.pathname + (window.location.search ? window.location.search + '&' : '?') + new URLSearchParams(params).toString());
                     if (result && result.error === 0) {
                         setRequestStatistic(result.data.statistic ?? {});
                         return {

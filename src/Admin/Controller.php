@@ -356,7 +356,7 @@ class Controller
      */
     public static function upload()
     {
-        $path = trim((string) Request::$data['path'] ?? '', '/');
+        $path = trim((string) (Request::$data['path'] ?? ''), '/');
         $local = (int) (Request::$data['local'] ?? 0);
         $keepName = (int) (Request::$data['keep'] ?? 0);
         $tinymce = (int) (Request::$data['tinymce'] ?? 0);
@@ -391,7 +391,7 @@ class Controller
         }
 
         $resData = [
-            'name' => $filePath . '/' . $fileName,
+            'name' => '/' . $filePath . '/' . $fileName,
             'url' => Request::scheme() . '://' . Request::host() . '/' . $filePath . '/' . $fileName,
         ];
 

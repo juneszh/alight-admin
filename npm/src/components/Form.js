@@ -107,25 +107,40 @@ const Form = props => {
                 colProps: { xs: 24 }
             };
 
-            if (fieldValue.value) {
+            if (fieldValue.value !== undefined) {
                 if (fieldValue.type === 'upload') {
                     column.initialValue = [];
                     if (notEmpty(fieldValue.value)) {
                         let basicUrl = fieldValue?.typeProps?.basicUrl ?? window.location.origin;
                         for (const value of Object.values(fieldValue.value)) {
-                            let fileUrl = value;
-                            if (fileUrl.substring(0, 4) !== 'http') {
-                                fileUrl = basicUrl + (fileUrl[0] === '/' ? '' : '/') + fileUrl;
+                            if (value) {
+                                let fileUrl = value;
+                                if (fileUrl.substring(0, 4) !== 'http') {
+                                    fileUrl = basicUrl + (fileUrl[0] === '/' ? '' : '/') + fileUrl;
+                                }
+                                column.initialValue.push({
+                                    status: 'done',
+                                    name: value,
+                                    url: fileUrl,
+                                });
                             }
-                            column.initialValue.push({
-                                status: 'done',
-                                name: value,
-                                url: fileUrl,
-                            });
                         }
                     }
                 } else {
-                    column.initialValue = fieldValue.value;
+                    if (typeof fieldValue.value === 'number') {
+                        column.initialValue = fieldValue.value.toString();
+                    } else if (typeof fieldValue.value === 'object') {
+                        column.initialValue = [];
+                        for (const [valueKey, valueValue] of Object.entries(fieldValue.value)) {
+                            if (typeof valueValue === 'number') {
+                                column.initialValue.push(valueValue.toString());
+                            } else {
+                                column.initialValue.push(valueValue);
+                            }
+                        }
+                    } else {
+                        column.initialValue = fieldValue.value;
+                    }
                 }
             }
 

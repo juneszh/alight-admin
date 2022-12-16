@@ -138,9 +138,10 @@ class Form
             }
 
             $rsId = 0;
+            $rsIds = [];
             if ($table && $sqlData) {
                 if (isset(Request::$data['_ids']) && Request::$data['_ids']) {
-                    $rsId = Model::formUpdateMultiple($table, $sqlData, Request::$data['_ids']);
+                    $rsIds = Model::formUpdateMultiple($table, $sqlData, Request::$data['_ids']);
                 } elseif (Request::$data['_id']) {
                     $rsId = Model::formUpdate($table, $sqlData, Request::$data['_id']);
                 } else {
@@ -148,19 +149,24 @@ class Form
                 }
             }
 
-            if ($rsId) {
+            $resData = [
+                'id' => $rsId,
+                'ids' => $rsIds,
+            ];
+
+            if ($rsId || $rsIds) {
+                Model::userLog($userId, true);
+
                 $cache = Cache::init();
                 $cache->delete($table . '_list');
                 $cache->delete($table . '_enum_list');
 
                 if (is_callable($middleware)) {
-                    $middleware('api', $rsId);
+                    $middleware('api', $resData);
                 }
-
-                Model::userLog($userId, true);
             }
 
-            Response::api(0, ['result' => 'success']);
+            Response::api(0, $resData);
         }
     }
 

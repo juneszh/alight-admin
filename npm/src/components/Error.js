@@ -1,6 +1,6 @@
 import { useState, createRef, useEffect } from 'react';
 import { Row, Col, Result, Button } from 'antd';
-import global, { localeInit, localeValue, postMessage, redirect } from '../global';
+import global, { localeInit, localeValue, postMessage, redirect } from './Util';
 
 const Error = props => {
     localeInit(props.locale);

@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Row, Col, Card, Avatar, Modal } from 'antd';
 import { EditOutlined, LockOutlined, PoweroffOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import Plots from '@ant-design/plots';
-import global, { localeInit, localeValue, redirect, ModelKit, notEmpty, ajax } from '../global';
+import global, { localeInit, localeValue, redirect, ModelKit, notEmpty, ajax } from './Util';
 
 const Console = props => {
     localeInit(props.locale);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Space, Grid, message } from 'antd';
 import { BetaSchemaForm, ProFormUploadDragger } from '@ant-design/pro-components';
-import global, { localeInit, localeValue, inIframe, notEmpty, postMessage, ajax } from '../global';
+import global, { localeInit, localeValue, inIframe, notEmpty, postMessage, ajax } from './Util';
 import { useResizeDetector } from 'react-resize-detector';
 import { Editor } from '@tinymce/tinymce-react';
 

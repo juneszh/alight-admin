@@ -101,12 +101,12 @@ class Controller
             $userInfo = Model::getUserInfo($userId);
             if (!password_verify($password, $userInfo['password'])) {
                 $cache->set('admin_user_login_fail_' . $userId, $failTimes + 1, $waitMinute * 60);
-                Response::api(1005, ':invalid_account');
+                Response::api(1003, ':invalid_account');
                 exit;
             }
 
             if ($userInfo['status'] != 1) {
-                Response::api(1006, ':invalid_account');
+                Response::api(1005, ':invalid_account');
                 exit;
             }
 
@@ -274,7 +274,7 @@ class Controller
     {
         Auth::checkRole([1]);
 
-        $roleEnum = Model::getRoleEnumList(null, 'id', 'name');
+        $roleEnum = Model::getRoleEnum(null, 'id', 'name');
         $statusEnum = [1 => ['text' => ':enable', 'status' => 'success'], 2 => ['text' => ':disable', 'status' => 'error']];
 
         Table::column('id')->title('ID')->sort('ascend');
@@ -313,7 +313,7 @@ class Controller
 
         Auth::checkRole($role);
 
-        $roleEnum = Model::getRoleEnumList(null, 'id', 'name');
+        $roleEnum = Model::getRoleEnum(null, 'id', 'name');
         $statusEnum = [1 => ':enable', 2 => ':disable'];
 
         Form::create('add');

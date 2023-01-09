@@ -74,7 +74,7 @@ const redirect = url => {
     }
 };
 
-let successCallback = undefined;
+let doneCallback = undefined;
 
 const ModelKit = forwardRef((props, ref) => {
     const [modalOpen, setIsModalOpen] = useState(false);
@@ -88,8 +88,8 @@ const ModelKit = forwardRef((props, ref) => {
         modalHide
     }))
 
-    const modalShow = (button, params, success) => {
-        successCallback = success;
+    const modalShow = (button, params, done) => {
+        doneCallback = done;
         window.addEventListener('message', modalMessage);
         setIsModalConfig({
             title: params?._title ? params?._title : localeValue(button.title),
@@ -104,8 +104,8 @@ const ModelKit = forwardRef((props, ref) => {
             if (event.data.error === 0) {
                 setIsModalDestroy(true);
                 modalHide();
-                if (successCallback !== undefined) {
-                    successCallback(event.data);
+                if (doneCallback !== undefined) {
+                    doneCallback(event.data);
                 }
             } else if (event.data.size) {
                 if (event.data.size.height) {

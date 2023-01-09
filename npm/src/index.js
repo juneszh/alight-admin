@@ -1,6 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
-import global from './global';
+import global from './components/Util';
 import { ConfigProvider, Spin } from 'antd';
 import 'antd/dist/antd.css';
 import defaultAlight from './locale/en_US';

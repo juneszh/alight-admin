@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Layout, Menu } from 'antd';
 import { DashboardOutlined, SafetyCertificateOutlined, TeamOutlined } from '@ant-design/icons';
-import global, { localeInit, localeValue, notEmpty, ModelKit } from '../global';
+import global, { localeInit, localeValue, notEmpty, ModelKit } from './Util';
 
 const Home = props => {
     localeInit(props.locale);

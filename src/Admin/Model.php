@@ -39,10 +39,10 @@ class Model
      * @throws InvalidArgumentException 
      * @throws PDOException 
      */
-    public static function getRoleEnumList(?array $filter = [], ?string $enumKey = null, ?string $enumValue = null): array
+    public static function getRoleEnum(?array $filter = [], ?string $enumKey = null, ?string $enumValue = null): array
     {
         $cache = Cache::init();
-        $cacheKey = 'admin_role_enum_list';
+        $cacheKey = 'admin_role_enum';
 
         if ($cache->has($cacheKey)) {
             $result = $cache->get($cacheKey);
@@ -72,10 +72,10 @@ class Model
      * @throws InvalidArgumentException 
      * @throws PDOException 
      */
-    public static function getUserEnumList(?array $filter = [], ?string $enumKey = null, ?string $enumValue = null): array
+    public static function getUserEnum(?array $filter = [], ?string $enumKey = null, ?string $enumValue = null): array
     {
         $cache = Cache::init();
-        $cacheKey = 'admin_user_enum_list';
+        $cacheKey = 'admin_user_enum';
 
         if ($cache->has($cacheKey)) {
             $result = $cache->get($cacheKey);

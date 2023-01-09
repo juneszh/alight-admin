@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Row, Col, Form, Input, Button, Checkbox } from 'antd';
 import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons';
-import global, { localeInit, localeValue, ajax } from '../global';
+import global, { localeInit, localeValue, ajax } from './Util';
 
 const Login = props => {
     localeInit(props.locale);
@@ -94,6 +94,7 @@ const Login = props => {
                                     placeholder={localeValue(':captcha')}
                                     prefix={<SafetyOutlined />}
                                     maxLength={5}
+                                    inputMode='numeric'
                                 />
                             </Form.Item>
                             <img

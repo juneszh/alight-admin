@@ -159,7 +159,7 @@ class Form
 
                 $cache = Cache::init();
                 $cache->delete($table . '_list');
-                $cache->delete($table . '_enum_list');
+                $cache->delete($table . '_enum');
 
                 if (is_callable($middleware)) {
                     $middleware('api', $resData);

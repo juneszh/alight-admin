@@ -61,7 +61,7 @@ class Console
         $avatarDomain = Config::get('cravatar') ? 'cravatar.cn' : 'www.gravatar.com';
         $avatar = 'https://' . $avatarDomain . '/avatar/' . ($userInfo['email'] ? md5(strtolower(trim($userInfo['email']))) : '') . '?s=100&d=mp';
 
-        $roleEnum = Model::getRoleEnumList(['id' => $userInfo['role_id']]);
+        $roleEnum = Model::getRoleEnum(['id' => $userInfo['role_id']]);
         $roleName = $roleEnum ? reset($roleEnum)['name'] : '';
 
 

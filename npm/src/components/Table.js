@@ -4,7 +4,7 @@ import moment from 'moment';
 import { ProTable } from '@ant-design/pro-components';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import '@ant-design/pro-table/dist/table.css';
-import global, { localeInit, localeValue, inIframe, notEmpty, postMessage, ajax, ModelKit } from '../global';
+import global, { localeInit, localeValue, inIframe, notEmpty, postMessage, ajax, ModelKit } from './Util';
 import { useResizeDetector } from 'react-resize-detector';
 
 const Table = props => {

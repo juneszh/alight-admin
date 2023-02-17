@@ -8,15 +8,15 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
        run:
-         working-directory: ./npm/
+         working-directory: ./resource/
     steps:
     - uses: actions/checkout@v3
-    - name: Use Node.js 16.x
+    - name: Use Node.js 18.x
       uses: actions/setup-node@v3
       with:
-        node-version: 16.x
+        node-version: 18.x
         cache: npm
-        cache-dependency-path: npm/package-lock.json
+        cache-dependency-path: resource/package-lock.json
     - run: echo 'BUILD_PATH=' > .env.production.local
     - run: npm ci
     - run: npm run build --if-present
@@ -25,7 +25,7 @@ jobs:
       with:
         type: tar
         filename: build.tar.gz
-        directory: ./npm/
+        directory: ./resource/
         path: build
     - name: Upload Release Asset
       id: upload-release-asset 
@@ -34,6 +34,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./npm/build.tar.gz
+        asset_path: ./resource/build.tar.gz
         asset_name: build.tar.gz
         asset_content_type: application/gzip

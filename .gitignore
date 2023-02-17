@@ -11,6 +11,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-/npm/node_modules
-/npm/coverage
-/npm/build
+/resource/node_modules
+/resource/coverage
+/resource/build

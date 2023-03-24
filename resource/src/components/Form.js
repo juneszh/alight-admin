@@ -17,43 +17,37 @@ const Form = props => {
     const formRef = useRef();
 
     const uploadRender = (schema, form) => (
-        <ProFormUploadDragger
-            name={schema.dataIndex}
-            max={schema.proFieldProps.readonly ? 0 : undefined}
-            disabled={(schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined}
-            fieldProps={{
-                name: 'file',
-                listType: 'picture',
-                action: global.path + '/upload',
-                maxCount: schema.fieldProps.multiple ? 0 : 1,
-                onChange: ({ file, fileList }) => {
-                    if (file.status === 'done') {
-                        if (file.response?.data) {
+        <>
+            <ProFormUploadDragger
+                name={schema.dataIndex}
+                max={schema.proFieldProps.readonly ? 0 : undefined}
+                disabled={(schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined}
+                fieldProps={{
+                    name: 'file',
+                    listType: 'picture',
+                    action: global.path + '/upload',
+                    maxCount: schema.fieldProps.multiple ? 0 : 1,
+                    onChange: ({ file, fileList }) => {
+                        if (file.status === 'error') {
                             for (const [key, value] of Object.entries(fileList)) {
                                 if (value.uid === file.uid) {
-                                    fileList[key] = { ...value, ...file.response.data }
+                                    fileList.splice(key, 1);
+                                    if (file.response?.message) {
+                                        message.error(localeValue(file.response.message));
+                                    } else {
+                                        message.error(localeValue(':upload_failed'));
+                                    }
                                 }
                             }
                         }
-                    } else if (file.status === 'error') {
-                        for (const [key, value] of Object.entries(fileList)) {
-                            if (value.uid === file.uid) {
-                                fileList.splice(key, 1);
-                                if (file.response?.message) {
-                                    message.error(localeValue(file.response?.message));
-                                } else {
-                                    message.error(localeValue(':upload_failed'));
-                                }
-                            }
-                        }
-                    }
-                },
-                ...schema.fieldProps
-            }}
-            formItemProps={{
-                style: { margin: 0 }
-            }}
-        />
+                    },
+                    ...schema.fieldProps
+                }}
+                formItemProps={{
+                    style: { margin: 0 }
+                }}
+            />
+        </>
     );
 
     // https://www.tiny.cloud/docs/tinymce/6
@@ -281,7 +275,7 @@ const Form = props => {
                     if (notEmpty(global.config.field)) {
                         for (const [key, value] of Object.entries(values)) {
                             if (global.config.field[key].type === 'upload') {
-                                values[key] = value.map(e => e['name']);
+                                values[key] = value.map(e => e.response?.data?.name);
                             }
                         }
                     }

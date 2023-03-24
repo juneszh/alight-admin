@@ -78,18 +78,33 @@ class TableButton
     public function batch(): TableButton
     {
         Table::$config['button'][$this->index]['place'] = '_' . __FUNCTION__;
+        Table::$config['button'][$this->index]['action'] = 'confirm';
         return $this;
     }
 
     /**
-     * Put in the specified column (Create _action column by default)
+     * Put in the specified column (Create _column column by default)
      * 
      * @param string $columnKey 
      * @return TableButton 
      */
-    public function column(string $columnKey): TableButton
+    public function column(string $columnKey = '_column'): TableButton
     {
         if ($columnKey) {
+            if ($columnKey !== '_column') {
+                $columnKey = '_column_' . $columnKey;
+            }
+            Table::$config['button'][$this->index]['place'] = $columnKey;
+        }
+        return $this;
+    }
+
+    public function expand(string $columnKey = '_expand'): TableButton
+    {
+        if ($columnKey) {
+            if ($columnKey !== '_expand') {
+                $columnKey = '_expand_' . $columnKey;
+            }
             Table::$config['button'][$this->index]['place'] = $columnKey;
         }
         return $this;
@@ -98,19 +113,18 @@ class TableButton
     /**
      * Set click action
      *
-     * @param string $value modal|confirm|submit|popup
+     * @param string $value form|page|confirm|submit|popup|redirect
      * @return TableButton
      */
     public function action(string $value): TableButton
     {
-        if (!in_array($value, ['modal', 'confirm', 'submit', 'popup'])) {
+        if (!in_array($value, ['form', 'page', 'confirm', 'submit', 'popup', 'redirect'])) {
             throw new Exception('$value must be a valid value');
         }
 
         Table::$config['button'][$this->index][__FUNCTION__] = $value;
         return $this;
     }
-
 
     /**
      * Set request parameters

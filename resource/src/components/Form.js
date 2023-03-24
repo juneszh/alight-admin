@@ -1,25 +1,23 @@
-import { useEffect, useState } from 'react';
-import { Space, Grid, message } from 'antd';
+import { useEffect, useRef, useCallback } from 'react';
+import { message } from 'antd';
 import { BetaSchemaForm, ProFormUploadDragger } from '@ant-design/pro-components';
-import global, { localeInit, localeValue, inIframe, notEmpty, postMessage, ajax } from './Util';
+import global, { localeInit, localeValue, inIframe, notEmpty, postMessage, ajax, redirect } from './Util';
 import { useResizeDetector } from 'react-resize-detector';
 import { Editor } from '@tinymce/tinymce-react';
 
 const Form = props => {
     localeInit(props.locale);
 
-    const [editorFullScreen, setEditorFullScreen] = useState(false);
-
     const rootSize = useResizeDetector({
         handleWidth: false,
         refreshMode: 'debounce',
-        refreshRate: 100
+        refreshRate: 200
     });
 
-    const screens = Grid.useBreakpoint();
+    const formRef = useRef();
 
     const uploadRender = (schema, form) => (
-        <><ProFormUploadDragger
+        <ProFormUploadDragger
             name={schema.dataIndex}
             max={schema.proFieldProps.readonly ? 0 : undefined}
             disabled={(schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined}
@@ -55,26 +53,24 @@ const Form = props => {
             formItemProps={{
                 style: { margin: 0 }
             }}
-        /></>
+        />
     );
 
     // https://www.tiny.cloud/docs/tinymce/6
     const richTextRender = (schema, form) => (
-        <><Editor
-            onInit={(evt, editor) => {
-                editor.on('FullscreenStateChanged', e => setEditorFullScreen(e.state));
-            }}
+        <Editor
             tinymceScriptSrc='/alight-admin/tinymce/tinymce.min.js'
             initialValue={schema.initialValue}
             disabled={(schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined}
             init={{
+                promotion: false,
                 language: localeValue(':tinymce'),
-                skin: 'tinymce-5',
                 plugins: [
                     'advlist', 'anchor', 'autolink', 'autoresize', 'charmap', 'code',
                     'emoticons', 'fullscreen', 'image', 'insertdatetime', 'link', 'lists',
                     'quickbars', 'searchreplace', 'table', 'visualblocks',
                 ],
+                fullscreen_native: true,
                 menubar: schema.proFieldProps.readonly ? false : 'edit view insert format table',
                 max_height: 600,
                 toolbar: false,
@@ -88,7 +84,7 @@ const Form = props => {
                 ...schema.fieldProps
             }}
             onEditorChange={(newValue, editor) => form ? form.setFieldsValue({ [schema.key]: newValue }) : false}
-        /></>
+        />
     );
 
     const columns = [];
@@ -127,17 +123,17 @@ const Form = props => {
                         }
                     }
                 } else {
-                    if (typeof fieldValue.value === 'number') {
-                        column.initialValue = fieldValue.value.toString();
-                    } else if (typeof fieldValue.value === 'object') {
+                    if (typeof fieldValue.value === 'object') {
                         column.initialValue = [];
-                        for (const [valueKey, valueValue] of Object.entries(fieldValue.value)) {
+                        for (const valueValue of Object.values(fieldValue.value)) {
                             if (typeof valueValue === 'number') {
                                 column.initialValue.push(valueValue.toString());
                             } else {
                                 column.initialValue.push(valueValue);
                             }
                         }
+                    } else if (typeof fieldValue.value === 'number') {
+                        column.initialValue = fieldValue.value.toString();
                     } else {
                         column.initialValue = fieldValue.value;
                     }
@@ -186,7 +182,9 @@ const Form = props => {
                 column.fieldProps.disabled = fieldValue.disabled;
             }
 
-            if (['money', 'date', 'dateTime', 'dateWeek', 'dateMonth', 'dateQuarter', 'dateYear', 'dateRange', 'dateTimeRange', 'time', 'timeRange', 'progress', 'percent', 'digit', 'fromNow'].indexOf(fieldValue.type) !== -1) {
+            if (['select', 'treeSelect'].indexOf(fieldValue.type) !== -1) {
+                column.fieldProps.listHeight = 128;
+            } else if (['money', 'date', 'dateTime', 'dateWeek', 'dateMonth', 'dateQuarter', 'dateYear', 'dateRange', 'dateTimeRange', 'time', 'timeRange', 'progress', 'percent', 'digit', 'fromNow'].indexOf(fieldValue.type) !== -1) {
                 column.fieldProps.style = { width: '100%' };
             }
 
@@ -234,59 +232,70 @@ const Form = props => {
         }
     }
 
+    const getMessage = useCallback(event => {
+        if (event.origin === window.location.origin) {
+            if (event.data.submit) {
+                formRef.current?.submit();
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         if (inIframe()) {
-            if (editorFullScreen) {
-                postMessage({ size: { height: -1 } });
-            } else if (rootSize.height) {
-                postMessage({ size: { height: rootSize.height } });
-            }
+            window.addEventListener('message', getMessage);
         }
-    }, [editorFullScreen, rootSize.height]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        if (inIframe() && rootSize.height) {
+            postMessage({ size: { height: rootSize.height, width: 800 } });
+        }
+    }, [rootSize.height]);
 
     return (
         <div ref={rootSize.ref}>
-            <Space
+            <BetaSchemaForm
                 style={{
                     width: '100%',
-                    padding: '24px ' + (screens.xs ? '24px' : '48px'),
-                    backgroundColor: '#ffffff'
+                    padding: 24
                 }}
-                direction='vertical'
-            >
-                <BetaSchemaForm
-                    shouldUpdate={false}
-                    layoutType='Form'
-                    layout={layout}
-                    labelWrap={true}
-                    grid={true}
-                    rowProps={{ gutter: 24, justify: 'start' }}
-                    columns={columns}
-                    submitter={{
-                        resetButtonProps: false,
-                        submitButtonProps: {
-                            style: {
-                                float: 'right'
+                formRef={formRef}
+                shouldUpdate={false}
+                layoutType='Form'
+                layout={layout}
+                labelWrap={true}
+                grid={true}
+                rowProps={{ gutter: 24, justify: 'start' }}
+                columns={columns}
+                submitter={inIframe() ? false : {
+                    resetButtonProps: false,
+                    submitButtonProps: {
+                        style: {
+                            float: 'right'
+                        }
+                    }
+                }}
+                onFinish={async (values) => {
+                    if (notEmpty(global.config.field)) {
+                        for (const [key, value] of Object.entries(values)) {
+                            if (global.config.field[key].type === 'upload') {
+                                values[key] = value.map(e => e['name']);
                             }
                         }
-                    }}
-                    onFinish={async (values) => {
-                        if (notEmpty(global.config.field)) {
-                            for (const [key, value] of Object.entries(values)) {
-                                if (global.config.field[key].type === 'upload') {
-                                    values[key] = value.map(e => e['name']);
-                                }
-                            }
-                        }
-                        ajax(window.location.href, values).then(result => {
-                            if (result && result.error === 0) {
+                    }
+                    ajax(window.location.href, values).then(result => {
+                        if (result && result.error === 0) {
+                            if (inIframe()) {
                                 postMessage(result);
+                            } else {
+                                redirect(global.path + '/result/200');
                             }
-                        })
-                    }}
-                />
-            </Space>
+                        }
+                    })
+                }}
+            />
         </div>
     );
 };

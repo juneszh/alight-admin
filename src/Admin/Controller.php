@@ -112,7 +112,7 @@ class Controller
 
             Auth::store($userId);
 
-            Response::api(0, ['result' => 'success']);
+            Response::api(0);
         } else {
             if (Auth::getUserId()) {
                 Response::redirect(Admin::url());
@@ -157,20 +157,20 @@ class Controller
                 }
             }
 
-            Response::api(0, ['data' => $resData]);
+            Response::api(0, null, ['data' => $resData]);
         }
     }
 
     /**
-     * Error page
+     * Result page
      * 
      * @throws Exception 
      */
-    public static function error($status)
+    public static function result($status)
     {
-        $status = in_array($status, [401, 403, 404, 500]) ? (int) $status : 404;
+        $status = in_array($status, [200, 401, 403, 404, 500]) ? (int) $status : 404;
 
-        Response::render('public/alight-admin/index.html', ['title' => Config::get('title'), 'script' => Admin::globalScript('Error', ['status' => $status])]);
+        Response::render('public/alight-admin/index.html', ['title' => Config::get('title'), 'script' => Admin::globalScript('Result', ['status' => $status])]);
     }
 
     /**
@@ -274,7 +274,7 @@ class Controller
     {
         Auth::checkRole([1]);
 
-        $roleEnum = Model::getRoleEnum(null, 'id', 'name');
+        $roleEnum = Utility::arrayFilter(Model::getRoleList(), [], 'id', 'name');
         $statusEnum = [1 => ['text' => ':enable', 'status' => 'success'], 2 => ['text' => ':disable', 'status' => 'error']];
 
         Table::column('id')->title('ID')->sort('ascend');
@@ -313,7 +313,7 @@ class Controller
 
         Auth::checkRole($role);
 
-        $roleEnum = Model::getRoleEnum(null, 'id', 'name');
+        $roleEnum = Utility::arrayFilter(Model::getRoleList(), [], 'id', 'name');
         $statusEnum = [1 => ':enable', 2 => ':disable'];
 
         Form::create('add');
@@ -399,7 +399,7 @@ class Controller
             header('Content-Type: application/json; charset=utf-8', true, 200);
             echo json_encode(['location' => $local ? $resData['name'] : $resData['url']], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         } else {
-            Response::api(0, $resData);
+            Response::api(0, null, $resData);
         }
     }
 }

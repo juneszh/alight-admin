@@ -16,79 +16,77 @@ namespace Alight\Admin;
 use Alight\Cache;
 use Alight\Database;
 use Alight\Request;
-use Alight\Utility;
 use Exception;
 use ErrorException;
 use InvalidArgumentException;
 use PDOException;
+use Psr\SimpleCache\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException as ExceptionInvalidArgumentException;
 
 class Model
 {
+
     /**
-     * Get role enum list
+     * Get data or cache
      * 
-     * @param null|array $filter 
-     * @param null|string $enumKey 
-     * @param null|string $enumValue 
+     * @param string $table 
+     * @param null|int $id 
+     * @param null|int $ttl 
      * @return array 
      * @throws Exception 
      * @throws ErrorException 
      * @throws ExceptionInvalidArgumentException 
-     * @throws ExceptionInvalidArgumentException 
-     * @throws InvalidArgumentException 
-     * @throws PDOException 
+     * @throws CacheException 
      */
-    public static function getRoleEnum(?array $filter = [], ?string $enumKey = null, ?string $enumValue = null): array
+    public static function getCacheData(string $table, ?int $id = null, ?int $ttl = 86400): array
     {
         $cache = Cache::init();
-        $cacheKey = 'admin_role_enum';
+        $cacheKey = $table . '_data' . ($id === null ? '' : '_' . $id);
 
         if ($cache->has($cacheKey)) {
             $result = $cache->get($cacheKey);
         } else {
             $db = Database::init();
-            $result = $db->select('admin_role', ['id', 'name'], ['ORDER' => ['id' => 'ASC']]);
-
-            $cache->set($cacheKey, $result, 86400);
+            if ($id === null) {
+                $result = $db->select($table, '*', ['ORDER' => ['id' => 'ASC']]);
+            } elseif ($id > 0) {
+                $result = $db->get($table, '*', ['id' => $id]);
+            } else {
+                return [];
+            }
+            $cache->set($cacheKey, $result, $ttl);
         }
 
-        $result = Utility::arrayFilter($result, $filter, $enumKey, $enumValue);
-
-        return $result;
+        return $result ?: [];
     }
 
     /**
-     * Get user enum list
+     * Get role list
      * 
-     * @param null|array $filter 
-     * @param null|string $enumKey 
-     * @param null|string $enumValue 
+     * @return array 
+     * @throws Exception 
+     * @throws ErrorException 
+     * @throws ExceptionInvalidArgumentException 
+     * @throws CacheException 
+     */
+    public static function getRoleList(): array
+    {
+        return self::getCacheData('admin_role');
+    }
+
+    /**
+     * Get user info
+     * 
+     * @param int $id 
      * @return array 
      * @throws Exception 
      * @throws ErrorException 
      * @throws ExceptionInvalidArgumentException 
      * @throws ExceptionInvalidArgumentException 
-     * @throws InvalidArgumentException 
-     * @throws PDOException 
      */
-    public static function getUserEnum(?array $filter = [], ?string $enumKey = null, ?string $enumValue = null): array
+    public static function getUserInfo(int $id): array
     {
-        $cache = Cache::init();
-        $cacheKey = 'admin_user_enum';
-
-        if ($cache->has($cacheKey)) {
-            $result = $cache->get($cacheKey);
-        } else {
-            $db = Database::init();
-            $result = $db->select('admin_user', ['id', 'name', 'role_id', 'status'], ['ORDER' => ['id' => 'ASC']]);
-
-            $cache->set($cacheKey, $result, 86400);
-        }
-
-        $result = Utility::arrayFilter($result, $filter, $enumKey, $enumValue);
-
-        return $result;
+        return self::getCacheData('admin_user', $id);
     }
 
     /**
@@ -147,21 +145,6 @@ class Model
         }
 
         return (int) $result;
-    }
-
-    /**
-     * Get user info
-     * 
-     * @param int $id 
-     * @return array 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws ExceptionInvalidArgumentException 
-     * @throws ExceptionInvalidArgumentException 
-     */
-    public static function getUserInfo(int $id): array
-    {
-        return $id > 0 ? self::formGet('admin_user', $id) : [];
     }
 
     /**
@@ -338,8 +321,10 @@ class Model
 
         if ($db->id()) {
             $cache = Cache::init();
-            $cacheKey = $table . '_info_' . $db->id();
-            $cache->delete($cacheKey);
+            $cache->deleteMultiple([
+                $table . '_data',
+                $table . '_data_' . $db->id()
+            ]);
         }
 
         return (int) $db->id();
@@ -366,8 +351,10 @@ class Model
 
         if ($result->rowCount()) {
             $cache = Cache::init();
-            $cacheKey = $table . '_info_' . $id;
-            $cache->delete($cacheKey);
+            $cache->deleteMultiple([
+                $table . '_data',
+                $table . '_data_' . $id
+            ]);
         }
 
         return $result->rowCount() ? $id : (!$db->error ? $id : 0);
@@ -394,11 +381,11 @@ class Model
 
         if ($result->rowCount()) {
             $cache = Cache::init();
-            $cacheKey = [];
+            $cacheKeys = [$table . '_data'];
             foreach ($id as $_id) {
-                $cacheKey[] = $table . '_info_' . $_id;
+                $cacheKeys[] = $table . '_data_' . $_id;
             }
-            $cache->deleteMultiple($cacheKey);
+            $cache->deleteMultiple($cacheKeys);
         }
 
         return $result->rowCount() ? $id : (!$db->error ? $id : []);

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Alight\Admin;
 
 use Alight\App;
+use Alight\Utility;
 use Exception;
 use ErrorException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
@@ -61,7 +62,7 @@ class Console
         $avatarDomain = Config::get('cravatar') ? 'cravatar.cn' : 'www.gravatar.com';
         $avatar = 'https://' . $avatarDomain . '/avatar/' . ($userInfo['email'] ? md5(strtolower(trim($userInfo['email']))) : '') . '?s=100&d=mp';
 
-        $roleEnum = Model::getRoleEnum(['id' => $userInfo['role_id']]);
+        $roleEnum = Utility::arrayFilter(Model::getRoleList(), ['id' => $userInfo['role_id']]);
         $roleName = $roleEnum ? reset($roleEnum)['name'] : '';
 
 

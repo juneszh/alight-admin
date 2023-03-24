@@ -17,6 +17,7 @@ use Exception;
 
 class TableColumn
 {
+    private string $type;
     private string $key;
 
     /**
@@ -25,8 +26,9 @@ class TableColumn
      * @param string $key 
      * @return TableColumn 
      */
-    public function __construct(string $key)
+    public function __construct(string $type, string $key)
     {
+        $this->type = $type;
         $this->key = $key;
         return $this;
     }
@@ -39,9 +41,9 @@ class TableColumn
      */
     public function title(string $value): TableColumn
     {
-        Table::$config['column'][$this->key][__FUNCTION__] = $value;
+        Table::$config[$this->type][$this->key][__FUNCTION__] = $value;
         if ($value[0] === ':') {
-            Table::$config['column'][$this->key]['locale'] = true;
+            Table::$config[$this->type][$this->key]['locale'] = true;
         }
         return $this;
     }
@@ -54,7 +56,7 @@ class TableColumn
      */
     public function database(bool $value): TableColumn
     {
-        Table::$config['column'][$this->key][__FUNCTION__] = $value;
+        Table::$config[$this->type][$this->key][__FUNCTION__] = $value;
         return $this;
     }
 
@@ -69,7 +71,7 @@ class TableColumn
         if ($initOrder === 'asc' || $initOrder === 'desc') {
             $initOrder .= 'end';
         }
-        Table::$config['column'][$this->key][__FUNCTION__] = $initOrder ? $initOrder : true;
+        Table::$config[$this->type][$this->key][__FUNCTION__] = $initOrder ? $initOrder : true;
         return $this;
     }
 
@@ -85,7 +87,7 @@ class TableColumn
             throw new Exception('$direction must be a valid value');
         }
 
-        Table::$config['column'][$this->key][__FUNCTION__] = $direction;
+        Table::$config[$this->type][$this->key][__FUNCTION__] = $direction;
         return $this;
     }
 
@@ -132,14 +134,14 @@ class TableColumn
             throw new Exception('$valueType must be a valid value');
         }
 
-        Table::$config['column'][$this->key][__FUNCTION__] = $valueType;
+        Table::$config[$this->type][$this->key][__FUNCTION__] = $valueType;
 
         if ($props) {
-            Table::$config['column'][$this->key][__FUNCTION__ . 'Props'] = $props;
+            Table::$config[$this->type][$this->key][__FUNCTION__ . 'Props'] = $props;
         }
 
         if ($raw) {
-            Table::$config['column'][$this->key][__FUNCTION__ . 'Raw'] = $raw;
+            Table::$config[$this->type][$this->key][__FUNCTION__ . 'Raw'] = $raw;
         }
 
         return $this;
@@ -157,7 +159,7 @@ class TableColumn
      */
     public function enum(array $keyValues): TableColumn
     {
-        Table::$config['column'][$this->key][__FUNCTION__] = $keyValues;
+        Table::$config[$this->type][$this->key][__FUNCTION__] = $keyValues;
         return $this;
     }
 
@@ -168,7 +170,7 @@ class TableColumn
      */
     public function hide(): TableColumn
     {
-        Table::$config['column'][$this->key][__FUNCTION__] = true;
+        Table::$config[$this->type][$this->key][__FUNCTION__] = true;
         return $this;
     }
 
@@ -181,7 +183,7 @@ class TableColumn
      */
     public function role(array $roleValues): TableColumn
     {
-        Table::$config['column'][$this->key][__FUNCTION__] = $roleValues;
+        Table::$config[$this->type][$this->key][__FUNCTION__] = $roleValues;
         return $this;
     }
 
@@ -193,7 +195,7 @@ class TableColumn
      */
     public function width(string $value): TableColumn
     {
-        Table::$config['column'][$this->key][__FUNCTION__] = $value;
+        Table::$config[$this->type][$this->key][__FUNCTION__] = $value;
         return $this;
     }
 
@@ -208,7 +210,7 @@ class TableColumn
         if (!in_array($direction, ['left', 'right'])) {
             throw new Exception('$direction must be a valid value');
         }
-        Table::$config['column'][$this->key][__FUNCTION__] = $direction;
+        Table::$config[$this->type][$this->key][__FUNCTION__] = $direction;
         return $this;
     }
 
@@ -220,7 +222,7 @@ class TableColumn
      */
     public function tooltip(string $value): TableColumn
     {
-        Table::$config['column'][$this->key][__FUNCTION__] = $value;
+        Table::$config[$this->type][$this->key][__FUNCTION__] = $value;
         return $this;
     }
 
@@ -231,7 +233,7 @@ class TableColumn
      */
     public function copyable(): TableColumn
     {
-        Table::$config['column'][$this->key][__FUNCTION__] = true;
+        Table::$config[$this->type][$this->key][__FUNCTION__] = true;
         return $this;
     }
 
@@ -242,7 +244,7 @@ class TableColumn
      */
     public function ellipsis(): TableColumn
     {
-        Table::$config['column'][$this->key][__FUNCTION__] = true;
+        Table::$config[$this->type][$this->key][__FUNCTION__] = true;
         return $this;
     }
 
@@ -253,7 +255,7 @@ class TableColumn
      */
     public function html(): TableColumn
     {
-        Table::$config['column'][$this->key][__FUNCTION__] = true;
+        Table::$config[$this->type][$this->key][__FUNCTION__] = true;
         return $this;
     }
 }

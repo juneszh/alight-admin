@@ -34,8 +34,8 @@ The following commands will build the runtime environment required by **Alight-A
 ```bash
 $ cd {PROJECT_DIRECTORY} 
 $ composer require juneszh/alight-admin
-$ composer run-script admin-install
-$ composer run-script admin-download
+$ composer run admin-install
+$ composer run admin-download
 ```
 
 ## Credits

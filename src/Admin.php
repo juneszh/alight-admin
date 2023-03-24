@@ -46,12 +46,12 @@ class Admin
         Route::get('logout', [Controller::class, 'logout'])->cache(0);
         Route::get('captcha', [Controller::class, 'captcha'])->cache(0);
         Route::get('console', [Controller::class, 'console'])->auth();
-        Route::get('error/{status:\d+}', [Controller::class, 'error']);
         Route::get('role/table', [Controller::class, 'roleTable'])->auth();
         Route::any('role/form', [Controller::class, 'roleForm'])->auth();
         Route::get('user/table', [Controller::class, 'userTable'])->auth();
         Route::any('user/form', [Controller::class, 'userForm'])->auth();
         Route::post('upload', [Controller::class, 'upload'])->auth();
+        Route::get('result/{status:\d+}', [Controller::class, 'result']);
     }
 
     /**

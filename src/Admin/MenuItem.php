@@ -70,13 +70,13 @@ class MenuItem
     /**
      * Set click action
      *
-     * @param string $value iframe|modal|location|popup
+     * @param string $value iframe|form|page|popup|redirect
      * @return MenuItem 
      * @throws Exception 
      */
     public function action(string $value): MenuItem
     {
-        if (!in_array($value, ['iframe', 'modal', 'location', 'popup'])) {
+        if (!in_array($value, ['iframe', 'form', 'page', 'popup', 'redirect'])) {
             throw new Exception('$value must be a valid value');
         }
         

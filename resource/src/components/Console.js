@@ -20,22 +20,28 @@ const Console = props => {
     const editProfile = () => {
         modelRef.current?.modalShow({
             title: localeValue(':user_profile'),
-            url: global.path + '/user/form'
+            url: global.path + '/user/form',
+            action: 'form'
         }, {
             _form: 'my_profile'
-        }, () => {
-            window.location.reload();
+        }, {
+            done: () => {
+                window.location.reload();
+            }
         });
     };
 
     const changePassword = () => {
         modelRef.current?.modalShow({
             title: localeValue(':change_password'),
-            url: global.path + '/user/form'
+            url: global.path + '/user/form',
+            action: 'form'
         }, {
             _form: 'my_password'
-        }, () => {
-            window.location.reload();
+        }, {
+            done: () => {
+                window.location.reload();
+            }
         });
     };
 

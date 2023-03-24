@@ -27,7 +27,7 @@ class Config
         'remember' => 86400, // Login renewal cycle
         'cravatar' => false, // Whether to use Cravatar instead of Gravatar to display avatar
         'join' => '|', // Join separator for convert array to string when storing database
-        'errorPageHandler' => [Controller::class, 'error'], // Override error page handler
+        'errorPageHandler' => [Controller::class, 'result'], // Override error page handler
     ];
 
     /**

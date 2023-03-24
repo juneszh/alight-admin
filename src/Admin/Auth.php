@@ -45,7 +45,7 @@ class Auth
             Response::api(401, ':status_401');
             exit;
         } else {
-            Controller::error(401);
+            Controller::result(401);
             exit;
         }
     }
@@ -178,7 +178,7 @@ class Auth
             Response::api(403, ':status_403');
             exit;
         } else {
-            Controller::error(403);
+            Controller::result(403);
             exit;
         }
     }

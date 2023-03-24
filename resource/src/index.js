@@ -18,7 +18,7 @@ const components = {
     Login: lazy(() => import(/* webpackChunkName: 'login' */ './components/Login')),
     Table: lazy(() => import(/* webpackChunkName: 'table' */ './components/Table')),
     Form: lazy(() => import(/* webpackChunkName: 'form' */ './components/Form')),
-    Error: lazy(() => import(/* webpackChunkName: 'error' */ './components/Error')),
+    Result: lazy(() => import(/* webpackChunkName: 'result' */ './components/Result')),
     Console: lazy(() => import(/* webpackChunkName: 'console' */ './components/Console')),
 };
 const App = global.component ? (components[global.component] ?? null) : null;

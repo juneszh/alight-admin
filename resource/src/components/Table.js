@@ -1,9 +1,9 @@
 import { useRef, useState, useEffect } from 'react';
-import { Button, Space, Modal, message, Card, Grid, Row, Col, Statistic } from 'antd';
+import { Button, Space, Modal, message, Card, Row, Col, Statistic } from 'antd';
 import dayjs from 'dayjs';
 import { ProTable } from '@ant-design/pro-components';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import global, { localeInit, localeValue, inIframe, notEmpty, postMessage, ajax, ModelKit } from './Util';
+import global, { localeInit, localeValue, notEmpty, ajax, ModelKit } from './Util';
 import { useResizeDetector } from 'react-resize-detector';
 
 const Table = props => {
@@ -21,175 +21,178 @@ const Table = props => {
         refreshRate: 100
     });
 
-    const screens = Grid.useBreakpoint();
-
-    const columns = [];
     let tableSearch;
-    let columnEllipsis;
-    if (notEmpty(global.config.column)) {
-        let column = {};
-        for (const [columnKey, columnValue] of Object.entries(global.config.column)) {
-            if (columnValue.hide) {
-                continue;
-            }
-            column = {
-                dataIndex: columnKey,
-                title: columnValue.locale ? localeValue(columnValue.title) : columnValue.title,
-                search: false
-            };
 
-            if (columnValue.search) {
-                tableSearch = true;
+    const columnsBuilder = (columnObj) => {
+        const columns = [];
+        if (notEmpty(columnObj)) {
+            let column = {};
+            for (const [columnKey, columnValue] of Object.entries(columnObj)) {
+                if (columnValue.hide) {
+                    continue;
+                }
+                column = {
+                    dataIndex: columnKey,
+                    title: columnValue.locale ? localeValue(columnValue.title) : columnValue.title,
+                    search: false
+                };
 
-                if (['dateRange', 'timeRange', 'dateTimeRange'].indexOf(columnValue.search) !== -1) {
-                    column.valueType = columnValue.search.slice(0, -4);
-                    let columnSearch = {
-                        dataIndex: columnKey,
-                        title: columnValue.locale ? localeValue(columnValue.title) : columnValue.title,
-                        search: true,
-                        hideInTable: true,
-                        valueType: columnValue.search
-                    };
-                    if (columnValue.search === 'dateTimeRange') {
-                        columnSearch.fieldProps = { showTime: { defaultValue: [dayjs('00:00:00', 'HH:mm:ss'), dayjs('23:59:59', 'HH:mm:ss')] } };
+                if (columnValue.search) {
+                    tableSearch = true;
+
+                    if (['dateRange', 'timeRange', 'dateTimeRange'].indexOf(columnValue.search) !== -1) {
+                        column.valueType = columnValue.search.slice(0, -4);
+                        let columnSearch = {
+                            dataIndex: columnKey,
+                            title: columnValue.locale ? localeValue(columnValue.title) : columnValue.title,
+                            search: true,
+                            hideInTable: true,
+                            valueType: columnValue.search
+                        };
+                        if (columnValue.search === 'dateTimeRange') {
+                            columnSearch.fieldProps = { showTime: { defaultValue: [dayjs('00:00:00', 'HH:mm:ss'), dayjs('23:59:59', 'HH:mm:ss')] } };
+                        }
+                        columns.push(columnSearch);
+                    } else {
+                        column.valueType = columnValue.search;
+                        column.search = true;
                     }
-                    columns.push(columnSearch);
-                } else {
-                    column.valueType = columnValue.search;
-                    column.search = true;
+
+                    if (columnValue.searchProps) {
+                        column.fieldProps = columnValue.searchProps;
+                    }
                 }
 
-                if (columnValue.searchProps) {
-                    column.fieldProps = columnValue.searchProps;
+                if (columnValue.ellipsis) {
+                    column.ellipsis = columnValue.ellipsis;
                 }
-            }
 
-            if (columnValue.enum) {
-                if (columnValue.locale) {
-                    column.valueEnum = {};
-                    for (const [enumKey, enumValue] of Object.entries(columnValue.enum)) {
-                        if (typeof enumValue === 'string') {
-                            column.valueEnum[enumKey] = localeValue(enumValue);
-                        } else {
-                            column.valueEnum[enumKey] = enumValue;
-                            if (enumValue.text) {
-                                column.valueEnum[enumKey].text = localeValue(enumValue.text);
+                if (columnValue.enum) {
+                    if (columnValue.locale) {
+                        column.valueEnum = {};
+                        for (const [enumKey, enumValue] of Object.entries(columnValue.enum)) {
+                            if (typeof enumValue === 'string') {
+                                column.valueEnum[enumKey] = localeValue(enumValue);
+                            } else {
+                                column.valueEnum[enumKey] = enumValue;
+                                if (enumValue.text) {
+                                    column.valueEnum[enumKey].text = localeValue(enumValue.text);
+                                }
                             }
                         }
+                    } else {
+                        column.valueEnum = columnValue.enum;
                     }
-                } else {
-                    column.valueEnum = columnValue.enum;
                 }
-            }
 
-            if (columnValue.sort) {
-                column.sorter = true;
-                if (typeof columnValue.sort === 'string') {
-                    column.defaultSortOrder = columnValue.sort;
+                if (columnValue.sort) {
+                    column.sorter = true;
+                    if (typeof columnValue.sort === 'string') {
+                        column.defaultSortOrder = columnValue.sort;
+                    }
                 }
-            }
 
-            if (columnValue.align) {
-                column.align = columnValue.align;
-            }
-
-            if (columnValue.width) {
-                column.width = columnValue.width;
-            }
-
-            if (columnValue.fixed) {
-                column.fixed = columnValue.fixed;
-            }
-
-            if (columnValue.tooltip) {
-                column.tooltip = columnValue.tooltip;
-            }
-
-            if (columnValue.copyable) {
-                column.copyable = columnValue.copyable;
-            }
-
-            if (columnValue.ellipsis) {
-                column.ellipsis = columnValue.ellipsis;
-                columnEllipsis = true;
-            }
-
-            if (columnValue.html) {
-                column.render = (text, record, index, action) => {
-                    return <div dangerouslySetInnerHTML={{ __html: text }} />;
+                if (columnValue.align) {
+                    column.align = columnValue.align;
                 }
-            } else if (columnValue.button) {
-                column.render = (text, record, index, action) => {
-                    let buttons = [];
-                    if (notEmpty(columnValue.button)) {
-                        for (const [buttonKey, buttonValue] of Object.entries(columnValue.button)) {
-                            let buttonShow = true;
-                            if (notEmpty(buttonValue.if)) {
-                                for (const [ifKey, ifValue] of Object.entries(buttonValue.if)) {
-                                    if (Array.isArray(ifValue)) {
-                                        if (ifValue.indexOf(record[ifKey]) === -1) {
-                                            buttonShow = false;
-                                            continue;
-                                        }
-                                    } else {
-                                        let ifSign = ifKey.slice(-3);
-                                        if (ifSign === '>=]') {
-                                            if (record[ifKey.slice(0, -4)] < ifValue) {
-                                                buttonShow = false;
-                                                continue;
-                                            }
-                                        } else if (ifSign === '<=]') {
-                                            if (record[ifKey.slice(0, -4)] > ifValue) {
-                                                buttonShow = false;
-                                                continue;
-                                            }
-                                        } else if (ifSign === '[>]') {
-                                            if (record[ifKey.slice(0, -3)] <= ifValue) {
-                                                buttonShow = false;
-                                                continue;
-                                            }
-                                        } else if (ifSign === '[<]') {
-                                            if (record[ifKey.slice(0, -3)] >= ifValue) {
-                                                buttonShow = false;
-                                                continue;
-                                            }
-                                        } else if (ifSign === '[!]') {
-                                            if (record[ifKey.slice(0, -3)] === ifValue) {
+
+                if (columnValue.width) {
+                    column.width = columnValue.width;
+                }
+
+                if (columnValue.fixed) {
+                    column.fixed = columnValue.fixed;
+                }
+
+                if (columnValue.tooltip) {
+                    column.tooltip = columnValue.tooltip;
+                }
+
+                if (columnValue.copyable) {
+                    column.copyable = columnValue.copyable;
+                }
+
+                if (columnValue.html) {
+                    column.render = (text, record, index, action) => {
+                        return <div dangerouslySetInnerHTML={{ __html: text }} />;
+                    }
+                } else if (columnValue.button) {
+                    column.render = (text, record, index, action) => {
+                        let buttons = [];
+                        if (notEmpty(columnValue.button)) {
+                            for (const [buttonKey, buttonValue] of Object.entries(columnValue.button)) {
+                                let buttonShow = true;
+                                if (notEmpty(buttonValue.if)) {
+                                    for (const [ifKey, ifValue] of Object.entries(buttonValue.if)) {
+                                        if (Array.isArray(ifValue)) {
+                                            if (ifValue.indexOf(record[ifKey]) === -1) {
                                                 buttonShow = false;
                                                 continue;
                                             }
                                         } else {
-                                            if (record[ifKey] !== ifValue) {
-                                                buttonShow = false;
-                                                continue;
+                                            let ifSign = ifKey.slice(-3);
+                                            if (ifSign === '>=]') {
+                                                if (record[ifKey.slice(0, -4)] < ifValue) {
+                                                    buttonShow = false;
+                                                    continue;
+                                                }
+                                            } else if (ifSign === '<=]') {
+                                                if (record[ifKey.slice(0, -4)] > ifValue) {
+                                                    buttonShow = false;
+                                                    continue;
+                                                }
+                                            } else if (ifSign === '[>]') {
+                                                if (record[ifKey.slice(0, -3)] <= ifValue) {
+                                                    buttonShow = false;
+                                                    continue;
+                                                }
+                                            } else if (ifSign === '[<]') {
+                                                if (record[ifKey.slice(0, -3)] >= ifValue) {
+                                                    buttonShow = false;
+                                                    continue;
+                                                }
+                                            } else if (ifSign === '[!]') {
+                                                if (record[ifKey.slice(0, -3)] === ifValue) {
+                                                    buttonShow = false;
+                                                    continue;
+                                                }
+                                            } else {
+                                                if (record[ifKey] !== ifValue) {
+                                                    buttonShow = false;
+                                                    continue;
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
 
-                            if (buttonShow) {
-                                buttons.push(
-                                    <Button
-                                        key={`column-botton-${columnKey}-${buttonKey}`}
-                                        type={buttonValue.type ?? 'default'}
-                                        href={buttonHref(buttonValue, record)}
-                                        danger={buttonValue.danger ?? undefined}
-                                        size='small'
-                                        onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, record); }}
-                                        children={buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}
-                                    />
-                                );
+                                if (buttonShow) {
+                                    buttons.push(
+                                        <Button
+                                            key={`column-botton-${columnKey}-${buttonKey}`}
+                                            type={buttonValue.type ?? 'default'}
+                                            href={buttonHref(buttonValue, record)}
+                                            danger={buttonValue.danger ?? undefined}
+                                            size='small'
+                                            onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, record); }}
+                                            children={buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}
+                                        />
+                                    );
+                                }
                             }
                         }
-                    }
-                    return buttons ? <Space wrap children={buttons} /> : null;
-                };
-            }
+                        return buttons ? <Space wrap children={buttons} /> : null;
+                    };
+                }
 
-            columns.push(column);
+                columns.push(column);
+            }
         }
+        return columns;
     }
+
+    const mainColumns = columnsBuilder(global.config.column);
+    const expandColumns = columnsBuilder(global.config.expand);
 
     const paramReplace = (data, record) => {
         data = Object.assign({}, data);
@@ -218,22 +221,30 @@ const Table = props => {
         if (notEmpty(button.param)) {
             Object.assign(params, arrayRecord ? button.param : paramReplace(button.param, record));
         }
-        return [params, arrayRecord];
+        return params;
     };
 
     const buttonHref = (button, record) => {
-        const [params] = buttonParams(button, record);
+        const params = buttonParams(button, record);
         return button.url + '?' + new URLSearchParams(params).toString();
     };
 
     const buttonAction = (button, record) => {
-        const [params, arrayRecord] = buttonParams(button, record);
-        const action = button.action ?? (arrayRecord ? 'confirm' : 'modal');
-        switch (action) {
-            case 'modal':
-                modelRef.current?.modalShow(button, params, () => {
-                    message.success(localeValue(':success'));
-                    actionRef.current?.reload();
+        const params = buttonParams(button, record);
+        switch (button.action) {
+            case 'form':
+                modelRef.current?.modalShow(button, params, {
+                    done: () => {
+                        message.success(localeValue(':success'));
+                        actionRef.current?.reload();
+                    }
+                });
+                break;
+            case 'page':
+                modelRef.current?.modalShow(button, params, {
+                    close: () => {
+                        actionRef.current?.reload();
+                    }
                 });
                 break;
             case 'confirm':
@@ -259,7 +270,10 @@ const Table = props => {
                 })
                 break;
             case 'popup':
-                window.open(button.url + '?' + new URLSearchParams(params).toString());
+                window.open(button.url);
+                break;
+            case 'redirect':
+                window.location.assign(button.url);
                 break;
             default:
                 break;
@@ -281,12 +295,6 @@ const Table = props => {
     }
 
     useEffect(() => {
-        if (inIframe()) {
-            postMessage({ size: { height: -1, width: -1 } });
-        }
-    }, []);
-
-    useEffect(() => {
         if (statSize.height) {
             if (statSize.height > 100) {
                 setStatisticJustify('start');
@@ -301,8 +309,8 @@ const Table = props => {
             <ProTable
                 style={{ padding: 24 }}
                 cardBordered
-                scroll={(columnEllipsis && screens.xs) ? { x: 'max-content' } : undefined}
-                columns={columns}
+                scroll={{ x: 'max-content' }}
+                columns={mainColumns}
                 actionRef={actionRef}
                 request={async (params = {}, sort, filter) => {
                     if (notEmpty(sort)) {
@@ -366,7 +374,7 @@ const Table = props => {
                     let sumCells = [];
                     let avgCells = [];
 
-                    if (notEmpty(columns) && notEmpty(pageData)) {
+                    if (notEmpty(mainColumns) && notEmpty(pageData)) {
                         let titleIndex = '0';
                         let summaryColumns = [];
 
@@ -374,7 +382,7 @@ const Table = props => {
                             titleIndex = '1';
                             summaryColumns.push('_batch')
                         }
-                        for (const column of Object.values(columns)) {
+                        for (const column of Object.values(mainColumns)) {
                             summaryColumns.push(column.dataIndex)
                         }
 
@@ -448,6 +456,15 @@ const Table = props => {
                             <Row gutter={[16, 16]} justify={statisticJustify} ref={statSize.ref} children={statistic} />
                         </Card>
                     );
+                } : undefined}
+                expandable={notEmpty(expandColumns) ? {
+                    expandedRowRender: (record) => <ProTable
+                        columns={expandColumns}
+                        dataSource={record?._expand}
+                        search={false}
+                        options={false}
+                        pagination={false}
+                    />
                 } : undefined}
             />
             <ModelKit ref={modelRef} />

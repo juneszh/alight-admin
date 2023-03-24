@@ -20,14 +20,15 @@ const Home = props => {
     const menuAction = (e, item) => {
         e.preventDefault();
         switch (item.action ?? 'iframe') {
-            case 'modal':
+            case 'form':
+            case 'page':
                 modelRef.current?.modalShow(item);
-                break;
-            case 'location':
-                window.location.assign(item.url);
                 break;
             case 'popup':
                 window.open(item.url);
+                break;
+            case 'redirect':
+                window.location.assign(item.url);
                 break;
             default:
                 setIframeSrc(item.url);
@@ -126,7 +127,7 @@ const Home = props => {
                     <iframe
                         title='homeFrame'
                         src={iframeSrc}
-                        style={{ border: 'none', flex: '1 1 auto' }}
+                        style={{ border: 'none', flex: '1 1 auto', overflow: 'auto' }}
                     />
                 </Layout.Content>
             </Layout>

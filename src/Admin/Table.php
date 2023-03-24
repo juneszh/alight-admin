@@ -42,7 +42,18 @@ class Table
                 'database' => true,
             ];
         }
-        return new TableColumn($key);
+        return new TableColumn(__FUNCTION__, $key);
+    }
+
+    public static function expand(string $key): TableColumn
+    {
+        if (!isset(self::$config[__FUNCTION__][$key])) {
+            self::$config[__FUNCTION__][$key] = [
+                'title' => $key,
+                'database' => false,
+            ];
+        }
+        return new TableColumn(__FUNCTION__, $key);
     }
 
     /**
@@ -62,7 +73,8 @@ class Table
             'form' => $form,
             'title' => $form,
             'url' => $defaultUrl ?: Admin::url(),
-            'place' => '_action',
+            'action' => 'form',
+            'place' => '_column',
         ];
         return new TableButton(self::$buttonIndex);
     }
@@ -131,6 +143,21 @@ class Table
                 }
             }
 
+            $expand = new ArrayObject();
+            if (isset(Table::$config['expand'])) {
+                foreach (Table::$config['expand'] as $k => $v) {
+                    if (isset($v['role']) && $v['role'] && !in_array($userInfo['role_id'], $v['role'])) {
+                        continue;
+                    }
+
+                    if (isset($v['search'])) {
+                        unset($v['search']);
+                    }
+
+                    $expand[$k] = $v;
+                }
+            }
+
             $toolbar = [];
             $batch = [];
             if (isset(Table::$config['button'])) {
@@ -139,21 +166,36 @@ class Table
                         continue;
                     }
 
-                    if ($v['place'] == '_action') {
-                        if (!isset($column['_action'])) {
-                            $column['_action'] = [
-                                'title' => ':action',
-                                'database' => false,
-                                'locale' => true,
-                            ];
-                        }
-                        $column['_action']['button'][] = $v;
-                    } elseif ($v['place'] == '_toolbar') {
+                    if ($v['place'] === '_toolbar') {
                         $toolbar['button'][] = $v;
-                    } elseif ($v['place'] == '_batch') {
+                    } elseif ($v['place'] === '_batch') {
                         $batch['button'][] = $v;
-                    } elseif (isset($column[$v['place']])) {
-                        $column[$v['place']]['button'][] = $v;
+                    } elseif (substr($v['place'], 0, 7) === '_column') {
+                        $_place = substr($v['place'], 8);
+                        if (!$_place) {
+                            $_place = $v['place'];
+                            if (!isset($column[$_place])) {
+                                $column[$_place] = [
+                                    'title' => ':action',
+                                    'database' => false,
+                                    'locale' => true,
+                                ];
+                            }
+                        }
+                        $column[$_place]['button'][] = $v;
+                    } elseif (substr($v['place'], 0, 7) === '_expand') {
+                        $_place = substr($v['place'], 8);
+                        if (!$_place) {
+                            $_place = $v['place'];
+                            if (!isset($expand[$_place])) {
+                                $expand[$_place] = [
+                                    'title' => ':action',
+                                    'database' => false,
+                                    'locale' => true,
+                                ];
+                            }
+                        }
+                        $expand[$_place]['button'][] = $v;
                     }
                 }
             }
@@ -169,6 +211,7 @@ class Table
 
             $renderData = [
                 'column' => $column,
+                'expand' => $expand,
                 'toolbar' => $toolbar,
                 'batch' => $batch,
                 'summary' => $summary,
@@ -225,7 +268,7 @@ class Table
                 $middleware('api', $resData);
             }
 
-            Response::api(0, $resData);
+            Response::api(0, null, $resData);
         }
     }
 

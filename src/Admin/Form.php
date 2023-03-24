@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Alight\Admin;
 
 use Alight\Admin;
-use Alight\Cache;
 use Alight\Request;
 use Alight\Response;
 use ErrorException;
@@ -109,7 +108,7 @@ class Form
         if (!Request::isAjax()) {
             $value = [];
             if ($table && Request::$data['_id']) {
-                $value = Model::formGet($table, Request::$data['_id']);
+                $value = Model::formGet($table, (int) Request::$data['_id']);
             }
             foreach ($field as $k => $v) {
                 if ($value && isset($value[$k]) && $field[$k]['type'] !== 'password') {
@@ -157,16 +156,12 @@ class Form
             if ($rsId || $rsIds) {
                 Model::userLog($userId, true);
 
-                $cache = Cache::init();
-                $cache->delete($table . '_list');
-                $cache->delete($table . '_enum');
-
                 if (is_callable($middleware)) {
                     $middleware('api', $resData);
                 }
             }
 
-            Response::api(0, $resData);
+            Response::api(0, null, $resData);
         }
     }
 

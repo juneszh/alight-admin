@@ -30,7 +30,7 @@
     "require": {
         "php": ">=7.4",
         "juneszh/alight": "*",
-        "gregwar/captcha": "^1.1",
+        "gregwar/captcha": "^1.2",
         "symfony/var-exporter": ">=5.4"
     }
 }

@@ -364,7 +364,7 @@ class Controller
 
         $fileName = '';
         $now = time();
-        $filePath = 'upload/' . ($path ?: 'file') . '/' . date('ym', $now) . '/' . date('d', $now);
+        $filePath = 'upload/' . ($path ?: 'file') . '/' . date('Y', $now) . '/' . date('md', $now);
         $localPath = App::root('public' . '/' . $filePath);
         if (!is_dir($localPath)) {
             mkdir($localPath, 0775, true);
@@ -374,9 +374,10 @@ class Controller
             if ($keepName) {
                 $fileName = preg_replace('/[^\w\-_.]/', '', $file['name']);
                 $dotPos = strrpos($fileName, '.');
-                $fileName = substr_replace($fileName, '_' . date('His') . '.', $dotPos, 1);
+                $mtime = explode(' ', microtime());
+                $fileName = substr_replace($fileName, '_' . date('His', (int) $mtime[1]) . $mtime[0] . '.', $dotPos, 1);
             } else {
-                $fileName = md5($file['name']);
+                $fileName = md5_file($file['tmp_name']);
                 $extIndex = strrpos($file['name'], '.');
                 if ($extIndex !== false) {
                     $fileName .= strtolower(substr($file['name'], $extIndex));

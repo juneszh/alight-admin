@@ -14,3 +14,4 @@ yarn-error.log*
 /resource/node_modules
 /resource/coverage
 /resource/build
+/resource/public/tinymce

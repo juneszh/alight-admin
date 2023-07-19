@@ -19,6 +19,7 @@ jobs:
         cache-dependency-path: resource/package-lock.json
     - run: echo 'BUILD_PATH=' > .env.production.local
     - run: npm ci
+    - run: npm run tinymce
     - run: npm run build --if-present
     - name: Archive Release
       uses: thedoctor0/zip-release@main

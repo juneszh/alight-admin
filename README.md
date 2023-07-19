@@ -43,6 +43,7 @@ $ composer run admin-download
     * [gregwar/captcha](https://github.com/Gregwar/Captcha)
     * [symfony/var-exporter](https://github.com/symfony/var-exporter)
 * UI components
+    * [React](https://react.dev/)
     * [Ant Design](https://ant.design/)
     * [Ant Design Pro Components](https://procomponents.ant.design/)
     * [Ant Design Charts](https://charts.ant.design/en)

@@ -26,14 +26,15 @@ class Config
         'console' => '', // Console configuration file
         'remember' => 86400, // Login renewal cycle
         'cravatar' => false, // Whether to use Cravatar instead of Gravatar to display avatar
-        'join' => '|', // Join separator for convert array to string when storing database
+        'separator' => '|', // Join separator for convert array to string when storing database
         'errorPageHandler' => [Controller::class, 'result'], // Override error page handler
     ];
 
     /**
      * Merge default configuration and user configuration
      * 
-     * @param string $key
+     * @param string $key 
+     * @throws Exception 
      */
     public static function init(string $key = '')
     {
@@ -60,7 +61,7 @@ class Config
 
         self::$config = array_replace_recursive(self::$config, $configAdmin);
 
-        AlightConfig::$config['app']['errorPageHandler'] = self::$config['errorPageHandler'];
+        AlightConfig::set('app', 'errorPageHandler', self::$config['errorPageHandler']);
     }
 
     /**
@@ -71,6 +72,6 @@ class Config
      */
     public static function get(?string $option = null)
     {
-        return $option !== null ? (self::$config[$option] ?? null) : self::$config;
+        return $option ? (self::$config[$option] ?? null) : self::$config;
     }
 }

@@ -64,9 +64,9 @@ class Controller
     public static function login()
     {
         if (Request::method() === 'POST') {
-            $account = Request::$body['account'] ?? '';
-            $password = Request::$body['password'] ?? '';
-            $captchaCode = Request::$body['captcha'] ?? '';
+            $account = Request::post('account', '');
+            $password = Request::post('password', '');
+            $captchaCode = Request::post('captcha', '');
 
             if (!$account || !$password || !$captchaCode) {
                 Response::api(1001, ':missing_param');
@@ -306,8 +306,8 @@ class Controller
     {
         $role = [1];
 
-        if (substr(Request::$data['_form'] ?? '', 0, 3) === 'my_') {
-            Request::$data['_id'] = (string) Auth::getUserId();
+        if (substr(Request::request('_form', ''), 0, 3) === 'my_') {
+            Request::request('_id', null, (string) Auth::getUserId());
             $role = [];
         }
 
@@ -342,7 +342,7 @@ class Controller
 
         Form::render('admin_user', function ($action, &$return) {
             if ($action == 'filter') {
-                if (in_array(Request::$data['_form'], ['add', 'password', 'my_password'])) {
+                if (in_array(Request::request('_form', ''), ['add', 'password', 'my_password'])) {
                     $return['auth_key'] = Utility::randomHex();
                 }
             }
@@ -356,11 +356,11 @@ class Controller
      */
     public static function upload()
     {
-        $path = trim((string) (Request::$data['path'] ?? ''), '/');
-        $local = (int) (Request::$data['local'] ?? 0);
-        $keepName = (int) (Request::$data['keep'] ?? 0);
-        $tinymce = (int) (Request::$data['tinymce'] ?? 0);
-        $file = $_FILES['file'] ?? null;
+        $path = trim(Request::request('path', ''), '/');
+        $local = Request::request('local', 0);
+        $keepName = Request::request('keep', 0);
+        $tinymce = Request::request('tinymce', 0);
+        $file = Request::file('file');
 
         $fileName = '';
         $now = time();

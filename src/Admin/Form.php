@@ -81,24 +81,21 @@ class Form
      */
     public static function render(string $table, ?callable $middleware = null)
     {
-        Request::$data['_id'] = (int) (Request::$data['_id'] ?? 0);
-        Request::$data['_form'] = Request::$data['_form'] ?? '';
-        Request::$data['_title'] = Request::$data['_title'] ?? '';
+        $_id = Request::request('_id', 0);
+        $_form = Request::request('_form', '');
+        $_title = Request::request('_title', '');
 
-        $separator = (string) Config::get('join');
-        if (isset(Request::$data['_ids'])) {
-            if (is_string(Request::$data['_ids'])) {
-                Request::$data['_ids'] = explode($separator, Request::$data['_ids']);
-            }
-            if (Request::$data['_ids']) {
-                Request::$data['_ids'] = array_values(array_filter(array_map('intval', Request::$data['_ids'])));
-            }
+        $separator = (string) Config::get('separator');
+        $_ids = Request::request('_ids');
+        if ($_ids) {
+            $_ids = is_string($_ids) ? explode($separator, $_ids) : (array) $_ids;
+            $_ids = array_values(array_filter(array_map('intval', $_ids)));
         }
 
         $userId = Auth::getUserId();
         $userInfo = Model::getUserInfo($userId);
 
-        $field = Form::$config[Request::$data['_form']] ?? [];
+        $field = Form::$config[$_form] ?? [];
         foreach ($field as $k => $v) {
             if (isset($v['role']) && $v['role'] && !in_array($userInfo['role_id'], $v['role'])) {
                 unset($field[$k]);
@@ -107,8 +104,8 @@ class Form
 
         if (!Request::isAjax()) {
             $value = [];
-            if ($table && Request::$data['_id']) {
-                $value = Model::formGet($table, (int) Request::$data['_id']);
+            if ($table && $_id) {
+                $value = Model::formGet($table, $_id);
             }
             foreach ($field as $k => $v) {
                 if ($value && isset($value[$k]) && $field[$k]['type'] !== 'password') {
@@ -128,9 +125,9 @@ class Form
                 $middleware('render', $renderData);
             }
 
-            Response::render('public/alight-admin/index.html', ['title' => Request::$data['_title'] ?? '', 'script' => Admin::globalScript('Form', $renderData)]);
+            Response::render('public/alight-admin/index.html', ['title' => $_title, 'script' => Admin::globalScript('Form', $renderData)]);
         } else {
-            $sqlData = self::dataFilter($field, Request::$data);
+            $sqlData = self::dataFilter($field, Request::request());
 
             if (is_callable($middleware)) {
                 $middleware('filter', $sqlData);
@@ -139,10 +136,10 @@ class Form
             $rsId = 0;
             $rsIds = [];
             if ($table && $sqlData) {
-                if (isset(Request::$data['_ids']) && Request::$data['_ids']) {
-                    $rsIds = Model::formUpdateMultiple($table, $sqlData, Request::$data['_ids']);
-                } elseif (Request::$data['_id']) {
-                    $rsId = Model::formUpdate($table, $sqlData, Request::$data['_id']);
+                if ($_ids) {
+                    $rsIds = Model::formUpdateMultiple($table, $sqlData, $_ids);
+                } elseif ($_id) {
+                    $rsId = Model::formUpdate($table, $sqlData, $_id);
                 } else {
                     $rsId = Model::formInsert($table, $sqlData);
                 }
@@ -176,7 +173,7 @@ class Form
     private static function dataFilter(array $field, array $data): array
     {
         $return = [];
-        $separator = (string) Config::get('join');
+        $separator = (string) Config::get('separator');
         foreach ($field as $k => $v) {
             if ($v['database'] && !isset($v['disabled'])) {
                 if (isset($data[$k])) {

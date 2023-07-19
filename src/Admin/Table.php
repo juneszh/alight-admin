@@ -224,13 +224,13 @@ class Table
 
             Model::userLog($userId);
 
-            Response::render('public/alight-admin/index.html', ['title' => Request::$data['_title'] ?? '', 'script' => Admin::globalScript('Table', $renderData)]);
+            Response::render('public/alight-admin/index.html', ['title' => Request::request('_title', ''), 'script' => Admin::globalScript('Table', $renderData)]);
         } else {
-            $page = (int) (Request::$data['current'] ?? 1);
-            $limit = (int) (Request::$data['pageSize'] ?? 20);
+            $page = Request::request('current', 1);
+            $limit = Request::request('pageSize', 20);
             $limit = $limit < 100 ? $limit : 100;
-            $order = (Request::$data['_order'] ?? '') ?: 'id';
-            $sort = (Request::$data['_sort'] ?? '') ?: 'asc';
+            $order = Request::request('_order', '') ?: 'id';
+            $sort = Request::request('_sort', '') ?: 'asc';
 
             $sortLimit = ['ascend' => 'asc', 'descend' => 'desc'];
             $sort = $sortLimit[$sort] ?? 'asc';
@@ -250,7 +250,7 @@ class Table
                 }
             }
 
-            $searchData = self::searchFilter($column, Request::$data);
+            $searchData = self::searchFilter($column, Request::request());
 
             if (is_callable($middleware)) {
                 $middleware('filter', $searchData);

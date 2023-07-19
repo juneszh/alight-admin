@@ -112,12 +112,6 @@ class Admin
             throw new Exception('PHP-CLI required.');
         }
 
-        $configFile = realpath('config/app.php');
-        if (!$configFile) {
-            throw new Exception('Missing configuration file: config/app.php');
-        }
-
-        Config::init($configFile);
         self::insertConfig();
         self::createTable();
     }
@@ -131,70 +125,69 @@ class Admin
     {
         exec('cp -rn ' . App::root('vendor/juneszh/alight-admin/example/config/*') . ' ' . App::root('config/'));
 
-        $configData = require Config::$configFile;
-        if (is_array($configData)) {
-            $routeAdmin = 'config/route/admin.php';
-            if ($configData['route']) {
-                $configRoute = is_string($configData['route']) ? [$configData['route']] : $configData['route'];
-                $associative = false;
-                $insert = false;
-                foreach ($configRoute as $value) {
-                    if (is_string($value)) {
-                        if (strpos($value, $routeAdmin) !== false) {
+        $configData = Config::get();
+        $configFile = App::root(Config::FILE);
+        $routeAdmin = 'config/route/admin.php';
+        if ($configData['route']) {
+            $configRoute = is_string($configData['route']) ? [$configData['route']] : $configData['route'];
+            $associative = false;
+            $insert = false;
+            foreach ($configRoute as $value) {
+                if (is_string($value)) {
+                    if (strpos($value, $routeAdmin) !== false) {
+                        $insert = true;
+                        break;
+                    }
+                } elseif (is_array($value)) {
+                    foreach ($value as $value2) {
+                        if (strpos($value2, $routeAdmin) !== false) {
                             $insert = true;
                             break;
+                            break;
                         }
-                    } elseif (is_array($value)) {
-                        foreach ($value as $value2) {
-                            if (strpos($value2, $routeAdmin) !== false) {
-                                $insert = true;
-                                break;
-                                break;
+                    }
+                }
+            }
+            if (!$insert) {
+                foreach ($configRoute as $key => $value) {
+                    if (is_string($key)) {
+                        $associative = true;
+                        if ($key === '*') {
+                            if (is_string($value)) {
+                                $configRoute[$key] = [$value];
                             }
                         }
                     }
                 }
-                if (!$insert) {
-                    foreach ($configRoute as $key => $value) {
-                        if (is_string($key)) {
-                            $associative = true;
-                            if ($key === '*') {
-                                if (is_string($value)) {
-                                    $configRoute[$key] = [$value];
-                                }
-                            }
-                        }
-                    }
-                    if ($associative) {
-                        if (isset($configRoute['*'])) {
-                            $configRoute['*'][] = $routeAdmin;
-                        } else {
-                            $configRoute['*'] = $routeAdmin;
-                        }
+                if ($associative) {
+                    if (isset($configRoute['*'])) {
+                        $configRoute['*'][] = $routeAdmin;
                     } else {
-                        $configRoute[] = $routeAdmin;
+                        $configRoute['*'] = $routeAdmin;
                     }
+                } else {
+                    $configRoute[] = $routeAdmin;
                 }
-            } else {
-                $configRoute = [$routeAdmin];
             }
-            $configData['route'] = $configRoute;
+        } else {
+            $configRoute = [$routeAdmin];
+        }
+        $configData['route'] = $configRoute;
 
-            if (!isset($configData['admin']) || !$configData['admin']) {
-                $configData['admin'] = array_intersect_key(AdminConfig::$config, ['title' => 1, 'path' => 1, 'locale' => 1]);
-            }
+        if (!isset($configData['admin']) || !$configData['admin']) {
+            $configData['admin'] = array_intersect_key(AdminConfig::$config, ['title' => 1, 'path' => 1, 'locale' => 1]);
+        }
 
-            if (!isset($configData['admin']['menu']) || !$configData['admin']['menu']) {
-                $configData['admin']['menu'] = 'config/admin/menu.php';
-            }
+        if (!isset($configData['admin']['menu']) || !$configData['admin']['menu']) {
+            $configData['admin']['menu'] = 'config/admin/menu.php';
+        }
 
-            if (!isset($configData['admin']['console']) || !$configData['admin']['console']) {
-                $configData['admin']['console'] = 'config/admin/console.php';
-            }
+        if (!isset($configData['admin']['console']) || !$configData['admin']['console']) {
+            $configData['admin']['console'] = 'config/admin/console.php';
+        }
 
-            if ($configData) {
-                file_put_contents(Config::$configFile, '<?php' . PHP_EOL . 'return ' . VarExporter::export($configData) . ';', LOCK_EX);
-            }
+        if ($configData) {
+            file_put_contents($configFile, '<?php' . PHP_EOL . 'return ' . VarExporter::export($configData) . ';', LOCK_EX);
         }
     }
 
@@ -383,13 +376,6 @@ class Admin
         if (PHP_SAPI !== 'cli') {
             throw new Exception('PHP-CLI required.');
         }
-
-        $configFile = realpath('config/app.php');
-        if (!$configFile) {
-            throw new Exception('Missing configuration file: config/app.php');
-        }
-        
-        Config::init($configFile);
 
         $package = 'juneszh/alight-admin';
         $version = InstalledVersions::getPrettyVersion($package);

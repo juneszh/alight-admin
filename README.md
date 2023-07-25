@@ -40,13 +40,18 @@ $ composer run admin-download
 
 ## Credits
 * Composer requires
+    * [juneszh/alight](https://github.com/juneszh/alight)
     * [gregwar/captcha](https://github.com/Gregwar/Captcha)
     * [symfony/var-exporter](https://github.com/symfony/var-exporter)
 * UI components
     * [React](https://react.dev/)
+    * [Create React App](https://create-react-app.dev/)
     * [Ant Design](https://ant.design/)
     * [Ant Design Pro Components](https://procomponents.ant.design/)
     * [Ant Design Charts](https://charts.ant.design/en)
+    * [TinyMCE](https://www.tiny.cloud/tinymce/)
+    * [fs-extra](https://github.com/jprichardson/node-fs-extra)
+    * [react-resize-detector](https://github.com/maslianok/react-resize-detector)
 
 ## License
 * [MIT license](./LICENSE)

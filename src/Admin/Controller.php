@@ -340,10 +340,10 @@ class Controller
 
         Form::create('my_password')->copy('password');
 
-        Form::render('admin_user', function ($action, &$return) {
-            if ($action == 'filter') {
+        Form::render('admin_user', function (string $action, array &$data) {
+            if ($action == 'request') {
                 if (in_array(Request::request('_form', ''), ['add', 'password', 'my_password'])) {
-                    $return['auth_key'] = Utility::randomHex();
+                    $data['auth_key'] = Utility::randomHex();
                 }
             }
         });

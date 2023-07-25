@@ -71,7 +71,7 @@ class Form
      * Form page render
      * 
      * @param string $table 
-     * @param null|callable $middleware function($action, &$return){}
+     * @param null|callable $middleware function(string $action, array &$data){} 
      * @throws Exception 
      * @throws ErrorException 
      * @throws InvalidArgumentException 
@@ -130,7 +130,7 @@ class Form
             $sqlData = self::dataFilter($field, Request::request());
 
             if (is_callable($middleware)) {
-                $middleware('filter', $sqlData);
+                $middleware('request', $sqlData);
             }
 
             $rsId = 0;
@@ -154,7 +154,7 @@ class Form
                 Model::userLog($userId, true);
 
                 if (is_callable($middleware)) {
-                    $middleware('api', $resData);
+                    $middleware('response', $resData);
                 }
             }
 

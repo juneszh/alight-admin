@@ -113,8 +113,8 @@ class Table
     /**
      * Table page render
      * 
-     * @param @param string $table 
-     * @param null|callable $middleware function($action, &$return){}
+     * @param string $table 
+     * @param null|callable $middleware function(string $action, array &$data){} 
      * @throws Exception 
      * @throws ErrorException 
      * @throws InvalidArgumentException 
@@ -253,7 +253,7 @@ class Table
             $searchData = self::searchFilter($column, Request::request());
 
             if (is_callable($middleware)) {
-                $middleware('filter', $searchData);
+                $middleware('request', $searchData);
             }
 
             $count = Model::tableCount($table, $searchData);
@@ -265,7 +265,7 @@ class Table
             ];
 
             if (is_callable($middleware)) {
-                $middleware('api', $resData);
+                $middleware('response', $resData);
             }
 
             Response::api(0, null, $resData);

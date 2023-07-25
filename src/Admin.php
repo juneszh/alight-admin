@@ -85,7 +85,7 @@ class Admin
         $global = [
             'title' => $admin['title'],
             'locale' => $admin['locale'],
-            'join' => $admin['join'],
+            'separator' => $admin['separator'],
             'path' => self::url(),
             'component' => $component,
             'config' => $config,

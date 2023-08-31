@@ -170,7 +170,7 @@ const ModelKit = forwardRef((props, ref) => {
                 ref={iframeRef}
                 title='modalFrame'
                 src={modalConfig.url}
-                style={{ border: 'none', flex: '1 1 auto', overflow: 'auto' }}
+                style={{ border: 'none', borderRadius: 8, flex: '1 1 auto', overflow: 'auto' }}
             />
         </Modal>
     );

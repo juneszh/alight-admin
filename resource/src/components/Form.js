@@ -176,9 +176,7 @@ const Form = props => {
                 column.fieldProps.disabled = fieldValue.disabled;
             }
 
-            if (['select', 'treeSelect'].indexOf(fieldValue.type) !== -1) {
-                column.fieldProps.listHeight = 128;
-            } else if (['money', 'date', 'dateTime', 'dateWeek', 'dateMonth', 'dateQuarter', 'dateYear', 'dateRange', 'dateTimeRange', 'time', 'timeRange', 'progress', 'percent', 'digit', 'fromNow'].indexOf(fieldValue.type) !== -1) {
+            if (['money', 'date', 'dateTime', 'dateWeek', 'dateMonth', 'dateQuarter', 'dateYear', 'dateRange', 'dateTimeRange', 'time', 'timeRange', 'progress', 'percent', 'digit', 'fromNow'].indexOf(fieldValue.type) !== -1) {
                 column.fieldProps.style = { width: '100%' };
             }
 

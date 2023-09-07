@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Alight\Admin;
 
-use Alight\Admin;
 use Alight\App;
 use ErrorException;
 use Exception;
@@ -24,6 +23,13 @@ class Menu
     public static array $config = [];
     private static int $index = 0;
     private static int $subIndex = 0;
+
+    public const
+        ACTION_IFRAME = 'iframe',
+        ACTION_FORM = 'form',
+        ACTION_PAGE = 'page',
+        ACTION_POPUP = 'popup',
+        ACTION_REDIRECT = 'redirect';
 
     /**
      * Create a menu item

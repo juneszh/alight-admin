@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Alight\Admin;
 
-use Exception;
-
 class TableColumn
 {
     private string $type;
@@ -63,14 +61,11 @@ class TableColumn
     /**
      * Set sort order
      *
-     * @param string $order asc|desc
+     * @param string $order Table::ORDER_*
      * @return TableColumn
      */
     public function sort(string $initOrder = ''): TableColumn
     {
-        if ($initOrder === 'asc' || $initOrder === 'desc') {
-            $initOrder .= 'end';
-        }
         Table::$config[$this->type][$this->key][__FUNCTION__] = $initOrder ? $initOrder : true;
         return $this;
     }
@@ -78,15 +73,11 @@ class TableColumn
     /**
      * Set text align
      *
-     * @param string $direction left|center|right
+     * @param string $direction Table::ALIGN_*
      * @return TableColumn
      */
     public function align(string $direction): TableColumn
     {
-        if (!in_array($direction, ['left', 'center', 'right'])) {
-            throw new Exception('$direction must be a valid value');
-        }
-
         Table::$config[$this->type][$this->key][__FUNCTION__] = $direction;
         return $this;
     }
@@ -94,8 +85,8 @@ class TableColumn
     /**
      * Set search (ProComponents) valueType
      *
-     * @param string $value password|money|textarea|date|dateTime|dateWeek|dateMonth|dateQuarter|dateYear|dateRange|dateTimeRange|time|timeRange|text|select|treeSelect|checkbox|rate|radio|radioButton|progress|percent|digit|second|avatar|code|switch|fromNow|image|jsonCode|color|cascader
-     * @param array $props $props Props for Ant Design components. e.g. multiple select:['mode' => 'multiple']
+     * @param string $valueType Table::SEARCH_*
+     * @param array $props Props for Ant Design components. e.g. multiple select:['mode' => 'multiple']
      * @param bool $raw
      * @return TableColumn
      * 
@@ -104,36 +95,6 @@ class TableColumn
      */
     public function search(string $valueType = 'text[~]', array $props = [], bool $raw = false): TableColumn
     {
-        $valueTypeLimit = [
-            'money',
-            'date',
-            'dateTime',
-            'dateWeek',
-            'dateMonth',
-            'dateQuarter',
-            'dateYear',
-            'dateRange',
-            'dateTimeRange',
-            'time',
-            'timeRange',
-            'text',
-            'select',
-            'treeSelect',
-            'checkbox',
-            'radio',
-            'radioButton',
-            'percent',
-            'digit',
-            'color',
-            'cascader',
-            //extension
-            'text[~]',
-        ];
-
-        if (!in_array($valueType, $valueTypeLimit)) {
-            throw new Exception('$valueType must be a valid value');
-        }
-
         Table::$config[$this->type][$this->key][__FUNCTION__] = $valueType;
 
         if ($props) {
@@ -202,14 +163,11 @@ class TableColumn
     /**
      * Set fixed 
      *
-     * @param string $direction left|right
+     * @param string $direction Table::FIXED_*
      * @return TableColumn
      */
     public function fixed(string $direction): TableColumn
     {
-        if (!in_array($direction, ['left', 'right'])) {
-            throw new Exception('$direction must be a valid value');
-        }
         Table::$config[$this->type][$this->key][__FUNCTION__] = $direction;
         return $this;
     }

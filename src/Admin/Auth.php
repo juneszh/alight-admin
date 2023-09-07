@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Alight\Admin;
 
-use Alight\Admin;
 use Alight\Cache;
 use Alight\Request;
 use Alight\Response;

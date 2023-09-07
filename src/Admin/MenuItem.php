@@ -70,16 +70,12 @@ class MenuItem
     /**
      * Set click action
      *
-     * @param string $value iframe|form|page|popup|redirect
+     * @param string $value Menu::ACTION_*
      * @return MenuItem 
      * @throws Exception 
      */
     public function action(string $value): MenuItem
     {
-        if (!in_array($value, ['iframe', 'form', 'page', 'popup', 'redirect'])) {
-            throw new Exception('$value must be a valid value');
-        }
-        
         if ($this->subIndex) {
             Menu::$config[$this->index]['sub'][$this->subIndex][__FUNCTION__] = $value;
         } else {

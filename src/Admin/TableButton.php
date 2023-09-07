@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Alight\Admin;
 
 use Alight\Admin;
-use Exception;
 
 class TableButton
 {
@@ -113,15 +112,11 @@ class TableButton
     /**
      * Set click action
      *
-     * @param string $value form|page|confirm|submit|popup|redirect
+     * @param string $value Table::ACTION_*
      * @return TableButton
      */
     public function action(string $value): TableButton
     {
-        if (!in_array($value, ['form', 'page', 'confirm', 'submit', 'popup', 'redirect'])) {
-            throw new Exception('$value must be a valid value');
-        }
-
         Table::$config['button'][$this->index][__FUNCTION__] = $value;
         return $this;
     }
@@ -166,17 +161,13 @@ class TableButton
     /**
      * Set type
      *
-     * @param string $value default|primary|dashed|text|link
+     * @param string $value Table::TYPE_*
      * @return TableButton
      * 
      * @see https://ant.design/components/button/
      */
     public function type(string $value): TableButton
     {
-        if (!in_array($value, ['default', 'primary', 'dashed', 'text', 'link'])) {
-            throw new Exception('$value must be a valid value');
-        }
-
         Table::$config['button'][$this->index][__FUNCTION__] = $value;
         return $this;
     }

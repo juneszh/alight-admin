@@ -28,6 +28,55 @@ class Table
     public static array $config = [];
     private static int $buttonIndex = 0;
 
+    public const
+        SEARCH_MONEY = 'money',
+        SEARCH_DATE = 'date',
+        SEARCH_DATE_TIME = 'dateTime',
+        SEARCH_DATE_WEEK = 'dateWeek',
+        SEARCH_DATE_MONTH = 'dateMonth',
+        SEARCH_DATE_QUARTER = 'dateQuarter',
+        SEARCH_DATE_YEAR = 'dateYear',
+        SEARCH_DATE_RANGE = 'dateRange',
+        SEARCH_DATE_TIME_RANGE = 'dateTimeRange',
+        SEARCH_TIME = 'time',
+        SEARCH_TIME_RANGE = 'timeRange',
+        SEARCH_TEXT = 'text',
+        SEARCH_SELECT = 'select',
+        SEARCH_TREE_SELECT = 'treeSelect',
+        SEARCH_CHECKBOX = 'checkbox',
+        SEARCH_RADIO = 'radio',
+        SEARCH_RADIO_BUTTON = 'radioButton',
+        SEARCH_PERCENT = 'percent',
+        SEARCH_DIGIT = 'digit',
+        SEARCH_COLOR = 'color',
+        SEARCH_CASCADER = 'cascader',
+        //extension
+        SEARCH_TEXT_LIKE = 'text[~]',
+
+        SORT_DEFAULT = '',
+        SORT_ASC = 'ascend',
+        SORT_DESC = 'descend',
+
+        ALIGN_LEFT = 'left',
+        ALIGN_CENTER = 'center',
+        ALIGN_RIGHT = 'right',
+
+        FIXED_LEFT = 'left',
+        FIXED_RIGHT = 'right',
+
+        ACTION_FORM = 'form',
+        ACTION_PAGE = 'page',
+        ACTION_CONFIRM = 'confirm',
+        ACTION_SUBMIT = 'submit',
+        ACTION_POPUP = 'popup',
+        ACTION_REDIRECT = 'redirect',
+
+        TYPE_DEFAULT = 'default',
+        TYPE_PRIMARY = 'primary',
+        TYPE_DASHED = 'dashed',
+        TYPE_TEXT = 'text',
+        TYPE_LINK = 'link';
+
     /**
      * Create a colum
      * 

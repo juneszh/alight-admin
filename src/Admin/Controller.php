@@ -228,7 +228,7 @@ class Controller
     {
         Auth::checkRole([1]);
 
-        Table::column('id')->title('ID')->sort('ascend');
+        Table::column('id')->title('ID')->sort(Table::SORT_ASC);
         Table::column('name')->title(':role');
         Table::column('create_time')->title(':create_time');
 
@@ -277,18 +277,19 @@ class Controller
         $roleEnum = Utility::arrayFilter(Model::getRoleList(), [], 'id', 'name');
         $statusEnum = [1 => ['text' => ':enable', 'status' => 'success'], 2 => ['text' => ':disable', 'status' => 'error']];
 
-        Table::column('id')->title('ID')->sort('ascend');
+        Table::column('id')->title('ID')->sort(Table::SORT_ASC);
         Table::column('account')->title(':account')->search()->sort();
-        Table::column('role_id')->title(':role')->search('select')->enum($roleEnum);
+        Table::column('role_id')->title(':role')->search(Table::SEARCH_SELECT)->enum($roleEnum);
         Table::column('name')->title(':name')->search();
         Table::column('email')->title(':email')->search();
-        Table::column('status')->title(':status')->search('select')->enum($statusEnum);
-        Table::column('create_time')->title(':create_time')->search('dateRange');
+        Table::column('status')->title(':status')->search(Table::SEARCH_SELECT)->enum($statusEnum);
+        Table::column('create_time')->title(':create_time')->search(Table::SEARCH_DATE_RANGE);
 
         Table::button('add')->title(':add')->toolbar();
         Table::button('edit')->title(':edit');
         Table::button('password')->title(':password')->danger();
 
+        json_encode([]);
         Table::render('admin_user');
     }
 
@@ -318,16 +319,16 @@ class Controller
 
         Form::create('add');
         Form::field('account')->title(':account')->required();
-        Form::field('role_id')->title(':role')->type('select')->enum($roleEnum)->required()->default('1');
+        Form::field('role_id')->title(':role')->type(Form::TYPE_SELECT)->enum($roleEnum)->required()->default('1');
         Form::field('name')->title(':name')->required();
         Form::field('email')->title(':email');
-        Form::field('password')->title(':password')->type('password')->required();
-        Form::field('confirm_password')->database(false)->title(':confirm_password')->type('password')->required()->confirm('password');
+        Form::field('password')->title(':password')->type(Form::TYPE_PASSWORD)->required();
+        Form::field('confirm_password')->database(false)->title(':confirm_password')->type(Form::TYPE_PASSWORD)->required()->confirm('password');
 
         Form::create('edit')->copy('add');
         Form::field('password')->delete();
         Form::field('confirm_password')->delete();
-        Form::field('status')->title(':status')->type('radio')->enum($statusEnum);
+        Form::field('status')->title(':status')->type(Form::TYPE_RADIO)->enum($statusEnum);
 
         Form::create('my_profile')->copy('edit');
         Form::field('account')->delete();
@@ -335,8 +336,8 @@ class Controller
         Form::field('status')->delete();
 
         Form::create('password');
-        Form::field('password')->title(':password')->type('password')->required();
-        Form::field('confirm_password')->title(':confirm_password')->type('password')->required()->confirm('password');
+        Form::field('password')->title(':password')->type(Form::TYPE_PASSWORD)->required();
+        Form::field('confirm_password')->title(':confirm_password')->type(Form::TYPE_PASSWORD)->required()->confirm('password');
 
         Form::create('my_password')->copy('password');
 

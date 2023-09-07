@@ -27,6 +27,43 @@ class Form
     public static array $config = [];
     private static string $form;
 
+    public const
+        TYPE_PASSWORD = 'password',
+        TYPE_MONEY = 'money',
+        TYPE_TEXTAREA = 'textarea',
+        TYPE_DATE = 'date',
+        TYPE_DATE_TIME = 'dateTime',
+        TYPE_DATE_WEEK = 'dateWeek',
+        TYPE_DATE_MONTH =   'dateMonth',
+        TYPE_DATE_QUARTER =   'dateQuarter',
+        TYPE_DATE_YEAR =   'dateYear',
+        TYPE_DATE_RANGE =   'dateRange',
+        TYPE_DATE_TIME_RANGE =   'dateTimeRange',
+        TYPE_TIME =   'time',
+        TYPE_TIME_RANGE =   'timeRange',
+        TYPE_TEXT =   'text',
+        TYPE_SELECT =   'select',
+        TYPE_TREE_SELECT =  'treeSelect',
+        TYPE_CHECK_BOX =   'checkbox',
+        TYPE_RATE =   'rate',
+        TYPE_RADIO =   'radio',
+        TYPE_RADIO_BUTTON =   'radioButton',
+        TYPE_PROGRESS =   'progress',
+        TYPE_PERCENT =  'percent',
+        TYPE_DIGIT = 'digit',
+        TYPE_SECOND = 'second',
+        TYPE_AVATAR = 'avatar',
+        TYPE_CODE = 'code',
+        TYPE_SWITCH = 'switch',
+        TYPE_FROM_NOW = 'fromNow',
+        TYPE_IMAGE = 'image',
+        TYPE_JSON_CODE = 'jsonCode',
+        TYPE_COLOR = 'color',
+        TYPE_CASCADER = 'cascader',
+        //extension
+        TYPE_UPLOAD = 'upload',
+        TYPE_RICH_TEXT = 'richText';
+
     /**
      * Create a form
      * 

@@ -26,17 +26,54 @@ class Console
     public static array $config = [];
     private static int $index = 0;
 
+    public const
+        CHART_LINE = 'Line',
+        CHART_AREA = 'Area',
+        CHART_COLUMN = 'Column',
+        CHART_BAR = 'Bar',
+        CHART_PIE = 'Pie',
+        CHART_DUAL_AXES = 'DualAxes',
+        CHART_GAUGE = 'Gauge',
+        CHART_LIQUID = 'Liquid',
+        CHART_BULLET = 'Bullet',
+        CHART_SCATTER = 'Scatter',
+        CHART_ROSE = 'Rose',
+        CHART_SANKEY = 'Sankey',
+        CHART_CHORD = 'Chord',
+        CHART_HEATMAP = 'Heatmap',
+        CHART_TINY_LINE = 'TinyLine',
+        CHART_TINY_AREA = 'TinyArea',
+        CHART_TINY_COLUMN = 'TinyColumn',
+        CHART_PROGRESS = 'Progress',
+        CHART_RING_PROGRESS = 'RingProgress',
+        CHART_TREEMAP = 'Treemap',
+        CHART_RADAR = 'Radar',
+        CHART_FUNNEL = 'Funnel',
+        CHART_WATERFALL = 'Waterfall',
+        CHART_WORD_CLOUD = 'WordCloud',
+        CHART_HISTOGRAM = 'Histogram',
+        CHART_SUNBURST = 'Sunburst',
+        CHART_BIDIRECTIONAL_BAR = 'BidirectionalBar',
+        CHART_RADIAL_BAR = 'RadialBar',
+        CHART_VIOLIN = 'Violin',
+        CHART_BOX = 'Box',
+        CHART_VENN = 'Venn',
+        CHART_STOCK = 'Stock',
+        CHART_CIRCLE_PACKING = 'CirclePacking',
+        CHART_MIX = 'Mix',
+        CHART_FACET = 'Facet';
+
     /**
      * Create a chart
      *
-     * @param string $component
+     * @param string $component Console::CHART_*
      * @return ConsoleChart
      */
     public static function chart(string $component): ConsoleChart
     {
         ++self::$index;
         self::$config[self::$index] = [
-            'component' => ucfirst($component),
+            'component' => $component,
             'grid' => ['span' => 24],
         ];
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Alight\Admin\Console;
 
-Console::chart('Heatmap')->config([
+Console::chart(Console::CHART_HEATMAP)->config([
     'width' => '100%',
     'height' => 200,
     'yField' => 'date',

@@ -64,7 +64,7 @@ class FormField
     /**
      * Set field (ProComponents) valueType
      *
-     * @param string $value password|money|textarea|date|dateTime|dateWeek|dateMonth|dateQuarter|dateYear|dateRange|dateTimeRange|time|timeRange|text|select|treeSelect|checkbox|rate|radio|radioButton|progress|percent|digit|second|avatar|code|switch|fromNow|image|jsonCode|color|cascader|upload|richText
+     * @param string $value Form::TYPE_*
      * @param array $props Props for Ant Design components. e.g. multiple select:['mode' => 'multiple'] or upload:['action' => 'api url', 'multiple' => true, 'data' => ['path' => 'test'], 'accept' => 'image/*,.pdf', 'basicUrl' => 'https://alight.cc']
      * @return FormField
      * 
@@ -74,48 +74,6 @@ class FormField
      */
     public function type(string $valueType, array $props = []): FormField
     {
-        $valueTypeLimit = [
-            'password',
-            'money',
-            'textarea',
-            'date',
-            'dateTime',
-            'dateWeek',
-            'dateMonth',
-            'dateQuarter',
-            'dateYear',
-            'dateRange',
-            'dateTimeRange',
-            'time',
-            'timeRange',
-            'text',
-            'select',
-            'treeSelect',
-            'checkbox',
-            'rate',
-            'radio',
-            'radioButton',
-            'progress',
-            'percent',
-            'digit',
-            'second',
-            'avatar',
-            'code',
-            'switch',
-            'fromNow',
-            'image',
-            'jsonCode',
-            'color',
-            'cascader',
-            //extension
-            'upload',
-            'richText'
-        ];
-
-        if (!in_array($valueType, $valueTypeLimit)) {
-            throw new Exception('$valueType must be a valid value');
-        }
-
         Form::$config[$this->form][$this->key][__FUNCTION__] = $valueType;
 
         if ($valueType === 'richText') {

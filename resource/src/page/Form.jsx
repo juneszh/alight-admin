@@ -1,9 +1,9 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { message } from 'antd';
 import { BetaSchemaForm, ProFormUploadDragger } from '@ant-design/pro-components';
-import global, { localeInit, localeValue, inIframe, notEmpty, postMessage, ajax, redirect } from './Util';
 import { useResizeDetector } from 'react-resize-detector';
 import { Editor } from '@tinymce/tinymce-react';
+import global, { localeInit, localeValue, inIframe, notEmpty, postMessage, ajax, redirect } from '../lib/Util';
 
 const Form = props => {
     localeInit(props.locale);
@@ -16,7 +16,7 @@ const Form = props => {
 
     const formRef = useRef();
 
-    const uploadRender = (schema, form) => (
+    const uploadRender = (schema) => (
         <>
             <ProFormUploadDragger
                 name={schema.dataIndex}
@@ -77,7 +77,7 @@ const Form = props => {
                 images_upload_url: global.path + '/upload?' + new URLSearchParams(schema.fieldProps.data).toString(),
                 ...schema.fieldProps
             }}
-            onEditorChange={(newValue, editor) => form ? form.setFieldsValue({ [schema.key]: newValue }) : false}
+            onEditorChange={(newValue) => form ? form.setFieldsValue({ [schema.key]: newValue }) : false}
         />
     );
 
@@ -162,7 +162,7 @@ const Form = props => {
 
             if (fieldValue.type === 'upload') {
                 column.render = (dom, entity, index, action, schema) => uploadRender(schema);
-                column.renderFormItem = (schema, config, form) => uploadRender(schema);
+                column.renderFormItem = (schema) => uploadRender(schema);
             } else if (fieldValue.type === 'richText') {
                 column.render = (dom, entity, index, action, schema) => richTextRender(schema);
                 column.renderFormItem = (schema, config, form) => richTextRender(schema, form);
@@ -230,7 +230,6 @@ const Form = props => {
                 formRef.current?.submit();
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {

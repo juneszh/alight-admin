@@ -20,13 +20,15 @@ use Composer\InstalledVersions;
 use Exception;
 use Symfony\Component\VarExporter\Exception\ExceptionInterface;
 use InvalidArgumentException;
+use OutOfBoundsException;
 use PDOException;
 use PharData;
 use Symfony\Component\VarExporter\VarExporter;
 
 class Admin
 {
-
+    const PACKAGE = 'juneszh/alight-admin';
+    const PUBLIC = 'public/alight-admin';
     /**
      * Admin built-in routes
      * 
@@ -74,11 +76,11 @@ class Admin
     /**
      * Transform configuration to front-end by the javascript
      * 
-     * @param string $component 
+     * @param string $page 
      * @param array $config 
      * @return string 
      */
-    public static function globalScript(string $component, array $config = [])
+    public static function globalScript(string $page, array $config = [])
     {
         $admin = AdminConfig::get();
 
@@ -87,13 +89,35 @@ class Admin
             'locale' => $admin['locale'],
             'separator' => $admin['separator'],
             'path' => self::url(),
-            'component' => $component,
+            'page' => $page,
             'config' => $config,
         ];
 
         $return = '<script>';
         $return .= 'window.$global=' . json_encode($global, JSON_UNESCAPED_UNICODE);
-        $return .= '</script>';
+        $return .= '</script>' . PHP_EOL;
+
+        $indent = '    ';
+
+        if ($admin['dev']) {
+            $return .= $indent . '<script type="module">import { injectIntoGlobalHook } from "http://localhost:5173/alight-admin/@react-refresh";injectIntoGlobalHook(window);window.$RefreshReg$ = () => {};window.$RefreshSig$ = () => (type) => type;</script>' . PHP_EOL;
+            $return .= $indent . '<script type="module" src="http://localhost:5173/alight-admin/@vite/client"></script>' . PHP_EOL;
+            $return .= $indent . '<script type="module" src="http://localhost:5173/alight-admin/src/main.jsx"></script>' . PHP_EOL;
+        } else {
+            $manifest = App::root(self::PUBLIC . '/manifest.json');
+            if (file_exists($manifest)) {
+                $manifestData = json_decode(file_get_contents($manifest), true);
+                if (isset($manifestData['index.html']['file'])) {
+                    $return .= $indent . '<script type="module" crossorigin src="/alight-admin/' . $manifestData['index.html']['file'] . '"></script>' . PHP_EOL;
+                }
+                if (isset($manifestData['index.html']['css'])) {
+                    foreach ($manifestData['index.html']['css'] as $_css) {
+                        $return .= $indent . '<link rel="stylesheet" href="/alight-admin/' . $_css . '">' . PHP_EOL;
+                    }
+                }
+            }
+        }
+
 
         return $return;
     }
@@ -123,7 +147,7 @@ class Admin
      */
     private static function insertConfig()
     {
-        exec('cp -rn ' . App::root('vendor/juneszh/alight-admin/example/config/*') . ' ' . App::root('config/'));
+        exec('cp -rn ' . self::path() . '/example/config/* ' . App::root('config/'));
 
         $configData = Config::get();
         $configFile = App::root(Config::FILE);
@@ -377,16 +401,15 @@ class Admin
             throw new Exception('PHP-CLI required.');
         }
 
-        $package = 'juneszh/alight-admin';
-        $version = InstalledVersions::getPrettyVersion($package);
+        $version = self::version();
 
         if ($version[0] !== 'v') {
             echo 'Unable to download about version: ', $version, PHP_EOL;
         } else {
-            $url = 'https://github.com/' . $package . '/releases/download/' . $version . '/build.tar.gz';
+            $url = 'https://github.com/' . self::PACKAGE . '/releases/download/' . $version . '/alight-admin.tar.gz';
             $storagePath = Config::get('app', 'storagePath') ?: 'storage';
-            $dir = App::root($storagePath . '/admin/');
-            $file = $dir . '/build.tar.gz';
+            $dir = App::root($storagePath . '/download/');
+            $file = $dir . '/alight-admin.tar.gz';
 
             if (!is_dir($dir)) {
                 if (!mkdir($dir, 0777, true)) {
@@ -404,9 +427,47 @@ class Admin
                 $result = $phar->extractTo($dir);
 
                 if ($result) {
-                    exec('rm -rf ' . App::root('public/alight-admin/') . ' && mkdir ' . App::root('public/alight-admin/') . ' && cp -r ' . App::root($storagePath . '/admin/build/*') . ' ' . App::root('public/alight-admin/'));
+                    self::publish(App::root($storagePath . '/download/alight-admin'));
                 }
             }
         }
+    }
+
+    /**
+     * Get package version from composer
+     * 
+     * @return string|null 
+     * @throws OutOfBoundsException 
+     */
+    public static function version(): ?string
+    {
+        return InstalledVersions::getPrettyVersion(self::PACKAGE);
+    }
+
+
+    /**
+     * Get package install path from composer
+     * 
+     * @return null|string 
+     * @throws OutOfBoundsException 
+     */
+    public static function path(): ?string
+    {
+        return InstalledVersions::getInstallPath(self::PACKAGE);
+    }
+
+    /**
+     * Move the dist files to public
+     * 
+     * @param $source 
+     * @throws OutOfBoundsException 
+     */
+    public static function publish($source)
+    {
+        if (!is_string($source)) {
+            $source = self::path() . '/resource/dist';
+        }
+        $dest = App::root(self::PUBLIC);
+        exec('rm -rf ' . $dest . ' && rm -f ' . $source . '/index.html && mv ' . $source . ' ' . $dest);
     }
 }

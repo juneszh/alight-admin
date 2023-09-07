@@ -1,10 +1,11 @@
 import { useRef, useState, useEffect } from 'react';
 import { Button, Space, Modal, message, Card, Row, Col, Statistic } from 'antd';
-import dayjs from 'dayjs';
-import { ProTable } from '@ant-design/pro-components';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import global, { localeInit, localeValue, notEmpty, ajax, ModelKit } from './Util';
+import { ProTable } from '@ant-design/pro-components';
 import { useResizeDetector } from 'react-resize-detector';
+import dayjs from 'dayjs';
+import global, { localeInit, localeValue, notEmpty, ajax } from '../lib/Util';
+import ModelKit from '../lib/ModelKit';
 
 const Table = props => {
     localeInit(props.locale);
@@ -113,11 +114,11 @@ const Table = props => {
                 }
 
                 if (columnValue.html) {
-                    column.render = (text, record, index, action) => {
+                    column.render = (text) => {
                         return <div dangerouslySetInnerHTML={{ __html: text }} />;
                     }
                 } else if (columnValue.button) {
-                    column.render = (text, record, index, action) => {
+                    column.render = (text, record) => {
                         let buttons = [];
                         if (notEmpty(columnValue.button)) {
                             for (const [buttonKey, buttonValue] of Object.entries(columnValue.button)) {
@@ -175,13 +176,12 @@ const Table = props => {
                                             danger={buttonValue.danger ?? undefined}
                                             size='small'
                                             onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, record); }}
-                                            children={buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}
-                                        />
+                                        >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
                                     );
                                 }
                             }
                         }
-                        return buttons ? <Space wrap children={buttons} /> : null;
+                        return buttons ? <Space wrap>{buttons}</Space> : null;
                     };
                 }
 
@@ -289,8 +289,7 @@ const Table = props => {
                 href={buttonHref(buttonValue)}
                 danger={buttonValue.danger ?? undefined}
                 onClick={(e) => { e.preventDefault(); buttonAction(buttonValue); }}
-                children={buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}
-            />);
+            >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>);
         }
     }
 
@@ -312,7 +311,7 @@ const Table = props => {
                 scroll={{ x: 'max-content' }}
                 columns={mainColumns}
                 actionRef={actionRef}
-                request={async (params = {}, sort, filter) => {
+                request={async (params = {}, sort) => {
                     if (notEmpty(sort)) {
                         params._order = Object.keys(sort)[0];
                         params._sort = sort[params._order];
@@ -336,7 +335,7 @@ const Table = props => {
                 }}
                 revalidateOnFocus={false}
                 rowKey='id'
-                search={tableSearch ? { labelWidth: 'auto' } : false}
+                search={tableSearch ? { labelWidth: 'auto', defaultCollapsed: false } : false}
                 pagination={{
                     hideOnSinglePage: false,
                     defaultPageSize: 10,
@@ -347,7 +346,7 @@ const Table = props => {
                     actions: toolbarActions
                 }}
                 rowSelection={notEmpty(global.config.batch.button) ? true : undefined}
-                tableAlertRender={({ selectedRowKeys, selectedRows, onCleanSelected }) => {
+                tableAlertRender={({ selectedRowKeys }) => {
                     const buttons = [];
                     if (notEmpty(global.config.batch.button)) {
                         for (const [buttonKey, buttonValue] of Object.entries(global.config.batch.button)) {
@@ -358,12 +357,11 @@ const Table = props => {
                                     href={buttonHref(buttonValue, selectedRowKeys)}
                                     danger={buttonValue.danger ?? undefined}
                                     onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, selectedRowKeys); }}
-                                    children={buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}
-                                />
+                                >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
                             );
                         }
                     }
-                    return <Space wrap children={buttons} />;
+                    return <Space wrap>{buttons}</Space>;
                 }}
                 options={{
                     setting: false
@@ -394,13 +392,13 @@ const Table = props => {
                                 sumVisible = true;
                                 sumCells.push(
                                     <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
-                                        {index === titleIndex ? <><span style={{ float: 'left' }} children={localeValue(':sum')} />{result}</> : result}
+                                        {index === titleIndex ? <><span style={{ float: 'left' }}>{localeValue(':sum')}</span>{result}</> : result}
                                     </ProTable.Summary.Cell>
                                 );
                                 if (global.config.summary[key].type === 'sum') {
                                     avgCells.push(
                                         <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
-                                            {index === titleIndex ? <span style={{ float: 'left' }} children={localeValue(':avg')} /> : undefined}
+                                            {index === titleIndex ? <span style={{ float: 'left' }}>{localeValue(':avg')}</span> : undefined}
                                         </ProTable.Summary.Cell>
                                     );
                                 } else {
@@ -408,19 +406,19 @@ const Table = props => {
                                     result = (sum / pageData.length).toFixed(precision);
                                     avgCells.push(
                                         <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
-                                            {index === titleIndex ? <><span style={{ float: 'left' }} children={localeValue(':avg')} />{result}</> : result}
+                                            {index === titleIndex ? <><span style={{ float: 'left' }}>{localeValue(':avg')}</span>{result}</> : result}
                                         </ProTable.Summary.Cell>
                                     );
                                 }
                             } else {
                                 sumCells.push(
                                     <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
-                                        {index === titleIndex ? <span style={{ float: 'left' }} children={localeValue(':sum')} /> : undefined}
+                                        {index === titleIndex ? <span style={{ float: 'left' }}>{localeValue(':sum')}</span> : undefined}
                                     </ProTable.Summary.Cell>
                                 );
                                 avgCells.push(
                                     <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
-                                        {index === titleIndex ? <span style={{ float: 'left' }} children={localeValue(':avg')} /> : undefined}
+                                        {index === titleIndex ? <span style={{ float: 'left' }}>{localeValue(':avg')}</span> : undefined}
                                     </ProTable.Summary.Cell>
                                 );
                             }
@@ -429,12 +427,12 @@ const Table = props => {
 
                     return sumVisible || avgVisible ? (
                         <ProTable.Summary>
-                            {sumVisible ? (<ProTable.Summary.Row style={{ textAlign: 'right' }} children={sumCells} />) : undefined}
-                            {avgVisible ? (<ProTable.Summary.Row style={{ textAlign: 'right' }} children={avgCells} />) : undefined}
+                            {sumVisible ? (<ProTable.Summary.Row style={{ textAlign: 'right' }}>{sumCells}</ProTable.Summary.Row>) : undefined}
+                            {avgVisible ? (<ProTable.Summary.Row style={{ textAlign: 'right' }}>{avgCells}</ProTable.Summary.Row>) : undefined}
                         </ProTable.Summary>
                     ) : undefined;
                 } : undefined}
-                tableExtraRender={notEmpty(global.config.statistic) ? (_, pageData) => {
+                tableExtraRender={notEmpty(global.config.statistic) ? () => {
                     const statistic = [];
                     for (const [key, value] of Object.entries(global.config.statistic)) {
                         let statValue = value.value ?? undefined;
@@ -453,7 +451,7 @@ const Table = props => {
                     }
                     return (
                         <Card>
-                            <Row gutter={[16, 16]} justify={statisticJustify} ref={statSize.ref} children={statistic} />
+                            <Row gutter={[16, 16]} justify={statisticJustify} ref={statSize.ref}>{statistic}</Row>
                         </Card>
                     );
                 } : undefined}

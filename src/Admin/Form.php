@@ -125,7 +125,7 @@ class Form
                 $middleware('render', $renderData);
             }
 
-            Response::render('public/alight-admin/index.html', ['title' => $_title, 'script' => Admin::globalScript('Form', $renderData)]);
+            Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => $_title, 'script' => Admin::globalScript('Form', $renderData)]);
         } else {
             $sqlData = self::dataFilter($field, Request::request());
 

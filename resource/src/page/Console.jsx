@@ -2,7 +2,8 @@ import { useRef, useState, useEffect } from 'react';
 import { Row, Col, Card, Avatar, Modal } from 'antd';
 import { EditOutlined, LockOutlined, PoweroffOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import Plots from '@ant-design/plots';
-import global, { localeInit, localeValue, redirect, ModelKit, notEmpty, ajax } from './Util';
+import global, { localeInit, localeValue, redirect, notEmpty, ajax } from '../lib/Util';
+import ModelKit from '../lib/ModelKit';
 
 const Console = props => {
     localeInit(props.locale);
@@ -138,7 +139,7 @@ const Console = props => {
             for (const [chartKey, chartValue] of Object.entries(global.config.chart)) {
                 return (
                     <Col {...chartValue.grid}>
-                        <Card children={chartComponent(chartKey, chartValue.component, chartValue.config)} />
+                        <Card>{chartComponent(chartKey, chartValue.component, chartValue.config)}</Card>
                     </Col>
                 );
             }
@@ -171,9 +172,9 @@ const Console = props => {
                     <Card
                         title={localeValue(':user_profile')}
                         actions={[
-                            <EditOutlined title={localeValue(':edit_profile')} onClick={editProfile} />,
-                            <LockOutlined title={localeValue(':change_password')} onClick={changePassword} />,
-                            <PoweroffOutlined title={localeValue(':logout')} onClick={logout} />,
+                            <EditOutlined key={1} title={localeValue(':edit_profile')} onClick={editProfile} />,
+                            <LockOutlined key={2} title={localeValue(':change_password')} onClick={changePassword} />,
+                            <PoweroffOutlined key={3} title={localeValue(':logout')} onClick={logout} />,
                         ]}
                     >
                         <Card.Meta

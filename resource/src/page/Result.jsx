@@ -1,6 +1,6 @@
 import { createRef, useState, useEffect } from 'react';
 import { Row, Col, Result, Button } from 'antd';
-import global, { localeInit, localeValue, inIframe, postMessage, redirect } from './Util';
+import global, { localeInit, localeValue, inIframe, postMessage, redirect } from '../lib/Util';
 
 const Error = props => {
     localeInit(props.locale);
@@ -22,8 +22,7 @@ const Error = props => {
             <Button
                 type='primary'
                 onClick={() => { redirect(global.path + '/login'); }}
-                children={localeValue(':login') + ' (' + countDown + ')'}
-            />
+            >{localeValue(':login') + ' (' + countDown + ')'}</Button>
         );
     };
 
@@ -32,8 +31,7 @@ const Error = props => {
             <Button
                 type='default'
                 onClick={() => { window.close(); }}
-                children={'关闭'}
-            />
+            >{localeValue(':close')}</Button>
         );
     };
 

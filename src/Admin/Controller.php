@@ -48,7 +48,7 @@ class Controller
         $roleId = Auth::checkRole([]);
         $menu = Menu::build($roleId);
 
-        Response::render('public/alight-admin/index.html', ['title' => $title, 'script' => Admin::globalScript('Home', ['menu' => $menu])]);
+        Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => $title, 'script' => Admin::globalScript('Home', ['menu' => $menu])]);
     }
 
     /**
@@ -118,7 +118,7 @@ class Controller
                 Response::redirect(Admin::url());
             }
 
-            Response::render('public/alight-admin/index.html', ['title' => Config::get('title'), 'script' => Admin::globalScript('Login')]);
+            Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => Config::get('title'), 'script' => Admin::globalScript('Login')]);
         }
     }
 
@@ -132,7 +132,7 @@ class Controller
         if (!Request::isAjax()) {
             Model::userLog($userId);
 
-            Response::render('public/alight-admin/index.html', ['title' => Config::get('title'), 'script' => Admin::globalScript('Console', Console::build($userId))]);
+            Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => Config::get('title'), 'script' => Admin::globalScript('Console', Console::build($userId))]);
         } else {
             $resData = [];
 
@@ -170,7 +170,7 @@ class Controller
     {
         $status = in_array($status, [200, 401, 403, 404, 500]) ? (int) $status : 404;
 
-        Response::render('public/alight-admin/index.html', ['title' => Config::get('title'), 'script' => Admin::globalScript('Result', ['status' => $status])]);
+        Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => Config::get('title'), 'script' => Admin::globalScript('Result', ['status' => $status])]);
     }
 
     /**
@@ -283,7 +283,7 @@ class Controller
         Table::column('name')->title(':name')->search();
         Table::column('email')->title(':email')->search();
         Table::column('status')->title(':status')->search('select')->enum($statusEnum);
-        Table::column('create_time')->title(':create_time');
+        Table::column('create_time')->title(':create_time')->search('dateRange');
 
         Table::button('add')->title(':add')->toolbar();
         Table::button('edit')->title(':edit');

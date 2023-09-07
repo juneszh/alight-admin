@@ -12,6 +12,7 @@ const i18n = {
     ':password': 'Password',
     ':captcha': 'Captcha',
     ':login': 'Log in',
+    ':close': 'Close',
     ':remember': 'Remember me',
     ':missing_param': 'Missing required parameter',
     ':invalid_captcha': 'Invalid captcha',

@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Layout, Menu } from 'antd';
 import { DashboardOutlined, SafetyCertificateOutlined, TeamOutlined } from '@ant-design/icons';
-import global, { localeInit, localeValue, notEmpty, ModelKit } from './Util';
+import global, { localeInit, localeValue, notEmpty } from '../lib/Util';
+import ModelKit from '../lib/ModelKit'
 
 const Home = props => {
     localeInit(props.locale);
@@ -73,8 +74,7 @@ const Home = props => {
                                 href={subValue.url + (subValue.url.indexOf('?') !== -1 ? '&' : '?') + '_title=' + (itemKey === '1' ? localeValue(subValue.title) : subValue.title)}
                                 rel='noopener noreferrer'
                                 onClick={e => menuAction(e, subValue)}
-                                children={itemKey === '1' ? localeValue(subValue.title) : subValue.title}
-                            />
+                            >{itemKey === '1' ? localeValue(subValue.title) : subValue.title}</a>
                         );
                     }
                     item.children.push(children);
@@ -87,8 +87,7 @@ const Home = props => {
                             href={itemValue.url + (itemValue.url.indexOf('?') !== -1 ? '&' : '?') + '_title=' + itemValue.title}
                             rel='noopener noreferrer'
                             onClick={e => menuAction(e, itemValue)}
-                            children={itemValue.title}
-                        />
+                        >{itemValue.title}</a>
                     );
                 }
             }

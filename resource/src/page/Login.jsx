@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { Row, Col, Form, Input, Button, Checkbox } from 'antd';
 import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons';
-import global, { localeInit, localeValue, ajax } from './Util';
+import global, { localeInit, localeValue, ajax } from '../lib/Util';
 
 const Login = props => {
     localeInit(props.locale);
 
     const [form] = Form.useForm();
 
-    const captchaPath = process.env.NODE_ENV === 'development' ? process.env.PUBLIC_URL + '/captcha.jpg?=' : global.path + '/captcha?t=';
+    const captchaPath = global.path + '/captcha?t=';
     const [captcha, setCaptcha] = useState(captchaPath + (new Date()).getTime());
     const buildCaptcha = () => {
         setCaptcha(captchaPath + (new Date()).getTime());
@@ -24,7 +24,7 @@ const Login = props => {
                     captcha: ''
                 });
             }
-        }).catch(error => {
+        }).catch(() => {
             buildCaptcha();
             form.setFieldsValue({
                 captcha: ''
@@ -39,7 +39,7 @@ const Login = props => {
             style={{ minHeight: '100vh', height: 'auto', backgroundColor: '#f0f2f5' }}
         >
             <Col style={{ width: '320px' }}>
-                <h1 style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '40px' }} children={global.title} />
+                <h1 style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '40px' }} >{global.title}</h1>
                 <Form
                     form={form}
                     initialValues={{
@@ -110,15 +110,14 @@ const Login = props => {
                             type='primary'
                             htmlType='submit'
                             block
-                            children={localeValue(':login')}
-                        />
+                        >{localeValue(':login')}</Button>
                     </Form.Item>
                     <Form.Item
                         name='remember'
                         valuePropName='checked'
                         style={{ textAlign: 'right' }}
                     >
-                        <Checkbox children={localeValue(':remember')} />
+                        <Checkbox>{localeValue(':remember')}</Checkbox>
                     </Form.Item>
                 </Form>
             </Col>

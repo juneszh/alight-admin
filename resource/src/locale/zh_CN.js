@@ -12,6 +12,7 @@ const i18n = {
     ':password': '密码',
     ':captcha': '验证码',
     ':login': '登录',
+    ':close': '关闭',
     ':remember': '自动登录',
     ':missing_param': '缺少必需参数',
     ':invalid_captcha': '无效验证码',

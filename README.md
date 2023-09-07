@@ -33,7 +33,6 @@ $ composer create-project juneszh/alight-project {PROJECT_DIRECTORY}
 The following commands will build the runtime environment required by **Alight-Admin**, such as installing composer package, inserting configuration options, creating database tables, and downloading front-end resources. Please make sure the [database has been configured](https://github.com/juneszh/alight#database).
 ```bash
 $ cd {PROJECT_DIRECTORY} 
-$ composer require juneszh/alight-admin
 $ composer run admin-install
 $ composer run admin-download
 ```
@@ -45,7 +44,7 @@ $ composer run admin-download
     * [symfony/var-exporter](https://github.com/symfony/var-exporter)
 * UI components
     * [React](https://react.dev/)
-    * [Create React App](https://create-react-app.dev/)
+    * [Vite](https://vitejs.dev/)
     * [Ant Design](https://ant.design/)
     * [Ant Design Pro Components](https://procomponents.ant.design/)
     * [Ant Design Charts](https://charts.ant.design/en)

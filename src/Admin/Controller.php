@@ -289,7 +289,6 @@ class Controller
         Table::button('edit')->title(':edit');
         Table::button('password')->title(':password')->danger();
 
-        json_encode([]);
         Table::render('admin_user');
     }
 
@@ -319,7 +318,7 @@ class Controller
 
         Form::create('add');
         Form::field('account')->title(':account')->required();
-        Form::field('role_id')->title(':role')->type(Form::TYPE_SELECT)->enum($roleEnum)->required()->default('1');
+        Form::field('role_id')->title(':role')->type(Form::TYPE_SELECT)->enum($roleEnum)->required()->default(1);
         Form::field('name')->title(':name')->required();
         Form::field('email')->title(':email');
         Form::field('password')->title(':password')->type(Form::TYPE_PASSWORD)->required();

@@ -228,7 +228,7 @@ class Controller
     {
         Auth::checkRole([1]);
 
-        Table::column('id')->title('ID')->sort(Table::SORT_ASC);
+        Table::column('id')->title('ID')->sort(Table::SORT_ASCEND);
         Table::column('name')->title(':role');
         Table::column('create_time')->title(':create_time');
 
@@ -277,7 +277,7 @@ class Controller
         $roleEnum = Utility::arrayFilter(Model::getRoleList(), [], 'id', 'name');
         $statusEnum = [1 => ['text' => ':enable', 'status' => 'success'], 2 => ['text' => ':disable', 'status' => 'error']];
 
-        Table::column('id')->title('ID')->sort(Table::SORT_ASC);
+        Table::column('id')->title('ID')->sort(Table::SORT_ASCEND);
         Table::column('account')->title(':account')->search()->sort();
         Table::column('role_id')->title(':role')->search(Table::SEARCH_SELECT)->enum($roleEnum);
         Table::column('name')->title(':name')->search();

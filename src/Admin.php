@@ -27,14 +27,14 @@ use Symfony\Component\VarExporter\VarExporter;
 
 class Admin
 {
-    const PACKAGE = 'juneszh/alight-admin';
-    const PUBLIC = 'public/alight-admin';
+    private const PACKAGE = 'juneszh/alight-admin';
+    private const PUBLIC = 'public/alight-admin';
     /**
      * Admin built-in routes
      * 
      * @param string $configKey 
      */
-    public static function route(string $configKey = '')
+    public static function start(string $configKey = '')
     {
         Route::beforeHandler([AdminConfig::class, 'init'], [$configKey]);
         Route::authHandler([Auth::class, 'verify']);

@@ -54,8 +54,8 @@ class Table
         SEARCH_TEXT_LIKE = 'text[~]',
 
         SORT_DEFAULT = '',
-        SORT_ASC = 'ascend',
-        SORT_DESC = 'descend',
+        SORT_ASCEND = 'ascend',
+        SORT_DESCEND = 'descend',
 
         ALIGN_LEFT = 'left',
         ALIGN_CENTER = 'center',

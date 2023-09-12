@@ -26,7 +26,7 @@ class MenuItem
      * 
      * @param int $index 
      * @param int $subIndex 
-     * @return MenuItem 
+     * @return $this  
      */
     public function __construct(int $index, int $subIndex)
     {
@@ -36,45 +36,13 @@ class MenuItem
     }
 
     /**
-     * Set url
-     * 
-     * @param string $value 
-     * @return MenuItem 
-     */
-    public function url(string $value): MenuItem
-    {
-        if ($this->subIndex) {
-            Menu::$config[$this->index]['sub'][$this->subIndex][__FUNCTION__] = Admin::url($value);
-        } else {
-            Menu::$config[$this->index][__FUNCTION__] = Admin::url($value);
-        }
-        return $this;
-    }
-
-    /**
-     * Which role has permission to view
-     *
-     * @param array $roleValues
-     * @return MenuItem
-     */
-    public function role(array $roleValues): MenuItem
-    {
-        if ($this->subIndex) {
-            Menu::$config[$this->index]['sub'][$this->subIndex][__FUNCTION__] = $roleValues;
-        } else {
-            Menu::$config[$this->index][__FUNCTION__] = $roleValues;
-        }
-        return $this;
-    }
-
-    /**
      * Set click action
      *
      * @param string $value Menu::ACTION_*
-     * @return MenuItem 
+     * @return $this  
      * @throws Exception 
      */
-    public function action(string $value): MenuItem
+    public function action(string $value)
     {
         if ($this->subIndex) {
             Menu::$config[$this->index]['sub'][$this->subIndex][__FUNCTION__] = $value;
@@ -88,17 +56,49 @@ class MenuItem
      * Set icon
      *
      * @param string $value
-     * @return MenuItem
+     * @return $this 
      * 
      * @see https://ant.design/components/icon/
      * @deprecated Only used in the built-in menu, because more icons must be imported in react
      */
-    public function icon(string $value): MenuItem
+    public function icon(string $value)
     {
         if ($this->subIndex) {
             Menu::$config[$this->index]['sub'][$this->subIndex][__FUNCTION__] = $value;
         } else {
             Menu::$config[$this->index][__FUNCTION__] = $value;
+        }
+        return $this;
+    }
+
+    /**
+     * Which role has permission to view
+     *
+     * @param array $roleValues
+     * @return $this 
+     */
+    public function role(array $roleValues)
+    {
+        if ($this->subIndex) {
+            Menu::$config[$this->index]['sub'][$this->subIndex][__FUNCTION__] = $roleValues;
+        } else {
+            Menu::$config[$this->index][__FUNCTION__] = $roleValues;
+        }
+        return $this;
+    }
+
+    /**
+     * Set url
+     * 
+     * @param string $value 
+     * @return $this  
+     */
+    public function url(string $value)
+    {
+        if ($this->subIndex) {
+            Menu::$config[$this->index]['sub'][$this->subIndex][__FUNCTION__] = Admin::url($value);
+        } else {
+            Menu::$config[$this->index][__FUNCTION__] = Admin::url($value);
         }
         return $this;
     }

@@ -23,7 +23,7 @@ class FormOption
      * Define the configuration index
      * 
      * @param string $form 
-     * @return FormOption 
+     * @return $this 
      */
     public function __construct(string $form)
     {
@@ -35,16 +35,26 @@ class FormOption
      * Copy form configuration
      * 
      * @param string $form 
-     * @return FormOption 
+     * @param array $fields 
+     * @return $this 
      * @throws Exception 
      */
-    public function copy(string $form): FormOption
+    public function copy(string $form, array $fields = [])
     {
         if (!isset(Form::$config[$form])) {
             throw new Exception('Missing copy form definition.');
         }
 
-        Form::$config[$this->form] = Form::$config[$form];
+        if ($fields) {
+            foreach ($fields as $key) {
+                if (isset(Form::$config[$form][$key])) {
+                    Form::$config[$this->form][$key] = Form::$config[$form][$key];
+                }
+            }
+        } else {
+            Form::$config[$this->form] = Form::$config[$form];
+        }
+
         return $this;
     }
 }

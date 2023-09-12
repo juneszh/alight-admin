@@ -25,7 +25,6 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException as ExceptionInval
 
 class Model
 {
-
     /**
      * Get data or cache
      * 
@@ -72,21 +71,6 @@ class Model
     public static function getRoleList(): array
     {
         return self::getCacheData('admin_role');
-    }
-
-    /**
-     * Get user info
-     * 
-     * @param int $id 
-     * @return array 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws ExceptionInvalidArgumentException 
-     * @throws ExceptionInvalidArgumentException 
-     */
-    public static function getUserInfo(int $id): array
-    {
-        return self::getCacheData('admin_user', $id);
     }
 
     /**
@@ -145,6 +129,21 @@ class Model
         }
 
         return (int) $result;
+    }
+
+    /**
+     * Get user info
+     * 
+     * @param int $id 
+     * @return array 
+     * @throws Exception 
+     * @throws ErrorException 
+     * @throws ExceptionInvalidArgumentException 
+     * @throws ExceptionInvalidArgumentException 
+     */
+    public static function getUserInfo(int $id): array
+    {
+        return self::getCacheData('admin_user', $id);
     }
 
     /**
@@ -217,6 +216,30 @@ class Model
     }
 
     /**
+     * Count database for Table
+     * 
+     * @param string $table 
+     * @param array $search 
+     * @return int
+     * @throws Exception 
+     * @throws InvalidArgumentException 
+     * @throws PDOException 
+     */
+    public static function tableCount(string $table, array $search = []): int
+    {
+        $db = Database::init();
+
+        $where = [];
+        if ($search) {
+            $where['AND'] = $search;
+        }
+
+        $count = $db->count($table, '*', $where);
+
+        return $count ?: 0;
+    }
+
+    /**
      * Select database for Table
      * 
      * @param string $table 
@@ -260,48 +283,6 @@ class Model
 
         return $data ?: [];
     }
-
-    /**
-     * Count database for Table
-     * 
-     * @param string $table 
-     * @param array $search 
-     * @return int
-     * @throws Exception 
-     * @throws InvalidArgumentException 
-     * @throws PDOException 
-     */
-    public static function tableCount(string $table, array $search = []): int
-    {
-        $db = Database::init();
-
-        $where = [];
-        if ($search) {
-            $where['AND'] = $search;
-        }
-
-        $count = $db->count($table, '*', $where);
-
-        return $count ?: 0;
-    }
-
-    /**
-     * Get data for From
-     * 
-     * @param string $table 
-     * @param int $id 
-     * @return array 
-     * @throws Exception 
-     */
-    public static function formGet(string $table, int $id): array
-    {
-        $db = Database::init();
-
-        $data = $db->get($table, '*', ['id' => $id]);
-
-        return $data ?: [];
-    }
-
     /**
      * Insert data for Form
      * 
@@ -328,6 +309,23 @@ class Model
         }
 
         return (int) $db->id();
+    }
+
+    /**
+     * Get data for From
+     * 
+     * @param string $table 
+     * @param int $id 
+     * @return array 
+     * @throws Exception 
+     */
+    public static function formGet(string $table, int $id): array
+    {
+        $db = Database::init();
+
+        $data = $db->get($table, '*', ['id' => $id]);
+
+        return $data ?: [];
     }
 
     /**
@@ -390,4 +388,5 @@ class Model
 
         return $result->rowCount() ? $id : (!$db->error ? $id : []);
     }
+
 }

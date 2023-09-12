@@ -52,6 +52,43 @@ class Controller
     }
 
     /**
+     * Result page
+     * 
+     * @throws Exception 
+     */
+    public static function result($status)
+    {
+        $status = in_array($status, [200, 401, 403, 404, 500]) ? (int) $status : 404;
+
+        Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => Config::get('title'), 'script' => Admin::globalScript('Result', ['status' => $status])]);
+    }
+
+    /**
+     * Captcha image
+     * 
+     * @throws Exception 
+     * @throws ErrorException 
+     * @throws InvalidArgumentException 
+     * @throws InvalidArgumentException 
+     */
+    public static function captcha()
+    {
+        $phraseBuilder = new \Gregwar\Captcha\PhraseBuilder(5, '0123456789');
+        $builder = new \Gregwar\Captcha\CaptchaBuilder(null, $phraseBuilder);
+        $code = $builder->build(130, 40)->getPhrase();
+
+        $captchaHash = Utility::randomHex();
+
+        $cache = Cache::init();
+        $cache->set('admin_captcha_' . $captchaHash, $code, 300);
+
+        setcookie('admin_captcha', $captchaHash, time() + 300, '/' . Config::get('path'), '.' . Request::host());
+
+        header('Content-type: image/jpeg');
+        $builder->output();
+    }
+
+    /**
      * Login page
      * 
      * @throws Exception 
@@ -122,6 +159,22 @@ class Controller
         }
     }
 
+    /**
+     * User logout
+     * 
+     * @throws Exception 
+     * @throws ErrorException 
+     * @throws InvalidArgumentException 
+     * @throws InvalidArgumentException 
+     */
+    public static function logout()
+    {
+        $userId = Auth::getUserId();
+        Auth::clear($userId);
+
+        Response::redirect(Admin::url('login'));
+    }
+
     /** 
      * Console page
      */
@@ -150,68 +203,15 @@ class Controller
                     $resData[] = [
                         'date' => $value->format('n-d'),
                         'time' => $hour . ':00',
-                        'size' => isset($log[$hour]) ? 1 : 0,
-                        'action' => isset($log[$hour]) ? $log[$hour]['view'] + $log[$hour]['edit'] : 0,
-                        'title' => "\u{1F50D}" . ' ' . ($log[$hour]['view'] ?? 0) . ' ' . "\u{270F}" . ' ' . ($log[$hour]['edit'] ?? 0),
+                        'show' => isset($log[$hour]) ? 1 : 0,
+                        'color' => isset($log[$hour]) ? $log[$hour]['view'] + $log[$hour]['edit'] : 0,
+                        'title' => "\u{1F50E}" . ' ' . ($log[$hour]['view'] ?? 0) . ' ' . "\u{270F}" . ' ' . ($log[$hour]['edit'] ?? 0),
                     ];
                 }
             }
 
             Response::api(0, null, ['data' => $resData]);
         }
-    }
-
-    /**
-     * Result page
-     * 
-     * @throws Exception 
-     */
-    public static function result($status)
-    {
-        $status = in_array($status, [200, 401, 403, 404, 500]) ? (int) $status : 404;
-
-        Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => Config::get('title'), 'script' => Admin::globalScript('Result', ['status' => $status])]);
-    }
-
-    /**
-     * User logout
-     * 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
-     */
-    public static function logout()
-    {
-        $userId = Auth::getUserId();
-        Auth::clear($userId);
-
-        Response::redirect(Admin::url('login'));
-    }
-
-    /**
-     * Captcha image
-     * 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
-     */
-    public static function captcha()
-    {
-        $phraseBuilder = new \Gregwar\Captcha\PhraseBuilder(5, '0123456789');
-        $builder = new \Gregwar\Captcha\CaptchaBuilder(null, $phraseBuilder);
-        $code = $builder->build(130, 40)->getPhrase();
-
-        $captchaHash = Utility::randomHex();
-
-        $cache = Cache::init();
-        $cache->set('admin_captcha_' . $captchaHash, $code, 300);
-
-        setcookie('admin_captcha', $captchaHash, time() + 300, '/' . Config::get('path'), '.' . Request::host());
-
-        header('Content-type: image/jpeg');
-        $builder->output();
     }
 
     /**
@@ -329,15 +329,9 @@ class Controller
         Form::field('confirm_password')->delete();
         Form::field('status')->title(':status')->type(Form::TYPE_RADIO)->enum($statusEnum);
 
-        Form::create('my_profile')->copy('edit');
-        Form::field('account')->delete();
-        Form::field('role_id')->delete();
-        Form::field('status')->delete();
+        Form::create('password')->copy('add', ['password', 'confirm_password']);
 
-        Form::create('password');
-        Form::field('password')->title(':password')->type(Form::TYPE_PASSWORD)->required();
-        Form::field('confirm_password')->title(':confirm_password')->type(Form::TYPE_PASSWORD)->required()->confirm('password');
-
+        Form::create('my_profile')->copy('add', ['name', 'email']);
         Form::create('my_password')->copy('password');
 
         Form::render('admin_user', function (string $action, array &$data) {

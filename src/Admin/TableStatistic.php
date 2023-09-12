@@ -21,7 +21,7 @@ class TableStatistic
      * Define the configuration index
      * 
      * @param string $key
-     * @return TableStatistic 
+     * @return $this 
      */
     public function __construct(string $key)
     {
@@ -33,9 +33,9 @@ class TableStatistic
      * Set title
      * 
      * @param string $value 
-     * @return TableStatistic 
+     * @return $this 
      */
-    public function title(string $value): TableStatistic
+    public function title(string $value)
     {
         Table::$config['statistic'][$this->key][__FUNCTION__] = $value;
         return $this;
@@ -45,9 +45,9 @@ class TableStatistic
      * Set value
      * 
      * @param mixed $value 
-     * @return TableStatistic 
+     * @return $this 
      */
-    public function value($value): TableStatistic
+    public function value($value)
     {
         Table::$config['statistic'][$this->key][__FUNCTION__] = $value;
         return $this;

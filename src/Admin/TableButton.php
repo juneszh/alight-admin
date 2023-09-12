@@ -23,7 +23,7 @@ class TableButton
      * Define the configuration index
      * 
      * @param int $index 
-     * @return TableButton 
+     * @return $this 
      */
     public function __construct(int $index)
     {
@@ -32,49 +32,23 @@ class TableButton
     }
 
     /**
-     * Set title
-     * 
-     * @param string $value 
-     * @return TableButton 
+     * Set click action
+     *
+     * @param string $value Table::ACTION_*
+     * @return TableButton
      */
-    public function title(string $value): TableButton
+    public function action(string $value)
     {
         Table::$config['button'][$this->index][__FUNCTION__] = $value;
-        if ($value[0] === ':') {
-            Table::$config['button'][$this->index]['locale'] = true;
-        }
-        return $this;
-    }
-
-    /**
-     * Set url
-     * 
-     * @param string $value 
-     * @return TableButton 
-     */
-    public function url(string $value): TableButton
-    {
-        Table::$config['button'][$this->index][__FUNCTION__] = Admin::url($value);
-        return $this;
-    }
-
-    /**
-     * Put in the toolbar
-     * 
-     * @return TableButton 
-     */
-    public function toolbar(): TableButton
-    {
-        Table::$config['button'][$this->index]['place'] = '_' . __FUNCTION__;
         return $this;
     }
 
     /**
      * Put in the batch bar
      * 
-     * @return TableButton 
+     * @return $this 
      */
-    public function batch(): TableButton
+    public function batch()
     {
         Table::$config['button'][$this->index]['place'] = '_' . __FUNCTION__;
         Table::$config['button'][$this->index]['action'] = 'confirm';
@@ -85,9 +59,9 @@ class TableButton
      * Put in the specified column (Create _column column by default)
      * 
      * @param string $columnKey 
-     * @return TableButton 
+     * @return $this 
      */
-    public function column(string $columnKey = '_column'): TableButton
+    public function column(string $columnKey = '_column')
     {
         if ($columnKey) {
             if ($columnKey !== '_column') {
@@ -98,7 +72,24 @@ class TableButton
         return $this;
     }
 
-    public function expand(string $columnKey = '_expand'): TableButton
+    /**
+     * Set danger
+     * 
+     * @return $this 
+     */
+    public function danger()
+    {
+        Table::$config['button'][$this->index][__FUNCTION__] = true;
+        return $this;
+    }
+
+    /**
+     * Put in the specified expand column (Create _expand column by default)
+     * 
+     * @param string $columnKey 
+     * @return $this 
+     */
+    public function expand(string $columnKey = '_expand')
     {
         if ($columnKey) {
             if ($columnKey !== '_expand') {
@@ -110,14 +101,14 @@ class TableButton
     }
 
     /**
-     * Set click action
+     * Set display conditions
      *
-     * @param string $value Table::ACTION_*
-     * @return TableButton
+     * @param array $keyValues 
+     * @return $this 
      */
-    public function action(string $value): TableButton
+    public function if(array $keyValues)
     {
-        Table::$config['button'][$this->index][__FUNCTION__] = $value;
+        Table::$config['button'][$this->index][__FUNCTION__] = $keyValues;
         return $this;
     }
 
@@ -127,19 +118,7 @@ class TableButton
      * @param array $keyValues Use {{column_key}} for column data
      * @return TableButton
      */
-    public function param(array $keyValues): TableButton
-    {
-        Table::$config['button'][$this->index][__FUNCTION__] = $keyValues;
-        return $this;
-    }
-
-    /**
-     * Set display conditions
-     *
-     * @param array $keyValues 
-     * @return TableButton 
-     */
-    public function if(array $keyValues): TableButton
+    public function param(array $keyValues)
     {
         Table::$config['button'][$this->index][__FUNCTION__] = $keyValues;
         return $this;
@@ -151,12 +130,37 @@ class TableButton
      * @param array $roleValues
      * @return TableButton
      */
-    public function role(array $roleValues): TableButton
+    public function role(array $roleValues)
     {
         Table::$config['button'][$this->index][__FUNCTION__] = $roleValues;
         return $this;
     }
 
+    /**
+     * Set title
+     * 
+     * @param string $value 
+     * @return $this 
+     */
+    public function title(string $value)
+    {
+        Table::$config['button'][$this->index][__FUNCTION__] = $value;
+        if ($value[0] === ':') {
+            Table::$config['button'][$this->index]['locale'] = true;
+        }
+        return $this;
+    }
+
+    /**
+     * Put in the toolbar
+     * 
+     * @return $this 
+     */
+    public function toolbar()
+    {
+        Table::$config['button'][$this->index]['place'] = '_' . __FUNCTION__;
+        return $this;
+    }
 
     /**
      * Set type
@@ -166,20 +170,21 @@ class TableButton
      * 
      * @see https://ant.design/components/button/
      */
-    public function type(string $value): TableButton
+    public function type(string $value)
     {
         Table::$config['button'][$this->index][__FUNCTION__] = $value;
         return $this;
     }
 
     /**
-     * Set danger
+     * Set url
      * 
-     * @return TableButton 
+     * @param string $value 
+     * @return $this 
      */
-    public function danger(): TableButton
+    public function url(string $value)
     {
-        Table::$config['button'][$this->index][__FUNCTION__] = true;
+        Table::$config['button'][$this->index][__FUNCTION__] = Admin::url($value);
         return $this;
     }
 }

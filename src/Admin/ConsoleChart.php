@@ -23,7 +23,7 @@ class ConsoleChart
      * Define the configuration index
      * 
      * @param int $index 
-     * @return ConsoleChart 
+     * @return $this 
      */
     public function __construct(int $index)
     {
@@ -35,23 +35,11 @@ class ConsoleChart
      * Set data api
      * 
      * @param string $value 
-     * @return ConsoleChart 
+     * @return $this 
      */
-    public function api(string $value): ConsoleChart
+    public function api(string $value)
     {
         Console::$config[$this->index][__FUNCTION__] = Admin::url($value);
-        return $this;
-    }
-
-    /**
-     * Which role has permission to view
-     *
-     * @param array $roleValues
-     * @return ConsoleChart
-     */
-    public function role(array $roleValues): ConsoleChart
-    {
-        Console::$config[$this->index][__FUNCTION__] = $roleValues;
         return $this;
     }
 
@@ -59,9 +47,9 @@ class ConsoleChart
      * Set chart config
      *
      * @param array $value
-     * @return ConsoleChart 
+     * @return $this 
      */
-    public function config(array $value): ConsoleChart
+    public function config(array $value)
     {
         Console::$config[$this->index][__FUNCTION__] = $value;
         return $this;
@@ -71,11 +59,23 @@ class ConsoleChart
      * Set chart grid
      *
      * @param array $value
-     * @return ConsoleChart 
+     * @return $this 
      */
-    public function grid(array $value): ConsoleChart
+    public function grid(array $value)
     {
         Console::$config[$this->index][__FUNCTION__] = $value;
+        return $this;
+    }
+
+    /**
+     * Which role has permission to view
+     *
+     * @param array $roleValues
+     * @return ConsoleChart
+     */
+    public function role(array $roleValues)
+    {
+        Console::$config[$this->index][__FUNCTION__] = $roleValues;
         return $this;
     }
 }

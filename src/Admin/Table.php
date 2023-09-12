@@ -29,6 +29,20 @@ class Table
     private static int $buttonIndex = 0;
 
     public const
+        ACTION_FORM = 'form',
+        ACTION_PAGE = 'page',
+        ACTION_CONFIRM = 'confirm',
+        ACTION_SUBMIT = 'submit',
+        ACTION_POPUP = 'popup',
+        ACTION_REDIRECT = 'redirect',
+
+        ALIGN_LEFT = 'left',
+        ALIGN_CENTER = 'center',
+        ALIGN_RIGHT = 'right',
+
+        FIXED_LEFT = 'left',
+        FIXED_RIGHT = 'right',
+
         SEARCH_MONEY = 'money',
         SEARCH_DATE = 'date',
         SEARCH_DATE_TIME = 'dateTime',
@@ -57,53 +71,11 @@ class Table
         SORT_ASCEND = 'ascend',
         SORT_DESCEND = 'descend',
 
-        ALIGN_LEFT = 'left',
-        ALIGN_CENTER = 'center',
-        ALIGN_RIGHT = 'right',
-
-        FIXED_LEFT = 'left',
-        FIXED_RIGHT = 'right',
-
-        ACTION_FORM = 'form',
-        ACTION_PAGE = 'page',
-        ACTION_CONFIRM = 'confirm',
-        ACTION_SUBMIT = 'submit',
-        ACTION_POPUP = 'popup',
-        ACTION_REDIRECT = 'redirect',
-
         TYPE_DEFAULT = 'default',
         TYPE_PRIMARY = 'primary',
         TYPE_DASHED = 'dashed',
         TYPE_TEXT = 'text',
         TYPE_LINK = 'link';
-
-    /**
-     * Create a colum
-     * 
-     * @param string $key 
-     * @return TableColumn 
-     */
-    public static function column(string $key): TableColumn
-    {
-        if (!isset(self::$config[__FUNCTION__][$key])) {
-            self::$config[__FUNCTION__][$key] = [
-                'title' => $key,
-                'database' => true,
-            ];
-        }
-        return new TableColumn(__FUNCTION__, $key);
-    }
-
-    public static function expand(string $key): TableColumn
-    {
-        if (!isset(self::$config[__FUNCTION__][$key])) {
-            self::$config[__FUNCTION__][$key] = [
-                'title' => $key,
-                'database' => false,
-            ];
-        }
-        return new TableColumn(__FUNCTION__, $key);
-    }
 
     /**
      * Create a button
@@ -129,18 +101,36 @@ class Table
     }
 
     /**
-     * Create a column summary
+     * Create a column
      * 
      * @param string $key 
-     * @return TableSummary 
+     * @return TableColumn 
      */
-    public static function summary(string $key): TableSummary
+    public static function column(string $key): TableColumn
     {
-        self::$config[__FUNCTION__][$key] = [
-            'type' => 'sum',
-        ];
+        if (!isset(self::$config[__FUNCTION__][$key])) {
+            self::$config[__FUNCTION__][$key] = [
+                'title' => $key,
+                'database' => true,
+            ];
+        }
+        return new TableColumn(__FUNCTION__, $key);
+    }
 
-        return new TableSummary($key);
+    /**
+     * Create a expand column
+     * 
+     * @param string $key 
+     * @return TableExpand 
+     */
+    public static function expand(string $key): TableExpand
+    {
+        if (!isset(self::$config[__FUNCTION__][$key])) {
+            self::$config[__FUNCTION__][$key] = [
+                'title' => $key,
+            ];
+        }
+        return new TableExpand(__FUNCTION__, $key);
     }
 
     /**
@@ -239,7 +229,6 @@ class Table
                             if (!isset($expand[$_place])) {
                                 $expand[$_place] = [
                                     'title' => ':action',
-                                    'database' => false,
                                     'locale' => true,
                                 ];
                             }

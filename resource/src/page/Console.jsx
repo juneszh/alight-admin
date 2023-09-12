@@ -12,8 +12,8 @@ const Console = props => {
 
     const chartDataInit = {};
     if (notEmpty(global.config.chart)) {
-        for (const chartKey of Object.keys(global.config.chart)) {
-            chartDataInit[chartKey] = [];
+        for (const [chartKey, chartValue] of Object.entries(global.config.chart)) {
+            chartDataInit[chartKey] = chartValue.config.data ?? [];
         }
     }
     const [chartData, setChartData] = useState(chartDataInit);
@@ -135,17 +135,17 @@ const Console = props => {
     };
 
     const ChartList = () => {
+        const charts = [];
         if (notEmpty(global.config.chart)) {
             for (const [chartKey, chartValue] of Object.entries(global.config.chart)) {
-                return (
-                    <Col {...chartValue.grid}>
+                charts.push(
+                    <Col key={chartKey} {...chartValue.grid}>
                         <Card>{chartComponent(chartKey, chartValue.component, chartValue.config)}</Card>
                     </Col>
                 );
             }
-        } else {
-            return null;
         }
+        return charts;
     };
 
     useEffect(() => {

@@ -24,7 +24,7 @@ const Table = props => {
 
     let tableSearch;
 
-    const columnsBuilder = (columnObj) => {
+    const columnsBuilder = (columnObj, expand) => {
         const columns = [];
         if (notEmpty(columnObj)) {
             let column = {};
@@ -87,7 +87,18 @@ const Table = props => {
                 }
 
                 if (columnValue.sort) {
-                    column.sorter = true;
+                    if (expand) {
+                        column.sorter = (a, b) => {
+                            if (a[columnKey] > b[columnKey]) {
+                                return 1;
+                            } else if (a[columnKey] < b[columnKey]) {
+                                return -1;
+                            }
+                            return 0;
+                        }
+                    } else {
+                        column.sorter = true;
+                    }
                     if (typeof columnValue.sort === 'string') {
                         column.defaultSortOrder = columnValue.sort;
                     }
@@ -192,7 +203,7 @@ const Table = props => {
     }
 
     const mainColumns = columnsBuilder(global.config.column);
-    const expandColumns = columnsBuilder(global.config.expand);
+    const expandColumns = columnsBuilder(global.config.expand, true);
 
     const paramReplace = (data, record) => {
         data = Object.assign({}, data);

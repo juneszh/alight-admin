@@ -21,7 +21,7 @@ class TableSummary
      * Define the configuration index
      * 
      * @param string $key 
-     * @return TableSummary 
+     * @return $this 
      */
     public function __construct(string $key)
     {
@@ -32,9 +32,9 @@ class TableSummary
     /**
      * Set average value
      * 
-     * @return TableSummary 
+     * @return $this 
      */
-    public function avg(): TableSummary
+    public function avg()
     {
         Table::$config['summary'][$this->key]['type'] = __FUNCTION__;
         return $this;
@@ -44,9 +44,9 @@ class TableSummary
      * Set precision
      * 
      * @param int $number 
-     * @return TableSummary 
+     * @return $this 
      */
-    public function precision(int $number): TableSummary
+    public function precision(int $number)
     {
         Table::$config['summary'][$this->key][__FUNCTION__] = $number;
         return $this;

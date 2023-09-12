@@ -117,9 +117,7 @@ Next, we go ahead and create a form function:
         Form::field('status')->type('radio')->enum([1 => 'Enable', 2 => 'Disable']);
 
         // Create last form for 'password' button
-        Form::create('password');
-        Form::field('password')->type('password')->required();
-        Form::field('confirm_password')->database(false)->type('password')->required()->confirm('password');
+        Form::create('password')->copy('add', ['password', 'confirm_password']);
 
         // Bind the database table 'admin_user' and render form page
         Form::render('admin_user');
@@ -146,6 +144,151 @@ Menu::subItem('User')->url('test/user/table');
 
 Finally, the database table **user_admin** has completed **CRUD** creation
 
+## Try the Console Charts
+### Create simple Line Charts with built-in data.
+
+File: app/config/admin/console.php
+```php
+Console::chart('Line')->config([
+    'xField' => 'date',
+    'yField' => 'value',
+    'height' => 200,
+    'data' => [
+        ['date' => '2019-07-21', 'value' => 20],
+        ['date' => '2019-07-22', 'value' => 14],
+        ['date' => '2019-07-23', 'value' => 9],
+        ['date' => '2019-07-24', 'value' => 26]
+    ]
+])->grid(['span' => 12]); // Means half the width of the grid. full of 24
+```
+### Create simple Column Charts with api data.
+
+File: app/config/admin/console.php
+```php
+Console::chart('Column')->config([
+    'xField' => 'date',
+    'yField' => 'value',
+    'height' => 200
+])->grid(['span' => 12])->api('test/column'); // Define the path to the API
+```
+
+File: app/controller/admin/Test.php
+```php
+    public static function columnData()
+    {
+        // Check the user access
+        Auth::checkRole([1]);
+
+        $data => [
+            ['date' => '2019-08-28', 'value' => 20],
+            ['date' => '2019-08-29', 'value' => 19],
+            ['date' => '2019-08-30', 'value' => 6],
+            ['date' => '2019-08-31', 'value' => 9]
+        ];
+
+        // Respond using the built-in json format api
+        Alight\Response::api(0, null, ['data' => $data]);
+    }
+```
+
+File: app/config/route/admin.php
+```php
+Route::get('test/column', [ctr\admin\Test::class, 'columnData'])->auth();
+```
+
+Finally, we will get the console page as:
+
+![chat screenshot](example/image/screenshot_chart.png)
+
+## API
+* [Alight\Admin\Table](./src/Admin/Table.php)
+    * [::button()](./src/Admin/TableButton.php)
+        * ->action()
+        * ->batch()
+        * ->column()
+        * ->danger()
+        * ->expand()
+        * ->if()
+        * ->param()
+        * ->role()
+        * ->title()
+        * ->toolbar()
+        * ->type()
+        * ->url()
+    * [::column()](./src/Admin/TableColumn.php)
+        * ->align()
+        * ->copyable()
+        * ->database()
+        * ->ellipsis()
+        * ->enum()
+        * ->fixed()
+        * ->hide()
+        * ->html()
+        * ->role()
+        * ->search()
+        * ->sort()
+        * ->title()
+        * ->tooltip()
+        * ->width()
+    * [::expand()](./src/Admin/TableExpand.php)
+        * ->align()
+        * ->copyable()
+        * ->enum()
+        * ->fixed()
+        * ->hide()
+        * ->html()
+        * ->role()
+        * ->sort()
+        * ->title()
+        * ->tooltip()
+        * ->width()
+    * [::statistic()](./src/Admin/TableStatistic.php)
+        * ->title()
+        * ->value()
+    * [::summary()](./src/Admin/TableSummary.php)
+        * ->avg()
+        * ->precision()
+    * ::render()
+* [Alight\Admin\Form](./src/Admin/Form.php)
+    * [::create()](./src/Admin/FormOption.php)
+        * ->copy()
+    * [::field()](./src/Admin/FormField.php)
+        * ->confirm()
+        * ->database()
+        * ->default()
+        * ->delete()
+        * ->disabled()
+        * ->enum()
+        * ->grid()
+        * ->hide()
+        * ->placeholder()
+        * ->raw()
+        * ->readonly()
+        * ->required()
+        * ->role()
+        * ->rules()
+        * ->title()
+        * ->tooltip()
+        * ->type()
+    * ::render()
+* [Alight\Admin\Console](./src/Admin/Console.php)
+    * [::chart()](./src/Admin/ConsoleChart.php)
+        * ->api()
+        * ->config()
+        * ->grid()
+        * ->role()
+    * ::build()
+* [Alight\Admin\Menu](./src/Admin/Menu.php)
+    * [::item()](./src/Admin/MenuItem.php)
+        * ->action()
+        * ->role()
+        * ->url()
+    * [::subItem()](./src/Admin/MenuItem.php)
+        * ->action()
+        * ->role()
+        * ->url()
+    * ::build()
+
 ## Credits
 * Composer requires
     * [juneszh/alight](https://github.com/juneszh/alight)
@@ -155,8 +298,6 @@ Finally, the database table **user_admin** has completed **CRUD** creation
     * [React](https://react.dev/)
     * [Vite](https://vitejs.dev/)
     * [Ant Design](https://ant.design/)
-    * [Ant Design Pro Components](https://procomponents.ant.design/)
-    * [Ant Design Charts](https://charts.ant.design/en)
     * [TinyMCE](https://www.tiny.cloud/tinymce/)
     * [fs-extra](https://github.com/jprichardson/node-fs-extra)
     * [react-resize-detector](https://github.com/maslianok/react-resize-detector)

@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Alight\Admin;
 
-use Exception;
-
 class FormField
 {
     private string $form;
@@ -25,7 +23,7 @@ class FormField
      * 
      * @param string $form 
      * @param string $key 
-     * @return FormField 
+     * @return $this 
      */
     public function __construct(string $form, string $key)
     {
@@ -35,12 +33,178 @@ class FormField
     }
 
     /**
+     * Field confirm (e.g. password confirm)
+     *
+     * @param string $key
+     * @return FormField
+     */
+    public function confirm(string $key)
+    {
+        Form::$config[$this->form][$this->key][__FUNCTION__] = $key;
+        return $this;
+    }
+
+    /**
+     * Whether to bind the database
+     * 
+     * @param bool $value 
+     * @return $this 
+     */
+    public function database(bool $value)
+    {
+        Form::$config[$this->form][$this->key][__FUNCTION__] = $value;
+        return $this;
+    }
+
+    /**
+     * Set default
+     *
+     * @param mixed $value
+     * @return FormField
+     */
+    public function default($value)
+    {
+        Form::$config[$this->form][$this->key]['value'] = $value;
+        return $this;
+    }
+
+    /** 
+     * Delete current field
+     */
+    public function delete()
+    {
+        unset(Form::$config[$this->form][$this->key]);
+    }
+
+    /**
+     * Set disabled
+     *
+     * @return FormField
+     */
+    public function disabled()
+    {
+        Form::$config[$this->form][$this->key][__FUNCTION__] = true;
+        return $this;
+    }
+
+    /**
+     * Set enum to replace value
+     *
+     * @param array $keyValues
+     * @return FormField
+     * 
+     * @example Basic [key=>value, key=>value]
+     * @example Badge [key=>[text=>value, status=>status], key=>[text=>value, status=>status]]
+     * @see https://ant.design/components/badge/#Badge
+     */
+    public function enum(array $keyValues)
+    {
+        Form::$config[$this->form][$this->key][__FUNCTION__] = $keyValues;
+
+        return $this;
+    }
+
+    /**
+     * Set the grid
+     * 
+     * @param array $value
+     * @return $this 
+     */
+    public function grid(array $value)
+    {
+        Form::$config[$this->form][$this->key][__FUNCTION__] = $value;
+        return $this;
+    }
+
+    /**
+     * Hide field
+     *
+     * @return FormField
+     */
+    public function hide()
+    {
+        Form::$config[$this->form][$this->key][__FUNCTION__] = true;
+        return $this;
+    }
+
+    /**
+     * Set placeholder
+     *
+     * @param string $value key
+     * @return FormField
+     */
+    public function placeholder(string $value)
+    {
+        Form::$config[$this->form][$this->key][__FUNCTION__] = $value;
+        return $this;
+    }
+
+    /**
+     * Keep the raw data when submit (trim default)
+     *
+     * @return FormField
+     */
+    public function raw()
+    {
+        Form::$config[$this->form][$this->key][__FUNCTION__] = true;
+        return $this;
+    }
+
+    /**
+     * Set readonly
+     *
+     * @return FormField
+     */
+    public function readonly()
+    {
+        Form::$config[$this->form][$this->key][__FUNCTION__] = true;
+        return $this;
+    }
+
+    /**
+     * Set required
+     *
+     * @return FormField
+     */
+    public function required()
+    {
+        Form::$config[$this->form][$this->key][__FUNCTION__] = true;
+        return $this;
+    }
+
+    /**
+     * Which role has permission to view
+     *
+     * @param array $roleValues
+     * @return FormField
+     */
+    public function role(array $roleValues)
+    {
+        Form::$config[$this->form][$this->key][__FUNCTION__] = $roleValues;
+        return $this;
+    }
+
+    /**
+     * Rules for field validation
+     *
+     * @param array $keyValues ['type' => 'string', 'min' => 6, 'max' => 20]
+     * @return FormField
+     * 
+     * @see https://ant.design/components/form/#Rule
+     */
+    public function rules(array $keyValues)
+    {
+        Form::$config[$this->form][$this->key][__FUNCTION__] = $keyValues;
+        return $this;
+    }
+
+    /**
      * Set title
      * 
      * @param string $value 
-     * @return FormField 
+     * @return $this 
      */
-    public function title(string $value): FormField
+    public function title(string $value)
     {
         Form::$config[$this->form][$this->key][__FUNCTION__] = $value;
         if ($value[0] === ':') {
@@ -50,12 +214,12 @@ class FormField
     }
 
     /**
-     * Whether to bind the database
-     * 
-     * @param bool $value 
-     * @return FormField 
+     * Set tooltip
+     *
+     * @param string $value key
+     * @return FormField
      */
-    public function database(bool $value): FormField
+    public function tooltip(string $value)
     {
         Form::$config[$this->form][$this->key][__FUNCTION__] = $value;
         return $this;
@@ -72,7 +236,7 @@ class FormField
      * @see https://ant.design/components/overview/
      * @see https://ant.design/components/upload/#API
      */
-    public function type(string $valueType, array $props = []): FormField
+    public function type(string $valueType, array $props = [])
     {
         Form::$config[$this->form][$this->key][__FUNCTION__] = $valueType;
 
@@ -82,171 +246,5 @@ class FormField
 
         Form::$config[$this->form][$this->key][__FUNCTION__ . 'Props'] = $props;
         return $this;
-    }
-
-    /**
-     * Set tooltip
-     *
-     * @param string $value key
-     * @return FormField
-     */
-    public function tooltip(string $value): FormField
-    {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $value;
-        return $this;
-    }
-
-    /**
-     * Set placeholder
-     *
-     * @param string $value key
-     * @return FormField
-     */
-    public function placeholder(string $value): FormField
-    {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $value;
-        return $this;
-    }
-
-    /**
-     * Set default
-     *
-     * @param mixed $value
-     * @return FormField
-     */
-    public function default($value): FormField
-    {
-        Form::$config[$this->form][$this->key]['value'] = $value;
-        return $this;
-    }
-
-    /**
-     * Set enum to replace value
-     *
-     * @param array $keyValues
-     * @return FormField
-     * 
-     * @example Basic [key=>value, key=>value]
-     * @example Badge [key=>[text=>value, status=>status], key=>[text=>value, status=>status]]
-     * @see https://ant.design/components/badge/#Badge
-     */
-    public function enum(array $keyValues): FormField
-    {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $keyValues;
-
-        return $this;
-    }
-
-    /**
-     * Set required
-     *
-     * @return FormField
-     */
-    public function required(): FormField
-    {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = true;
-        return $this;
-    }
-
-    /**
-     * Rules for field validation
-     *
-     * @param array $keyValues ['type' => 'string', 'min' => 6, 'max' => 20]
-     * @return FormField
-     * 
-     * @see https://ant.design/components/form/#Rule
-     */
-    public function rules(array $keyValues): FormField
-    {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $keyValues;
-        return $this;
-    }
-
-    /**
-     * Field confirm (e.g. password confirm)
-     *
-     * @param string $key
-     * @return FormField
-     */
-    public function confirm(string $key): FormField
-    {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $key;
-        return $this;
-    }
-
-    /**
-     * Hide field
-     *
-     * @return FormField
-     */
-    public function hide(): FormField
-    {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = true;
-        return $this;
-    }
-
-    /**
-     * Set readonly
-     *
-     * @return FormField
-     */
-    public function readonly(): FormField
-    {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = true;
-        return $this;
-    }
-
-    /**
-     * Set disabled
-     *
-     * @return FormField
-     */
-    public function disabled(): FormField
-    {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = true;
-        return $this;
-    }
-
-    /**
-     * Which role has permission to view
-     *
-     * @param array $roleValues
-     * @return FormField
-     */
-    public function role(array $roleValues): FormField
-    {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $roleValues;
-        return $this;
-    }
-
-    /**
-     * Set the grid
-     * 
-     * @param array $value
-     * @return FormField 
-     */
-    public function grid(array $value): FormField
-    {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $value;
-        return $this;
-    }
-
-    /**
-     * Keep the raw data when submit (trim default)
-     *
-     * @return FormField
-     */
-    public function raw(): FormField
-    {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = true;
-        return $this;
-    }
-
-    /** 
-     * Delete current field
-     */
-    public function delete()
-    {
-        unset(Form::$config[$this->form][$this->key]);
     }
 }

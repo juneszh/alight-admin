@@ -5,13 +5,12 @@ declare(strict_types=1);
 use Alight\Admin\Console;
 
 Console::chart(Console::CHART_HEATMAP)->config([
-    'width' => '100%',
     'height' => 200,
     'yField' => 'date',
     'xField' => 'time',
     'shape' => 'circle',
-    'colorField' => 'action',
-    'sizeField' => 'size',
+    'colorField' => 'color',
+    'sizeField' => 'show',
     'sizeRatio' => 0.5,
     'reflect' => 'y',
     'xAxis' => [

@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the Alight package.
  *
- * (c) June So <alight@juneszh.com>
+ * (c) June So <june@alight.cc>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -26,6 +26,11 @@ class Form
 {
     public static array $config = [];
     private static string $form;
+
+    public const
+        EVENT_RENDER = 'render',
+        EVENT_REQUEST = 'request',
+        EVENT_RESPONSE = 'response';
 
     public const
         TYPE_PASSWORD = 'password',
@@ -108,7 +113,7 @@ class Form
      * Form page render
      * 
      * @param string $table 
-     * @param null|callable $middleware function(string $action, array &$data){} 
+     * @param null|callable $callback function(string $event, array &$data){} 
      * @throws Exception 
      * @throws ErrorException 
      * @throws InvalidArgumentException 
@@ -116,7 +121,7 @@ class Form
      * @throws GlobalInvalidArgumentException 
      * @throws PDOException 
      */
-    public static function render(string $table, ?callable $middleware = null)
+    public static function render(string $table, ?callable $callback = null)
     {
         $_id = Request::request('_id', 0);
         $_form = Request::request('_form', '');
@@ -158,16 +163,16 @@ class Form
                 'field' => $field,
             ];
 
-            if (is_callable($middleware)) {
-                $middleware('render', $renderData);
+            if (is_callable($callback)) {
+                $callback(self::EVENT_RENDER, $renderData);
             }
 
             Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => $_title, 'script' => Admin::globalScript('Form', $renderData)]);
         } else {
             $sqlData = self::dataFilter($field, Request::request());
 
-            if (is_callable($middleware)) {
-                $middleware('request', $sqlData);
+            if (is_callable($callback)) {
+                $callback(self::EVENT_REQUEST, $sqlData);
             }
 
             $rsId = 0;
@@ -190,8 +195,8 @@ class Form
             if ($rsId || $rsIds) {
                 Model::userLog($userId, true);
 
-                if (is_callable($middleware)) {
-                    $middleware('response', $resData);
+                if (is_callable($callback)) {
+                    $callback(self::EVENT_RESPONSE, $resData);
                 }
             }
 

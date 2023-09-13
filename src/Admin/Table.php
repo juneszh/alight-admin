@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the Alight package.
  *
- * (c) June So <alight@juneszh.com>
+ * (c) June So <june@alight.cc>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -27,6 +27,11 @@ class Table
 {
     public static array $config = [];
     private static int $buttonIndex = 0;
+
+    public const
+        EVENT_RENDER = 'render',
+        EVENT_REQUEST = 'request',
+        EVENT_RESPONSE = 'response';
 
     public const
         ACTION_FORM = 'form',
@@ -153,7 +158,7 @@ class Table
      * Table page render
      * 
      * @param string $table 
-     * @param null|callable $middleware function(string $action, array &$data){} 
+     * @param null|callable $callback function(string $event, array &$data){} 
      * @throws Exception 
      * @throws ErrorException 
      * @throws InvalidArgumentException 
@@ -161,7 +166,7 @@ class Table
      * @throws GlobalInvalidArgumentException 
      * @throws PDOException 
      */
-    public static function render(string $table, ?callable $middleware = null)
+    public static function render(string $table, ?callable $callback = null)
     {
         $userId = Auth::getUserId();
         $userInfo = Model::getUserInfo($userId);
@@ -256,8 +261,8 @@ class Table
                 'statistic' => Table::$config['statistic'] ?? [],
             ];
 
-            if (is_callable($middleware)) {
-                $middleware('render', $renderData);
+            if (is_callable($callback)) {
+                $callback(self::EVENT_RENDER, $renderData);
             }
 
             Model::userLog($userId);
@@ -290,8 +295,8 @@ class Table
 
             $searchData = self::searchFilter($column, Request::request());
 
-            if (is_callable($middleware)) {
-                $middleware('request', $searchData);
+            if (is_callable($callback)) {
+                $callback(self::EVENT_REQUEST, $searchData);
             }
 
             $count = Model::tableCount($table, $searchData);
@@ -302,8 +307,8 @@ class Table
                 'list' => $list,
             ];
 
-            if (is_callable($middleware)) {
-                $middleware('response', $resData);
+            if (is_callable($callback)) {
+                $callback(self::EVENT_RESPONSE, $resData);
             }
 
             Response::api(0, null, $resData);

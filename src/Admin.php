@@ -427,7 +427,9 @@ class Admin
                 $result = $phar->extractTo($dir);
 
                 if ($result) {
-                    self::publish(App::root($storagePath . '/download/alight-admin'));
+                    self::publish(App::root($storagePath . '/download/dist'));
+                    unlink($file);
+                    unlink(substr($file, 0, -3));
                 }
             }
         }

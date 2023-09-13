@@ -69,7 +69,7 @@ class Console
      * @param string $component Console::CHART_*
      * @return ConsoleChart
      * 
-     * @see https://charts.ant.design/en/api/graphic-style
+     * @see https://charts.ant.design/en/docs/api
      */
     public static function chart(string $component): ConsoleChart
     {

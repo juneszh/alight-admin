@@ -33,6 +33,7 @@ $ composer create-project juneszh/alight-project {PROJECT_DIRECTORY}
 The following commands will build the runtime environment required by **Alight-Admin**, such as installing composer package, inserting configuration options, creating database tables, and downloading front-end resources. Please make sure the [database has been configured](https://github.com/juneszh/alight#database).
 ```bash
 $ cd {PROJECT_DIRECTORY} 
+$ composer require juneszh/alight-admin
 $ composer run admin-install
 $ composer run admin-download
 ```
@@ -142,13 +143,15 @@ Menu::item('Test');
 Menu::subItem('User')->url('test/user/table');
 ```
 
-Finally, the database table **user_admin** has completed **CRUD** creation
+Finally, the database table **user_admin** has completed **CRUD** creation. See [API LIST](#api) for more information.
 
 ## Try the Console Charts
-### Create simple Line Charts with built-in data.
+### Create charts with built-in data.
 
 File: app/config/admin/console.php
 ```php
+// Here using Line charts, we support 30+ charts with AntDesign Charts
+// More details please refer to : https://charts.ant.design/en/docs/api
 Console::chart('Line')->config([
     'xField' => 'date',
     'yField' => 'value',
@@ -161,7 +164,7 @@ Console::chart('Line')->config([
     ]
 ])->grid(['span' => 12]); // Means half the width of the grid. full of 24
 ```
-### Create simple Column Charts with api data.
+### Create charts with api data.
 
 File: app/config/admin/console.php
 ```php

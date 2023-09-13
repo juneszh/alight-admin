@@ -19,6 +19,20 @@ class TableColumn extends TableExpand
     private string $key;
 
     /**
+     * Define the configuration index
+     * 
+     * @param string $key 
+     * @return $this 
+     */
+    public function __construct(string $type, string $key)
+    {
+        parent::__construct($type, $key);
+        $this->type = $type;
+        $this->key = $key;
+        return $this;
+    }
+
+    /**
      * Whether to bind the database
      * 
      * @param bool $value 

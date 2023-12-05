@@ -58,7 +58,7 @@ const Form = props => {
             disabled={(schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined}
             init={{
                 promotion: false,
-                language: localeValue(':tinymce'),
+                language: localeValue(':tinymce') ? localeValue(':tinymce') : undefined,
                 plugins: [
                     'advlist', 'anchor', 'autolink', 'autoresize', 'charmap', 'code',
                     'emoticons', 'fullscreen', 'image', 'insertdatetime', 'link', 'lists',

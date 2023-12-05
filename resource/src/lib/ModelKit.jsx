@@ -90,9 +90,9 @@ const ModelKit = forwardRef((props, ref) => {
             destroyOnClose={true}
             onCancel={modalHide}
             onOk={modalSubmit}
-            bodyStyle={{ display: 'flex', padding: 0, maxHeight: 'calc(96vh - 116px)', height: modalHeight, transition: 'height .6s ease' }}
             width={modalWidth}
             style={{ transition: 'width .6s ease' }}
+            styles={{ body: { display: 'flex', padding: 0, maxHeight: 'calc(96vh - 116px)', height: modalHeight, transition: 'height .6s ease' } }}
             footer={modalConfig.footer}
         >
             <iframe

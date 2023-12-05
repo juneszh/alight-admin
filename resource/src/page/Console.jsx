@@ -59,76 +59,76 @@ const Console = props => {
     const chartComponent = (key, component, config) => {
         config.data = chartData[key];
         switch (component) {
-            case 'Line':
-                return <Plots.Line {...config} />;
             case 'Area':
                 return <Plots.Area {...config} />;
-            case 'Column':
-                return <Plots.Column {...config} />;
             case 'Bar':
                 return <Plots.Bar {...config} />;
-            case 'Pie':
-                return <Plots.Pie {...config} />;
-            case 'DualAxes':
-                return <Plots.DualAxes {...config} />;
-            case 'Gauge':
-                return <Plots.Gauge {...config} />;
-            case 'Liquid':
-                return <Plots.Liquid {...config} />;
+            case 'BidirectionalBar':
+                return <Plots.BidirectionalBar {...config} />;
+            case 'Box':
+                return <Plots.Box {...config} />;
             case 'Bullet':
                 return <Plots.Bullet {...config} />;
-            case 'Scatter':
-                return <Plots.Scatter {...config} />;
+            case 'Chord':
+                return <Plots.Chord {...config} />;
+            case 'CirclePacking':
+                return <Plots.CirclePacking {...config} />;
+            case 'Column':
+                return <Plots.Column {...config} />;
+            case 'DualAxes':
+                return <Plots.DualAxes {...config} />;
+            case 'Facet':
+                return <Plots.Facet {...config} />;
+            case 'Funnel':
+                return <Plots.Funnel {...config} />;
+            case 'Gauge':
+                return <Plots.Gauge {...config} />;
+            case 'Heatmap':
+                return <Plots.Heatmap {...config} />;
+            case 'Histogram':
+                return <Plots.Histogram {...config} />;
+            case 'Line':
+                return <Plots.Line {...config} />;
+            case 'Liquid':
+                return <Plots.Liquid {...config} />;
+            case 'Mix':
+                return <Plots.Mix {...config} />;
+            case 'Pie':
+                return <Plots.Pie {...config} />;
+            case 'Progress':
+                return <Plots.Progress {...config} />;
+            case 'Radar':
+                return <Plots.Radar {...config} />;
+            case 'RadialBar':
+                return <Plots.RadialBar {...config} />;
+            case 'RingProgress':
+                return <Plots.RingProgress {...config} />;
             case 'Rose':
                 return <Plots.Rose {...config} />;
             case 'Sankey':
                 return <Plots.Sankey {...config} />;
-            case 'Chord':
-                return <Plots.Chord {...config} />;
-            case 'Heatmap':
-                return <Plots.Heatmap {...config} />;
-            case 'TinyLine':
-                return <Plots.TinyLine {...config} />;
+            case 'Scatter':
+                return <Plots.Scatter {...config} />;
+            case 'Stock':
+                return <Plots.Stock {...config} />;
+            case 'Sunburst':
+                return <Plots.Sunburst {...config} />;
             case 'TinyArea':
                 return <Plots.TinyArea {...config} />;
             case 'TinyColumn':
                 return <Plots.TinyColumn {...config} />;
-            case 'Progress':
-                return <Plots.Progress {...config} />;
-            case 'RingProgress':
-                return <Plots.RingProgress {...config} />;
+            case 'TinyLine':
+                return <Plots.TinyLine {...config} />;
             case 'Treemap':
                 return <Plots.Treemap {...config} />;
-            case 'Radar':
-                return <Plots.Radar {...config} />;
-            case 'Funnel':
-                return <Plots.Funnel {...config} />;
+            case 'Venn':
+                return <Plots.Venn {...config} />;
+            case 'Violin':
+                return <Plots.Violin {...config} />;
             case 'Waterfall':
                 return <Plots.Waterfall {...config} />;
             case 'WordCloud':
                 return <Plots.WordCloud {...config} />;
-            case 'Histogram':
-                return <Plots.Histogram {...config} />;
-            case 'Sunburst':
-                return <Plots.Sunburst {...config} />;
-            case 'BidirectionalBar':
-                return <Plots.BidirectionalBar {...config} />;
-            case 'RadialBar':
-                return <Plots.RadialBar {...config} />;
-            case 'Violin':
-                return <Plots.Violin {...config} />;
-            case 'Box':
-                return <Plots.Box {...config} />;
-            case 'Venn':
-                return <Plots.Venn {...config} />;
-            case 'Stock':
-                return <Plots.Stock {...config} />;
-            case 'CirclePacking':
-                return <Plots.CirclePacking {...config} />;
-            case 'Mix':
-                return <Plots.Mix {...config} />;
-            case 'Facet':
-                return <Plots.Facet {...config} />;
             default:
                 return null;
         }

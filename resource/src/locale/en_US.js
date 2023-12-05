@@ -1,6 +1,6 @@
 const i18n = {
     // Tinymce locale file name
-    ':tinymce': 'en_US',
+    ':tinymce': '',
     // Error
     ':status_400': 'Bad Request',
     ':status_401': 'Unauthorized',

@@ -100,11 +100,11 @@ class Admin
         $indent = '    ';
 
         if ($admin['dev']) {
-            $return .= $indent . '<script type="module">import { injectIntoGlobalHook } from "http://localhost:5173/alight-admin/@react-refresh";injectIntoGlobalHook(window);window.$RefreshReg$ = () => {};window.$RefreshSig$ = () => (type) => type;</script>' . PHP_EOL;
+            $return .= $indent . '<script type="module">import RefreshRuntime from "http://localhost:5173/alight-admin/@react-refresh";RefreshRuntime.injectIntoGlobalHook(window);window.$RefreshReg$ = () => {};window.$RefreshSig$ = () => (type) => type;window.__vite_plugin_react_preamble_installed__ = true;</script>' . PHP_EOL;
             $return .= $indent . '<script type="module" src="http://localhost:5173/alight-admin/@vite/client"></script>' . PHP_EOL;
             $return .= $indent . '<script type="module" src="http://localhost:5173/alight-admin/src/main.jsx"></script>' . PHP_EOL;
         } else {
-            $manifest = App::root(self::PUBLIC . '/manifest.json');
+            $manifest = App::root(self::PUBLIC . '/.vite/manifest.json');
             if (file_exists($manifest)) {
                 $manifestData = json_decode(file_get_contents($manifest), true);
                 if (isset($manifestData['index.html']['file'])) {
@@ -112,12 +112,11 @@ class Admin
                 }
                 if (isset($manifestData['index.html']['css'])) {
                     foreach ($manifestData['index.html']['css'] as $_css) {
-                        $return .= $indent . '<link rel="stylesheet" href="/alight-admin/' . $_css . '">' . PHP_EOL;
+                        $return .= $indent . '<link rel="stylesheet" crossorigin href="/alight-admin/' . $_css . '">' . PHP_EOL;
                     }
                 }
             }
         }
-
 
         return $return;
     }

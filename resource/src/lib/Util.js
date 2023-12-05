@@ -9,7 +9,7 @@ const localeInit = i18nNew => {
 };
 
 const localeValue = key => {
-    return (key[0] === ':' && i18n[key]) ? i18n[key] : key;
+    return (key[0] === ':' && i18n[key] !== undefined) ? i18n[key] : key;
 };
 
 const inIframe = () => {

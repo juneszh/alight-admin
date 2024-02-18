@@ -45,7 +45,7 @@ class TableColumn extends TableExpand
     }
 
     /**
-     * Set ellipsis
+     * Set ellipsis (Only takes effect when width is set to '{n}px')
      * 
      * @return $this 
      */

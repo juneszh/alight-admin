@@ -156,7 +156,7 @@ class TableExpand
     }
 
     /**
-     * Set width
+     * Set width (Support '{n}px' or '{n}%')
      *
      * @param string $value
      * @return $this

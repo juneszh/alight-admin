@@ -64,10 +64,6 @@ const Table = props => {
                     }
                 }
 
-                if (columnValue.ellipsis) {
-                    column.ellipsis = columnValue.ellipsis;
-                }
-
                 if (columnValue.enum) {
                     if (columnValue.locale) {
                         column.valueEnum = {};
@@ -110,6 +106,9 @@ const Table = props => {
 
                 if (columnValue.width) {
                     column.width = columnValue.width;
+                    if (columnValue.ellipsis && columnValue.width.slice(-2) === 'px') {
+                        column.render = (text) => <div style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', wordBreak: 'keep-all', width: columnValue.width }} title={text}>{text}</div>;
+                    }
                 }
 
                 if (columnValue.fixed) {

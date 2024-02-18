@@ -22,6 +22,7 @@ use InvalidArgumentException;
 use PDOException;
 use Psr\SimpleCache\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException as ExceptionInvalidArgumentException;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class Model
 {
@@ -39,22 +40,23 @@ class Model
      */
     public static function getCacheData(string $table, ?int $id = null, ?int $ttl = 86400): array
     {
-        $cache = Cache::init();
-        $cacheKey = $table . '_data' . ($id === null ? '' : '_' . $id);
+        $cache6 = Cache::psr6();
+        $cacheKey = 'alight.' . $table . ($id === null ? '' : '.' . $id);
 
-        if ($cache->has($cacheKey)) {
-            $result = $cache->get($cacheKey);
-        } else {
+        $result = $cache6->get($cacheKey, function (ItemInterface $item) use ($table, $id, $ttl) {
             $db = Database::init();
             if ($id === null) {
                 $result = $db->select($table, '*', ['ORDER' => ['id' => 'ASC']]);
+                $item->tag('alight.' . $table . '.list');
             } elseif ($id > 0) {
                 $result = $db->get($table, '*', ['id' => $id]);
             } else {
-                return [];
+                $result = [];
             }
-            $cache->set($cacheKey, $result, $ttl);
-        }
+            $item->expiresAfter($ttl);
+            $item->tag('alight.' . $table);
+            return $result;
+        });
 
         return $result ?: [];
     }
@@ -85,19 +87,17 @@ class Model
      */
     public static function getUserIdByAccount(string $account): int
     {
-        $cache = Cache::init();
-        $cacheKey = 'admin_user_id_by_account_' . md5($account);
+        $cache6 = Cache::psr6();
+        $cacheKey = 'alight.admin_user.id_by_account.' . md5($account);
 
-        if ($cache->has($cacheKey)) {
-            return $cache->get($cacheKey);
-        }
+        $result = $cache6->get($cacheKey, function (ItemInterface $item) use ($account) {
+            $db = Database::init();
+            $result = $db->get('admin_user', 'id', ['account' => $account]);
 
-        $db = Database::init();
-        $result = $db->get('admin_user', 'id', ['account' => $account]);
-
-        if ($result) {
-            $cache->set($cacheKey, (int) $result, 3600);
-        }
+            $item->expiresAfter(3600);
+            $item->tag('alight.admin_user');
+            return $result;
+        });
 
         return (int) $result;
     }
@@ -114,19 +114,17 @@ class Model
      */
     public static function getUserIdByKey(string $key): int
     {
-        $cache = Cache::init();
-        $cacheKey = 'admin_user_id_by_key_' . $key;
+        $cache6 = Cache::psr6();
+        $cacheKey = 'alight.admin_user.id_by_key.' . $key;
 
-        if ($cache->has($cacheKey)) {
-            return $cache->get($cacheKey);
-        }
+        $result = $cache6->get($cacheKey, function (ItemInterface $item) use ($key) {
+            $db = Database::init();
+            $result = $db->get('admin_user', 'id', ['auth_key' => $key]);
 
-        $db = Database::init();
-        $result = $db->get('admin_user', 'id', ['auth_key' => $key]);
-
-        if ($result) {
-            $cache->set($cacheKey, (int) $result, 3600);
-        }
+            $item->expiresAfter(3600);
+            $item->tag('alight.admin_user');
+            return $result;
+        });
 
         return (int) $result;
     }
@@ -192,25 +190,26 @@ class Model
      */
     public static function getUserDateLog(int $userId, string $date): array
     {
-        $cache = Cache::init();
-        $cacheKey = 'admin_user_date_log_' . $userId . '_' . str_replace('-', '', $date);
-        if ($cache->has($cacheKey)) {
-            return $cache->get($cacheKey);
-        }
+        $cache6 = Cache::psr6();
+        $cacheKey = 'alight.admin_log.user_date.' . $userId . '_' . str_replace('-', '', $date);
 
-        $now = time();
-        $today = date('Y-m-d', $now);
+        $result = $cache6->get($cacheKey, function (ItemInterface $item) use ($userId, $date) {
+            $now = time();
+            $today = date('Y-m-d', $now);
 
-        $db = Database::init();
-        if ($date === $today) {
-            $result = $db->select('admin_log', ['hour' => ['view', 'edit']], ['user_id' => $userId, 'date' => $date, 'hour[<]' => date('G', $now)]);
-            $cacheTime = 3600 - ($now - strtotime(date('Y-m-d H:00:00', $now)));
-        } else {
-            $result = $db->select('admin_log', ['hour' => ['view', 'edit']], ['user_id' => $userId, 'date' => $date]);
-            $cacheTime = 86400;
-        }
+            $db = Database::init();
+            if ($date === $today) {
+                $result = $db->select('admin_log', ['hour' => ['view', 'edit']], ['user_id' => $userId, 'date' => $date, 'hour[<]' => date('G', $now)]);
+                $cacheTime = 3600 - ($now - strtotime(date('Y-m-d H:00:00', $now)));
+            } else {
+                $result = $db->select('admin_log', ['hour' => ['view', 'edit']], ['user_id' => $userId, 'date' => $date]);
+                $cacheTime = 86400;
+            }
 
-        $cache->set($cacheKey, $result ?: [], $cacheTime);
+            $item->expiresAfter($cacheTime);
+            $item->tag(['alight.admin_log', 'alight.admin_log.list']);
+            return $result;
+        });
 
         return $result ?: [];
     }
@@ -301,10 +300,14 @@ class Model
         $db->insert($table, $data);
 
         if ($db->id()) {
-            $cache = Cache::init();
-            $cache->deleteMultiple([
-                $table . '_data',
-                $table . '_data_' . $db->id()
+            $cache6 = Cache::psr6();
+            $cacheKeys = [
+                'alight.' . $table,
+                'alight.' . $table . '.' . $db->id()
+            ];
+            $cache6->deleteItems($cacheKeys);
+            $cache6->invalidateTags([
+                'alight.' . $table . '.list'
             ]);
         }
 
@@ -348,10 +351,14 @@ class Model
         $result = $db->update($table, $data, ['id' => $id]);
 
         if ($result->rowCount()) {
-            $cache = Cache::init();
-            $cache->deleteMultiple([
-                $table . '_data',
-                $table . '_data_' . $id
+            $cache6 = Cache::psr6();
+            $cacheKeys = [
+                'alight.' . $table,
+                'alight.' . $table . '.' . $db->id()
+            ];
+            $cache6->deleteItems($cacheKeys);
+            $cache6->invalidateTags([
+                'alight.' . $table . '.list'
             ]);
         }
 
@@ -378,15 +385,17 @@ class Model
         $result = $db->update($table, $data, ['id' => $id]);
 
         if ($result->rowCount()) {
-            $cache = Cache::init();
-            $cacheKeys = [$table . '_data'];
+            $cache6 = Cache::psr6();
+            $cacheKeys = ['alight.' .$table];
             foreach ($id as $_id) {
-                $cacheKeys[] = $table . '_data_' . $_id;
+                $cacheKeys[] = 'alight.' . $table . '.' . $_id;
             }
-            $cache->deleteMultiple($cacheKeys);
+            $cache6->deleteItems($cacheKeys);
+            $cache6->invalidateTags([
+                'alight.' . $table . '.list'
+            ]);
         }
 
         return $result->rowCount() ? $id : (!$db->error ? $id : []);
     }
-
 }

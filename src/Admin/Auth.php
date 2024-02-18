@@ -77,7 +77,7 @@ class Auth
             $userId = Model::getUserIdByKey($auth);
             if ($userId) {
                 $cache = Cache::init();
-                $cacheKey = 'admin_user_auth_' . $userId;
+                $cacheKey = 'alight.admin_user.auth.' . $userId;
                 $authInfo = $cache->get($cacheKey);
                 if ($authInfo && $authInfo['session'] == $session) {
                     $userInfo = Model::getUserInfo($userId);
@@ -116,10 +116,15 @@ class Auth
             'auth' => $auth,
             'session' => $session,
         ];
-        $cache = Cache::init();
-        $cacheKey = 'admin_user_auth_' . $userId;
         $cacheTime = Config::get('remember');
-        $cache->set($cacheKey, $authInfo, $cacheTime);
+
+        $cache6 = Cache::psr6();
+        $cacheKey = 'alight.admin_user.auth.' . $userId;
+        $cacheItem = $cache6->getItem($cacheKey);
+        $cacheItem->set($authInfo);
+        $cacheItem->expiresAfter((int) $cacheTime);
+        $cacheItem->tag('alight.admin_user');
+        $cache6->save($cacheItem);
 
         setcookie('admin_auth', $auth, time() + $cacheTime, '/' . Config::get('path'), '.' . Request::host());
         setcookie('admin_session', $session, time() + $cacheTime, '/' . Config::get('path'), '.' . Request::host());
@@ -138,7 +143,7 @@ class Auth
     {
         if ($userId) {
             $cache = Cache::init();
-            $cacheKey = 'admin_user_auth_' . $userId;
+            $cacheKey = 'alight.admin_user.auth.' . $userId;
             $cache->delete($cacheKey);
         }
 

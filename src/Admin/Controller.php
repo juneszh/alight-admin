@@ -80,7 +80,7 @@ class Controller
         $captchaHash = Utility::randomHex();
 
         $cache = Cache::init();
-        $cache->set('admin_captcha_' . $captchaHash, $code, 300);
+        $cache->set('alight.admin_captcha.' . $captchaHash, $code, 300);
 
         setcookie('admin_captcha', $captchaHash, time() + 300, '/' . Config::get('path'), '.' . Request::host());
 
@@ -112,7 +112,7 @@ class Controller
 
             $captchaHash = $_COOKIE['admin_captcha'] ?? '';
             $cache = Cache::init();
-            $cacheKey = 'admin_captcha_' . $captchaHash;
+            $cacheKey = 'alight.admin_captcha.' . $captchaHash;
             $captchaCodeCache = $cache->get($cacheKey);
             $cache->delete($cacheKey);
             setcookie('admin_captcha', '', 0, '/' . Config::get('path'), '.' . Request::host());
@@ -129,7 +129,7 @@ class Controller
             }
 
             $waitMinute = 15;
-            $failTimes = (int)$cache->get('admin_user_login_fail_' . $userId);
+            $failTimes = (int) $cache->get('alight.admin_login_fail.' . $userId);
             if ($failTimes >= 5) {
                 Response::api(1004, ':try_again_later');
                 exit;
@@ -137,7 +137,7 @@ class Controller
 
             $userInfo = Model::getUserInfo($userId);
             if (!password_verify($password, $userInfo['password'])) {
-                $cache->set('admin_user_login_fail_' . $userId, $failTimes + 1, $waitMinute * 60);
+                $cache->set('alight.admin_login_fail.' . $userId, $failTimes + 1, $waitMinute * 60);
                 Response::api(1003, ':invalid_account');
                 exit;
             }
@@ -205,7 +205,7 @@ class Controller
                         'time' => $hour . ':00',
                         'show' => isset($log[$hour]) ? 1 : 0,
                         'color' => isset($log[$hour]) ? $log[$hour]['view'] + $log[$hour]['edit'] : 0,
-                        'title' => "\u{1F50E}" . ' ' . ($log[$hour]['view'] ?? 0) . ' ' . "\u{270F}" . ' ' . ($log[$hour]['edit'] ?? 0),
+                        'title' => "\u{1F50D}" . ' ' . ($log[$hour]['view'] ?? 0) . ' ' . "\u{1F4BE}" . ' ' . ($log[$hour]['edit'] ?? 0),
                     ];
                 }
             }

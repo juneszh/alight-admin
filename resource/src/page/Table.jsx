@@ -106,8 +106,12 @@ const Table = props => {
 
                 if (columnValue.width) {
                     column.width = columnValue.width;
-                    if (columnValue.ellipsis && columnValue.width.slice(-2) === 'px') {
-                        column.render = (text) => <div style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', wordBreak: 'keep-all', width: columnValue.width }} title={text}>{text}</div>;
+                    if (columnValue.ellipsis) {
+                        if (columnValue.ellipsis && columnValue.width.slice(-2) === 'px') {
+                            column.render = (text) => <div style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', wordBreak: 'keep-all', width: columnValue.width }} title={text}>{text}</div>;
+                        } else {
+                            column.ellipsis = columnValue.ellipsis;
+                        }
                     }
                 }
 
@@ -347,9 +351,7 @@ const Table = props => {
                 rowKey='id'
                 search={tableSearch ? { labelWidth: 'auto', defaultCollapsed: false } : false}
                 pagination={{
-                    hideOnSinglePage: false,
-                    defaultPageSize: 10,
-                    pageSizeOptions: [10, 25, 50, 100],
+                    showSizeChanger: true,
                 }}
                 dateFormatter='string'
                 toolbar={{

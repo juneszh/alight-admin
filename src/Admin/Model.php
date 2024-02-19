@@ -354,7 +354,7 @@ class Model
             $cache6 = Cache::psr6();
             $cacheKeys = [
                 'alight.' . $table,
-                'alight.' . $table . '.' . $db->id()
+                'alight.' . $table . '.' . $id,
             ];
             $cache6->deleteItems($cacheKeys);
             $cache6->invalidateTags([
@@ -370,7 +370,7 @@ class Model
      * 
      * @param string $table 
      * @param array $data 
-     * @param array $id 
+     * @param array $ids 
      * @return array 
      * @throws Exception 
      * @throws InvalidArgumentException 
@@ -379,15 +379,15 @@ class Model
      * @throws ExceptionInvalidArgumentException 
      * @throws ExceptionInvalidArgumentException 
      */
-    public static function formUpdateMultiple(string $table, array $data, array $id): array
+    public static function formUpdateMultiple(string $table, array $data, array $ids): array
     {
         $db = Database::init();
-        $result = $db->update($table, $data, ['id' => $id]);
+        $result = $db->update($table, $data, ['id' => $ids]);
 
         if ($result->rowCount()) {
             $cache6 = Cache::psr6();
             $cacheKeys = ['alight.' .$table];
-            foreach ($id as $_id) {
+            foreach ($ids as $_id) {
                 $cacheKeys[] = 'alight.' . $table . '.' . $_id;
             }
             $cache6->deleteItems($cacheKeys);
@@ -396,6 +396,6 @@ class Model
             ]);
         }
 
-        return $result->rowCount() ? $id : (!$db->error ? $id : []);
+        return $result->rowCount() ? $ids : (!$db->error ? $ids : []);
     }
 }

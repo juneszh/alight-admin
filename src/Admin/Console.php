@@ -98,8 +98,13 @@ class Console
     {
         $userInfo = Model::getUserInfo($userId);
 
-        $avatarDomain = Config::get('cravatar') ? 'cravatar.cn' : 'www.gravatar.com';
-        $avatar = 'https://' . $avatarDomain . '/avatar/' . ($userInfo['email'] ? md5(strtolower(trim($userInfo['email']))) : '') . '?s=100&d=mp';
+        preg_match('/^(\d{5,11})@qq\.com$/', $userInfo['email'], $match);
+        if (isset($match[1])) {
+            $avatar = 'https://q.qlogo.cn/g?b=qq&nk=' . $match[1] . '&s=100';
+        } else {
+            $avatarDomain = Config::get('cravatar') ? 'cravatar.cn' : 'www.gravatar.com';
+            $avatar = 'https://' . $avatarDomain . '/avatar/' . ($userInfo['email'] ? md5(strtolower(trim($userInfo['email']))) : '') . '?s=100&d=mp';
+        }
 
         $roleEnum = Utility::arrayFilter(Model::getRoleList(), ['id' => $userInfo['role_id']]);
         $roleName = $roleEnum ? reset($roleEnum)['name'] : '';

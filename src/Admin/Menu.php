@@ -64,7 +64,7 @@ class Menu
         ++self::$subIndex;
         self::$config[self::$index]['sub'][self::$subIndex] = [
             'title' => $title,
-            'locale' => $title[0] === ':' ? true : false,
+            'locale' =>  substr($title, 0, 1) === ':' ? true : false,
         ];
 
         return new MenuItem(self::$index, self::$subIndex);

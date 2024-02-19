@@ -137,7 +137,7 @@ class TableExpand
     public function title(string $value)
     {
         Table::$config[$this->type][$this->key][__FUNCTION__] = $value;
-        if ($value[0] === ':') {
+        if (substr($value, 0, 1) === ':') {
             Table::$config[$this->type][$this->key]['locale'] = true;
         }
         return $this;

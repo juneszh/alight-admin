@@ -83,6 +83,7 @@ const Form = props => {
 
     const columns = [];
     let layout = 'horizontal';
+    let showButton = false;
     if (notEmpty(global.config.field)) {
         let column = {};
 
@@ -176,7 +177,7 @@ const Form = props => {
                 column.fieldProps.disabled = fieldValue.disabled;
             }
 
-            if (['money', 'date', 'dateTime', 'dateWeek', 'dateMonth', 'dateQuarter', 'dateYear', 'dateRange', 'dateTimeRange', 'time', 'timeRange', 'progress', 'percent', 'digit', 'fromNow'].indexOf(fieldValue.type) !== -1) {
+            if (['money', 'textarea', 'date', 'dateTime', 'dateWeek', 'dateMonth', 'dateQuarter', 'dateYear', 'dateRange', 'dateTimeRange', 'time', 'timeRange', 'progress', 'percent', 'digit', 'code', 'fromNow', 'jsonCode'].indexOf(fieldValue.type) !== -1) {
                 column.fieldProps.style = { width: '100%' };
             }
 
@@ -211,9 +212,11 @@ const Form = props => {
 
             if (fieldValue.readonly) {
                 column.proFieldProps.readonly = fieldValue.readonly;
+            } else {
+                showButton = true;
             }
 
-            if (fieldValue.type === 'richText') {
+            if (['textarea', 'code', 'jsonCode', 'richText'].indexOf(fieldValue.type) !== -1) {
                 layout = 'vertical';
             } else {
                 column.formItemProps.labelCol = { sm: 6 }
@@ -223,6 +226,7 @@ const Form = props => {
             columns.push(column);
         }
     }
+
 
     const getMessage = useCallback(event => {
         if (event.origin === window.location.origin) {
@@ -235,6 +239,9 @@ const Form = props => {
     useEffect(() => {
         if (inIframe()) {
             window.addEventListener('message', getMessage);
+            if (showButton){
+                postMessage({ button: showButton });
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -260,7 +267,7 @@ const Form = props => {
                 grid={true}
                 rowProps={{ gutter: 24, justify: 'start' }}
                 columns={columns}
-                submitter={inIframe() ? false : {
+                submitter={inIframe() || !showButton ? false : {
                     resetButtonProps: false,
                     submitButtonProps: {
                         style: {

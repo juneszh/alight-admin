@@ -145,7 +145,7 @@ class TableButton
     public function title(string $value)
     {
         Table::$config['button'][$this->index][__FUNCTION__] = $value;
-        if ($value[0] === ':') {
+        if (substr($value, 0, 1) === ':') {
             Table::$config['button'][$this->index]['locale'] = true;
         }
         return $this;

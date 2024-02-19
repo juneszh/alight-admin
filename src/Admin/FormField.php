@@ -207,7 +207,7 @@ class FormField
     public function title(string $value)
     {
         Form::$config[$this->form][$this->key][__FUNCTION__] = $value;
-        if ($value[0] === ':') {
+        if (substr($value, 0, 1) === ':') {
             Form::$config[$this->form][$this->key]['locale'] = true;
         }
         return $this;

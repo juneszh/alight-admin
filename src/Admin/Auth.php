@@ -65,8 +65,8 @@ class Auth
             $return[0] = $_SERVER['PHP_AUTH_USER'];
             $return[1] = $_SERVER['PHP_AUTH_PW'];
         } else {
-            $return[0] = $_COOKIE[self::COOKIE_AUTH];
-            $return[1] = $_COOKIE[self::COOKIE_SESSION];
+            $return[0] = $_COOKIE[self::COOKIE_AUTH] ?? '';
+            $return[1] = $_COOKIE[self::COOKIE_SESSION] ?? '';
         }
 
         return $return;

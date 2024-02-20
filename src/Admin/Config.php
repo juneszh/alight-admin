@@ -26,7 +26,7 @@ class Config
         'console' => '', // Console configuration file
         'remember' => 86400, // Login renewal cycle
         'sso' => true, // Single sign-on
-        'cravatar' => false, // Whether to use Cravatar instead of Gravatar to display avatar
+        'cravatar' => false, // Whether to use Cravatar instead of Libravatar (Gravatar) to display avatar
         'separator' => '|', // Join separator for convert array to string when storing database
         'errorPageHandler' => [Controller::class, 'result'], // Override error page handler
         'dev' => false, // Use the js from 'npm run dev' when set true

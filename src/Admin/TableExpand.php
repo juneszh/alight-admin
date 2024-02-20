@@ -60,8 +60,9 @@ class TableExpand
      * @param array $keyValues
      * @return $this
      * 
-     * @example Basic [key=>value, key=>value]
-     * @example Badge [key=>[text=>value, status=>status], key=>[text=>value, status=>status]]
+     * @example Basic [0=>'bad', 1=>'good']
+     * @example Badge with status [0=>['text'=>'bad', 'status'=>'error'], 1=>['text'=>'good', 'status'=>'success']]
+     * @example Badge with css color [0=>['text'=>'bad', 'color'=>'#f00'], 1=>['text'=>'good', 'color'=>'green']]
      * @see https://ant.design/components/badge/#Badge
      */
     public function enum(array $keyValues)

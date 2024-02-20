@@ -169,8 +169,7 @@ class Controller
      */
     public static function logout()
     {
-        $userId = Auth::getUserId();
-        Auth::clear($userId);
+        Auth::clear();
 
         Response::redirect(Admin::url('login'));
     }

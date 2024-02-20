@@ -115,7 +115,7 @@ class Model
     public static function getUserIdByKey(string $key): int
     {
         $cache6 = Cache::psr6();
-        $cacheKey = 'alight.admin_user.id_by_key.' . $key;
+        $cacheKey = 'alight.admin_user.id_by_key.' . md5($key);
 
         $result = $cache6->get($cacheKey, function (ItemInterface $item) use ($key) {
             $db = Database::init();

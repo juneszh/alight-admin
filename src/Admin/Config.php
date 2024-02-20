@@ -25,6 +25,7 @@ class Config
         'menu' => '', // Menu configuration file
         'console' => '', // Console configuration file
         'remember' => 86400, // Login renewal cycle
+        'sso' => true, // Single sign-on
         'cravatar' => false, // Whether to use Cravatar instead of Gravatar to display avatar
         'separator' => '|', // Join separator for convert array to string when storing database
         'errorPageHandler' => [Controller::class, 'result'], // Override error page handler

@@ -24,6 +24,9 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 class Auth
 {
+    private const COOKIE_AUTH = 'admin_auth';
+    private const COOKIE_SESSION = 'admin_session';
+
     /**
      * Verify authorization
      * 
@@ -50,6 +53,48 @@ class Auth
     }
 
     /**
+     * Get auth and session from client request
+     * 
+     * @return array 
+     */
+    private static function getClientAuth(): array
+    {
+        $return = [
+            'auth' => '',
+            'session' => '',
+        ];
+
+        if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
+            $return['auth'] = $_SERVER['PHP_AUTH_USER'];
+            $return['session'] = $_SERVER['PHP_AUTH_PW'];
+        } else {
+            $return['auth'] = $_COOKIE[self::COOKIE_AUTH];
+            $return['session'] = $_COOKIE[self::COOKIE_SESSION];
+        }
+
+        return $return;
+    }
+
+    /**
+     * Get auth cache key (different according to sso setting)
+     * 
+     * @param string $auth 
+     * @param string $session 
+     * @return string 
+     */
+    private static function getAuthCacheKey(string $auth, string $session): string
+    {
+        $sso = Config::get('sso');
+        if ($sso) {
+            $cacheKey = 'alight.admin_user.auth.' . md5($auth);
+        } else {
+            $cacheKey = 'alight.admin_user.auth.' . md5($session);
+        }
+
+        return $cacheKey;
+    }
+
+    /**
      * Get authorized user id
      * 
      * @return int 
@@ -65,25 +110,16 @@ class Auth
             return (int) $authId;
         }
 
-        if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
-            $auth = $_SERVER['PHP_AUTH_USER'];
-            $session = $_SERVER['PHP_AUTH_PW'];
-        } else {
-            $auth = $_COOKIE['admin_auth'] ?? '';
-            $session = $_COOKIE['admin_session'] ?? '';
-        }
-
+        list($auth, $session) = self::getClientAuth();
         if ($auth && $session) {
-            $userId = Model::getUserIdByKey($auth);
-            if ($userId) {
-                $cache = Cache::init();
-                $cacheKey = 'alight.admin_user.auth.' . $userId;
-                $authInfo = $cache->get($cacheKey);
-                if ($authInfo && $authInfo['session'] == $session) {
-                    $userInfo = Model::getUserInfo($userId);
-                    if ($userInfo['status'] == 1 && ($authInfo['auth'] ?? '') == $userInfo['auth_key']) {
-                        return (int) $userId;
-                    }
+            $cache = Cache::init();
+            $cacheKey = self::getAuthCacheKey($auth, $session);
+            $authCache = $cache->get($cacheKey);
+            if ($authCache && $authCache['auth'] === $auth && $authCache['session'] === $session) {
+                $userId = Model::getUserIdByKey($auth);
+                $userInfo = $userId ? Model::getUserInfo($userId) : [];
+                if ($userInfo && $userInfo['status'] === 1 && $userInfo['auth_key'] === $auth) {
+                    return (int) $userId;
                 }
             }
         }
@@ -104,51 +140,50 @@ class Auth
     public static function store(int $userId, bool $renew = false)
     {
         if ($renew) {
-            $auth = $_COOKIE['admin_auth'] ?? '';
-            $session = $_COOKIE['admin_session'] ?? '';
+            list($auth, $session) = self::getClientAuth();
         } else {
             $userInfo = Model::getUserInfo($userId);
             $auth = $userInfo['auth_key'];
             $session = Utility::randomHex();
         }
 
-        $authInfo = [
+        $authCache = [
             'auth' => $auth,
             'session' => $session,
         ];
         $cacheTime = Config::get('remember');
 
         $cache6 = Cache::psr6();
-        $cacheKey = 'alight.admin_user.auth.' . $userId;
+        $cacheKey = self::getAuthCacheKey($auth, $session);
         $cacheItem = $cache6->getItem($cacheKey);
-        $cacheItem->set($authInfo);
+        $cacheItem->set($authCache);
         $cacheItem->expiresAfter((int) $cacheTime);
         $cacheItem->tag('alight.admin_user');
         $cache6->save($cacheItem);
 
-        setcookie('admin_auth', $auth, time() + $cacheTime, '/' . Config::get('path'), '.' . Request::host());
-        setcookie('admin_session', $session, time() + $cacheTime, '/' . Config::get('path'), '.' . Request::host());
+        setcookie(self::COOKIE_AUTH, $auth, time() + $cacheTime, '/' . Config::get('path'), '.' . Request::host());
+        setcookie(self::COOKIE_SESSION, $session, time() + $cacheTime, '/' . Config::get('path'), '.' . Request::host());
     }
 
     /**
      * Clear login session
      * 
-     * @param int $userId 
      * @throws Exception 
      * @throws ErrorException 
      * @throws InvalidArgumentException 
      * @throws InvalidArgumentException 
      */
-    public static function clear(int $userId)
+    public static function clear()
     {
-        if ($userId) {
+        list($auth, $session) = self::getClientAuth();
+        if ($auth && $session) {
             $cache = Cache::init();
-            $cacheKey = 'alight.admin_user.auth.' . $userId;
+            $cacheKey = self::getAuthCacheKey($auth, $session);
             $cache->delete($cacheKey);
         }
 
-        setcookie('admin_auth', '', 0, '/' . Config::get('path'), '.' . Request::host());
-        setcookie('admin_session', '', 0, '/' . Config::get('path'), '.' . Request::host());
+        setcookie(self::COOKIE_AUTH, '', 0, '/' . Config::get('path'), '.' . Request::host());
+        setcookie(self::COOKIE_SESSION, '', 0, '/' . Config::get('path'), '.' . Request::host());
     }
 
     /**
@@ -166,7 +201,7 @@ class Auth
         $userId = self::getUserId();
         if ($userId) {
             $userInfo = Model::getUserInfo($userId);
-            if ($userInfo){
+            if ($userInfo) {
                 $roleId = (int) $userInfo['role_id'];
                 if ($roleIds) {
                     if (in_array($roleId, $roleIds)) {

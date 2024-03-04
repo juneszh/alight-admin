@@ -349,7 +349,7 @@ const Table = props => {
                 }}
                 revalidateOnFocus={false}
                 rowKey='id'
-                search={tableSearch ? { labelWidth: 'auto', defaultCollapsed: false } : false}
+                search={tableSearch}
                 pagination={{
                     showSizeChanger: true,
                 }}

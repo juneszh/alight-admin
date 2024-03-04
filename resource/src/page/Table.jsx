@@ -407,18 +407,18 @@ const Table = props => {
                                         {index === titleIndex ? <><span style={{ float: 'left' }}>{localeValue(':sum')}</span>{result}</> : result}
                                     </ProTable.Summary.Cell>
                                 );
-                                if (global.config.summary[key].type === 'sum') {
-                                    avgCells.push(
-                                        <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
-                                            {index === titleIndex ? <span style={{ float: 'left' }}>{localeValue(':avg')}</span> : undefined}
-                                        </ProTable.Summary.Cell>
-                                    );
-                                } else {
+                                if (global.config.summary[key].avg !== undefined) {
                                     avgVisible = true;
                                     result = (sum / pageData.length).toFixed(precision);
                                     avgCells.push(
                                         <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
                                             {index === titleIndex ? <><span style={{ float: 'left' }}>{localeValue(':avg')}</span>{result}</> : result}
+                                        </ProTable.Summary.Cell>
+                                    );
+                                } else {
+                                    avgCells.push(
+                                        <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
+                                            {index === titleIndex ? <span style={{ float: 'left' }}>{localeValue(':avg')}</span> : undefined}
                                         </ProTable.Summary.Cell>
                                     );
                                 }

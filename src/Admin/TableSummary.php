@@ -36,7 +36,7 @@ class TableSummary
      */
     public function avg()
     {
-        Table::$config['summary'][$this->key]['type'] = __FUNCTION__;
+        Table::$config['summary'][$this->key][__FUNCTION__] = true;
         return $this;
     }
 

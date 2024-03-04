@@ -139,6 +139,21 @@ class Table
     }
 
     /**
+     * Create a Summary
+     * 
+     * @param string $key 
+     * @return TableSummary
+     */
+    public static function summary(string $key): TableSummary
+    {
+        self::$config[__FUNCTION__][$key] = [
+            'precision' => 2,
+        ];
+
+        return new TableSummary($key);
+    }
+
+    /**
      * Create a statistic
      * 
      * @param string $key 

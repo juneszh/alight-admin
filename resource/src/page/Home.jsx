@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Layout, Menu } from 'antd';
 import { DashboardOutlined, SafetyCertificateOutlined, TeamOutlined } from '@ant-design/icons';
 import global, { localeInit, localeValue, notEmpty } from '../lib/Util';
@@ -102,31 +102,31 @@ const Home = props => {
     }, [defaultIframeSrc]);
 
     return (
-        <Layout style={{ minHeight: '100vh', height: 'auto' }}>
+        <Layout style={{ height: 'auto', minHeight: '100vh' }}>
             <Layout.Sider
-                collapsible
                 breakpoint='lg'
                 collapsedWidth={collapsedWidth}
+                collapsible
                 onBreakpoint={broken => {
                     setCollapsedWidth(broken ? 0 : 48);
                 }}
             >
                 <Menu
+                    defaultOpenKeys={defaultOpenKeys}
+                    defaultSelectedKeys={defaultSelectedKeys}
+                    forceSubMenuRender={true}
+                    inlineIndent={16}
+                    items={items}
                     mode='inline'
                     theme='dark'
-                    inlineIndent={16}
-                    defaultSelectedKeys={defaultSelectedKeys}
-                    defaultOpenKeys={defaultOpenKeys}
-                    items={items}
-                    forceSubMenuRender={true}
                 />
             </Layout.Sider>
             <Layout className='site-layout'>
                 <Layout.Content style={{ display: 'flex' }}>
                     <iframe
-                        title='homeFrame'
                         src={iframeSrc}
                         style={{ border: 'none', flex: '1 1 auto', overflow: 'auto' }}
+                        title='homeFrame'
                     />
                 </Layout.Content>
             </Layout>

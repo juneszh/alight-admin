@@ -13,7 +13,7 @@ const lazyPages = {
 const App = props => {
     const Page = lazyPages[props.page] ?? null;
     return (
-        <Suspense fallback={<Spin delay={1000} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />}>
+        <Suspense fallback={<Spin delay={1000} style={{ left: '50%', position: 'absolute', top: '50%', transform: 'translate(-50%, -50%)' }} />}>
             <Page locale={props.locale} />
         </Suspense>
     );

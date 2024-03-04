@@ -4,38 +4,6 @@ const $global = window.$global ?? {};
 
 let i18n = {};
 
-const localeInit = i18nNew => {
-    i18n = i18nNew;
-};
-
-const localeValue = key => {
-    return (key[0] === ':' && i18n[key] !== undefined) ? i18n[key] : key;
-};
-
-const inIframe = () => {
-    try {
-        return window.self !== window.top;
-    } catch (e) {
-        return false;
-    }
-};
-
-const notEmpty = obj => {
-    return obj && (Object.getPrototypeOf(obj) === Object.prototype || Object.getPrototypeOf(obj) === Array.prototype) && Object.keys(obj).length !== 0;
-};
-
-const postMessage = data => {
-    window.parent.postMessage(data, window.location.origin);
-};
-
-const redirect = url => {
-    if (inIframe()) {
-        window.top.location.replace(url);
-    } else {
-        window.location.replace(url);
-    }
-};
-
 const ajax = async (url, data) => {
     const options = data ? {
         headers: {
@@ -73,5 +41,37 @@ const ajax = async (url, data) => {
         });
 };
 
+const inIframe = () => {
+    try {
+        return window.self !== window.top;
+    } catch (e) {
+        return false;
+    }
+};
+
+const localeInit = i18nNew => {
+    i18n = i18nNew;
+};
+
+const localeValue = key => {
+    return (key[0] === ':' && i18n[key] !== undefined) ? i18n[key] : key;
+};
+
+const notEmpty = obj => {
+    return obj && (Object.getPrototypeOf(obj) === Object.prototype || Object.getPrototypeOf(obj) === Array.prototype) && Object.keys(obj).length !== 0;
+};
+
+const postMessage = data => {
+    window.parent.postMessage(data, window.location.origin);
+};
+
+const redirect = url => {
+    if (inIframe()) {
+        window.top.location.replace(url);
+    } else {
+        window.location.replace(url);
+    }
+};
+
 export default $global;
-export { localeInit, localeValue, inIframe, notEmpty, postMessage, redirect, ajax };
+export { ajax, inIframe, localeInit, localeValue, notEmpty, postMessage, redirect };

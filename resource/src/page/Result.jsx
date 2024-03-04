@@ -1,6 +1,6 @@
-import { createRef, useState, useEffect } from 'react';
-import { Row, Col, Result, Button } from 'antd';
-import global, { localeInit, localeValue, inIframe, postMessage, redirect } from '../lib/Util';
+import { createRef, useEffect, useState } from 'react';
+import { Button, Col, Result, Row } from 'antd';
+import global, { inIframe, localeInit, localeValue, postMessage, redirect } from '../lib/Util';
 
 const Error = props => {
     localeInit(props.locale);
@@ -20,8 +20,8 @@ const Error = props => {
         }, 1000);
         return (
             <Button
-                type='primary'
                 onClick={() => { redirect(global.path + '/login'); }}
+                type='primary'
             >{localeValue(':login') + ' (' + countDown + ')'}</Button>
         );
     };
@@ -43,16 +43,16 @@ const Error = props => {
 
     return (
         <Row
-            justify='center'
             align='middle'
-            style={{ minHeight: '100vh', height: 'auto' }}
+            justify='center'
+            style={{ height: 'auto', minHeight: '100vh' }}
         >
             <Col ref={rootRef}>
                 <Result
-                    status={global.config.status === 200 ? 'success' : (global.config.status === 401 ? 403 : global.config.status)}
-                    title={global.config.status === 200 ? localeValue(':success') : global.config.status}
-                    subTitle={global.config.status === 200 ? undefined : localeValue(':status_' + global.config.status)}
                     extra={global.config.status === 200 ? closeButton() : (global.config.status === 401 ? loginButton() : undefined)}
+                    status={global.config.status === 200 ? 'success' : (global.config.status === 401 ? 403 : global.config.status)}
+                    subTitle={global.config.status === 200 ? undefined : localeValue(':status_' + global.config.status)}
+                    title={global.config.status === 200 ? localeValue(':success') : global.config.status}
                 />
             </Col>
         </Row>

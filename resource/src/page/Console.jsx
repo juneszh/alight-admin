@@ -1,8 +1,8 @@
-import { useRef, useState, useEffect } from 'react';
-import { Row, Col, Card, Avatar, Modal } from 'antd';
-import { EditOutlined, LockOutlined, PoweroffOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { useEffect, useRef, useState } from 'react';
+import { Avatar, Card, Col, Modal, Row } from 'antd';
+import { EditOutlined, ExclamationCircleOutlined, LockOutlined, PoweroffOutlined } from '@ant-design/icons';
 import Plots from '@ant-design/plots';
-import global, { localeInit, localeValue, redirect, notEmpty, ajax } from '../lib/Util';
+import global, { ajax, localeInit, localeValue, notEmpty, redirect } from '../lib/Util';
 import ModelKit from '../lib/ModelKit';
 
 const Console = props => {
@@ -20,9 +20,9 @@ const Console = props => {
 
     const editProfile = () => {
         modelRef.current?.modalShow({
+            action: 'form',
             title: localeValue(':user_profile'),
             url: global.path + '/user/form',
-            action: 'form'
         }, {
             _form: 'my_profile'
         }, {
@@ -34,9 +34,9 @@ const Console = props => {
 
     const changePassword = () => {
         modelRef.current?.modalShow({
+            action: 'form',
             title: localeValue(':change_password'),
             url: global.path + '/user/form',
-            action: 'form'
         }, {
             _form: 'my_password'
         }, {
@@ -48,11 +48,11 @@ const Console = props => {
 
     const logout = () => {
         Modal.confirm({
-            title: localeValue(':confirm_logout'),
             icon: <ExclamationCircleOutlined />,
             onOk: () => {
                 redirect(global.path + '/logout');
             },
+            title: localeValue(':confirm_logout'),
         });
     };
 
@@ -166,22 +166,22 @@ const Console = props => {
     }, []);
 
     return (
-        <div style={{ minHeight: '100vh', height: 'auto', backgroundColor: '#f0f2f5', padding: 24 }}>
+        <div style={{ backgroundColor: '#f0f2f5', height: 'auto', minHeight: '100vh', padding: 24 }}>
             <Row gutter={[16, 16]}>
                 <Col xs={24} sm={12} md={8} lg={6} xxl={4}>
                     <Card
-                        title={localeValue(':user_profile')}
                         actions={[
                             <EditOutlined key={1} title={localeValue(':edit_profile')} onClick={editProfile} />,
                             <LockOutlined key={2} title={localeValue(':change_password')} onClick={changePassword} />,
                             <PoweroffOutlined key={3} title={localeValue(':logout')} onClick={logout} />,
                         ]}
+                        title={localeValue(':user_profile')}
                     >
                         <Card.Meta
                             avatar={<Avatar src={global.config.user.avatar} size={94} />}
-                            title={global.config.user.name}
                             description={<><p>{global.config.user.account}</p><p>{global.config.user.role}</p></>}
                             style={{ height: 103 }}
+                            title={global.config.user.name}
                         />
                     </Card>
                 </Col>

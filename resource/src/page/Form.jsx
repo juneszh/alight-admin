@@ -1,9 +1,9 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { message } from 'antd';
 import { BetaSchemaForm, ProFormUploadDragger } from '@ant-design/pro-components';
 import { useResizeDetector } from 'react-resize-detector';
 import { Editor } from '@tinymce/tinymce-react';
-import global, { localeInit, localeValue, inIframe, notEmpty, postMessage, ajax, redirect } from '../lib/Util';
+import global, { ajax, inIframe, localeInit, localeValue, notEmpty, postMessage, redirect } from '../lib/Util';
 
 const Form = props => {
     localeInit(props.locale);
@@ -19,14 +19,12 @@ const Form = props => {
     const uploadRender = (schema) => (
         <>
             <ProFormUploadDragger
-                name={schema.dataIndex}
-                max={schema.proFieldProps.readonly ? 0 : undefined}
                 disabled={(schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined}
                 fieldProps={{
-                    name: 'file',
-                    listType: 'picture',
                     action: global.path + '/upload',
+                    listType: 'picture',
                     maxCount: schema.fieldProps.multiple ? 0 : 1,
+                    name: 'file',
                     onChange: ({ file, fileList }) => {
                         if (file.status === 'error') {
                             for (const [key, value] of Object.entries(fileList)) {
@@ -46,6 +44,8 @@ const Form = props => {
                 formItemProps={{
                     style: { margin: 0 }
                 }}
+                max={schema.proFieldProps.readonly ? 0 : undefined}
+                name={schema.dataIndex}
             />
         </>
     );
@@ -53,8 +53,6 @@ const Form = props => {
     // https://www.tiny.cloud/docs/tinymce/6
     const richTextRender = (schema, form) => (
         <Editor
-            tinymceScriptSrc='/alight-admin/tinymce/tinymce.min.js'
-            initialValue={schema.initialValue}
             disabled={(schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined}
             init={{
                 promotion: false,
@@ -77,7 +75,9 @@ const Form = props => {
                 images_upload_url: global.path + '/upload?' + new URLSearchParams(schema.fieldProps.data).toString(),
                 ...schema.fieldProps
             }}
+            initialValue={schema.initialValue}
             onEditorChange={(newValue) => form ? form.setFieldsValue({ [schema.key]: newValue }) : false}
+            tinymceScriptSrc='/alight-admin/tinymce/tinymce.min.js'
         />
     );
 
@@ -239,7 +239,7 @@ const Form = props => {
     useEffect(() => {
         if (inIframe()) {
             window.addEventListener('message', getMessage);
-            if (showButton){
+            if (showButton) {
                 postMessage({ button: showButton });
             }
         }
@@ -255,26 +255,12 @@ const Form = props => {
     return (
         <div ref={rootSize.ref}>
             <BetaSchemaForm
-                style={{
-                    width: '100%',
-                    padding: 24
-                }}
-                formRef={formRef}
-                shouldUpdate={false}
-                layoutType='Form'
-                layout={layout}
-                labelWrap={true}
-                grid={true}
-                rowProps={{ gutter: 24, justify: 'start' }}
                 columns={columns}
-                submitter={inIframe() || !showButton ? false : {
-                    resetButtonProps: false,
-                    submitButtonProps: {
-                        style: {
-                            float: 'right'
-                        }
-                    }
-                }}
+                formRef={formRef}
+                grid={true}
+                labelWrap={true}
+                layout={layout}
+                layoutType='Form'
                 onFinish={async (values) => {
                     if (notEmpty(global.config.field)) {
                         for (const [key, value] of Object.entries(values)) {
@@ -292,6 +278,23 @@ const Form = props => {
                             }
                         }
                     })
+                }}
+                rowProps={{
+                    gutter: 24,
+                    justify: 'start'
+                }}
+                shouldUpdate={false}
+                style={{
+                    padding: 24,
+                    width: '100%'
+                }}
+                submitter={inIframe() || !showButton ? false : {
+                    resetButtonProps: false,
+                    submitButtonProps: {
+                        style: {
+                            float: 'right'
+                        }
+                    }
                 }}
             />
         </div>

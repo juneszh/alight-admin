@@ -1,10 +1,10 @@
-import { useRef, useState, useEffect } from 'react';
-import { Button, Space, Modal, message, Card, Row, Col, Statistic } from 'antd';
+import { useEffect, useRef, useState } from 'react';
+import { Button, Card, Col, message, Modal, Row, Space, Statistic } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import { useResizeDetector } from 'react-resize-detector';
 import dayjs from 'dayjs';
-import global, { localeInit, localeValue, notEmpty, ajax } from '../lib/Util';
+import global, { ajax, localeInit, localeValue, notEmpty } from '../lib/Util';
 import ModelKit from '../lib/ModelKit';
 
 const Table = props => {
@@ -108,7 +108,7 @@ const Table = props => {
                     column.width = columnValue.width;
                     if (columnValue.ellipsis) {
                         if (columnValue.ellipsis && columnValue.width.slice(-2) === 'px') {
-                            column.render = (text) => <div style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', wordBreak: 'keep-all', width: columnValue.width }} title={text}>{text}</div>;
+                            column.render = (text) => <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: columnValue.width, wordBreak: 'keep-all' }} title={text}>{text}</div>;
                         } else {
                             column.ellipsis = columnValue.ellipsis;
                         }
@@ -184,12 +184,12 @@ const Table = props => {
                                 if (buttonShow) {
                                     buttons.push(
                                         <Button
-                                            key={`column-botton-${columnKey}-${buttonKey}`}
-                                            type={buttonValue.type ?? 'default'}
-                                            href={buttonHref(buttonValue, record)}
                                             danger={buttonValue.danger ?? undefined}
-                                            size='small'
+                                            href={buttonHref(buttonValue, record)}
+                                            key={`column-botton-${columnKey}-${buttonKey}`}
                                             onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, record); }}
+                                            size='small'
+                                            type={buttonValue.type ?? 'default'}
                                         >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
                                     );
                                 }
@@ -263,7 +263,6 @@ const Table = props => {
                 break;
             case 'confirm':
                 Modal.confirm({
-                    title: localeValue(':confirm_modify'),
                     icon: <ExclamationCircleOutlined />,
                     onOk: () => {
                         ajax(button.url, params).then(result => {
@@ -273,6 +272,7 @@ const Table = props => {
                             }
                         })
                     },
+                    title: localeValue(':confirm_modify'),
                 });
                 break;
             case 'submit':
@@ -298,11 +298,11 @@ const Table = props => {
     if (notEmpty(global.config.toolbar.button)) {
         for (const [buttonKey, buttonValue] of Object.entries(global.config.toolbar.button)) {
             toolbarActions.push(<Button
-                key={`toolbar-botton-${buttonKey}`}
-                type={buttonValue.type ?? 'primary'}
-                href={buttonHref(buttonValue)}
                 danger={buttonValue.danger ?? undefined}
+                href={buttonHref(buttonValue)}
+                key={`toolbar-botton-${buttonKey}`}
                 onClick={(e) => { e.preventDefault(); buttonAction(buttonValue); }}
+                type={buttonValue.type ?? 'primary'}
             >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>);
         }
     }
@@ -318,13 +318,27 @@ const Table = props => {
     }, [statSize.height]);
 
     return (
-        <div style={{ minHeight: '100vh', height: 'auto', backgroundColor: '#f0f2f5' }}>
+        <div style={{ backgroundColor: '#f0f2f5', height: 'auto', minHeight: '100vh' }}>
             <ProTable
-                style={{ padding: 24 }}
-                cardBordered
-                scroll={{ x: 'max-content' }}
-                columns={mainColumns}
                 actionRef={actionRef}
+                cardBordered
+                columns={mainColumns}
+                dateFormatter='string'
+                expandable={notEmpty(expandColumns) ? {
+                    expandedRowRender: (record) => <ProTable
+                        columns={expandColumns}
+                        dataSource={record?._expand}
+                        options={false}
+                        pagination={false}
+                        search={false}
+                    />
+                } : undefined}
+                options={{
+                    setting: false
+                }}
+                pagination={{
+                    showSizeChanger: true,
+                }}
                 request={async (params = {}, sort) => {
                     if (notEmpty(sort)) {
                         params._order = Object.keys(sort)[0];
@@ -349,35 +363,10 @@ const Table = props => {
                 }}
                 revalidateOnFocus={false}
                 rowKey='id'
-                search={tableSearch}
-                pagination={{
-                    showSizeChanger: true,
-                }}
-                dateFormatter='string'
-                toolbar={{
-                    actions: toolbarActions
-                }}
                 rowSelection={notEmpty(global.config.batch.button) ? true : undefined}
-                tableAlertRender={({ selectedRowKeys }) => {
-                    const buttons = [];
-                    if (notEmpty(global.config.batch.button)) {
-                        for (const [buttonKey, buttonValue] of Object.entries(global.config.batch.button)) {
-                            buttons.push(
-                                <Button
-                                    key={`batch-botton-${buttonKey}`}
-                                    type={buttonValue.type ?? 'primary'}
-                                    href={buttonHref(buttonValue, selectedRowKeys)}
-                                    danger={buttonValue.danger ?? undefined}
-                                    onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, selectedRowKeys); }}
-                                >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
-                            );
-                        }
-                    }
-                    return <Space wrap>{buttons}</Space>;
-                }}
-                options={{
-                    setting: false
-                }}
+                scroll={{ x: 'max-content' }}
+                search={tableSearch}
+                style={{ padding: 24 }}
                 summary={notEmpty(global.config.summary) ? pageData => {
                     let sumVisible = false;
                     let avgVisible = false;
@@ -444,6 +433,23 @@ const Table = props => {
                         </ProTable.Summary>
                     ) : undefined;
                 } : undefined}
+                tableAlertRender={({ selectedRowKeys }) => {
+                    const buttons = [];
+                    if (notEmpty(global.config.batch.button)) {
+                        for (const [buttonKey, buttonValue] of Object.entries(global.config.batch.button)) {
+                            buttons.push(
+                                <Button
+                                    danger={buttonValue.danger ?? undefined}
+                                    href={buttonHref(buttonValue, selectedRowKeys)}
+                                    key={`batch-botton-${buttonKey}`}
+                                    onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, selectedRowKeys); }}
+                                    type={buttonValue.type ?? 'primary'}
+                                >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
+                            );
+                        }
+                    }
+                    return <Space wrap>{buttons}</Space>;
+                }}
                 tableExtraRender={notEmpty(global.config.statistic) ? () => {
                     const statistic = [];
                     for (const [key, value] of Object.entries(global.config.statistic)) {
@@ -467,15 +473,9 @@ const Table = props => {
                         </Card>
                     );
                 } : undefined}
-                expandable={notEmpty(expandColumns) ? {
-                    expandedRowRender: (record) => <ProTable
-                        columns={expandColumns}
-                        dataSource={record?._expand}
-                        search={false}
-                        options={false}
-                        pagination={false}
-                    />
-                } : undefined}
+                toolbar={{
+                    actions: toolbarActions
+                }}
             />
             <ModelKit ref={modelRef} />
         </div>

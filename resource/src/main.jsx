@@ -16,7 +16,7 @@ import localeAntd from 'antd/lib/locale/zh_CN';
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <ConfigProvider locale={global.locale ? localeAntd : defaultAntd} >
-            <App page={global.page ?? 'Login'} locale={global.locale ? localeAlight : defaultAlight} />
+            <App locale={global.locale ? localeAlight : defaultAlight} page={global.page ?? 'Login'} />
         </ConfigProvider>
     </React.StrictMode>
 )

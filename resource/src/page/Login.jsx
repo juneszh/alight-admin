@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Row, Col, Form, Input, Button, Checkbox } from 'antd';
-import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons';
-import global, { localeInit, localeValue, ajax } from '../lib/Util';
+import { Button, Checkbox, Col, Form, Input, Row } from 'antd';
+import { LockOutlined, SafetyOutlined, UserOutlined } from '@ant-design/icons';
+import global, { ajax, localeInit, localeValue } from '../lib/Util';
 
 const Login = props => {
     localeInit(props.locale);
@@ -34,22 +34,22 @@ const Login = props => {
 
     return (
         <Row
-            justify='center'
             align='middle'
-            style={{ minHeight: '100vh', height: 'auto', backgroundColor: '#f0f2f5' }}
+            justify='center'
+            style={{ backgroundColor: '#f0f2f5', height: 'auto', minHeight: '100vh' }}
         >
             <Col style={{ width: '320px' }}>
-                <h1 style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '40px' }} >{global.title}</h1>
+                <h1 style={{ fontWeight: 'bold', marginBottom: '40px', textAlign: 'center' }} >{global.title}</h1>
                 <Form
+                    autoComplete='off'
                     form={form}
                     initialValues={{
                         remember: true,
                     }}
-                    onFinish={onFinish}
-                    autoComplete='off'
-                    size='large'
-                    scrollToFirstError={true}
                     layout='vertical'
+                    onFinish={onFinish}
+                    scrollToFirstError={true}
+                    size='large'
                 >
                     <Form.Item
                         name='account'
@@ -73,9 +73,9 @@ const Login = props => {
                         ]}
                     >
                         <Input
-                            type='password'
                             placeholder={localeValue(':password')}
                             prefix={<LockOutlined />}
+                            type='password'
                         />
                     </Form.Item>
                     <Form.Item style={{ marginBottom: '0' }}>
@@ -91,31 +91,31 @@ const Login = props => {
                                 style={{ flex: '1 1 0%', marginRight: 8 }}
                             >
                                 <Input
+                                    inputMode='numeric'
+                                    maxLength={5}
                                     placeholder={localeValue(':captcha')}
                                     prefix={<SafetyOutlined />}
-                                    maxLength={5}
-                                    inputMode='numeric'
                                 />
                             </Form.Item>
                             <img
                                 alt='captcha'
-                                src={captcha}
                                 onClick={buildCaptcha}
+                                src={captcha}
                                 style={{ cursor: 'pointer', height: 'min-content' }}
                             ></img>
                         </div>
                     </Form.Item>
                     <Form.Item style={{ marginBottom: '12px' }}>
                         <Button
-                            type='primary'
-                            htmlType='submit'
                             block
+                            htmlType='submit'
+                            type='primary'
                         >{localeValue(':login')}</Button>
                     </Form.Item>
                     <Form.Item
                         name='remember'
-                        valuePropName='checked'
                         style={{ textAlign: 'right' }}
+                        valuePropName='checked'
                     >
                         <Checkbox>{localeValue(':remember')}</Checkbox>
                     </Form.Item>

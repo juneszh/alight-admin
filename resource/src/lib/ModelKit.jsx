@@ -1,4 +1,4 @@
-import { useState, useImperativeHandle, forwardRef, useCallback, useRef } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { Modal } from 'antd';
 import { localeValue } from './Util';
 
@@ -9,7 +9,7 @@ const ModelKit = forwardRef((props, ref) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalHeight, setModalHeight] = useState(400);
     const [modalWidth, setModalWidth] = useState(800);
-    const [modalConfig, setModalConfig] = useState({ title: '', url: ''});
+    const [modalConfig, setModalConfig] = useState({ title: '', url: '' });
     const [modalFooter, setModalFooter] = useState(null);
     const iframeRef = useRef();
     const [lastModal, setLastModal] = useState('form');
@@ -91,20 +91,20 @@ const ModelKit = forwardRef((props, ref) => {
     return (
         <Modal title={modalConfig.title}
             centered
-            open={modalOpen}
             destroyOnClose={true}
+            footer={modalFooter}
             onCancel={modalHide}
             onOk={modalSubmit}
-            width={modalWidth}
+            open={modalOpen}
             style={{ transition: 'width .6s ease' }}
-            styles={{ body: { display: 'flex', padding: 0, maxHeight: 'calc(96vh - 116px)', height: modalHeight, transition: 'height .6s ease' } }}
-            footer={modalFooter}
+            styles={{ body: { display: 'flex', height: modalHeight, maxHeight: 'calc(96vh - 116px)', padding: 0, transition: 'height .6s ease' } }}
+            width={modalWidth}
         >
             <iframe
                 ref={iframeRef}
-                title='modalFrame'
                 src={modalConfig.url}
                 style={{ border: 'none', borderRadius: 8, flex: '1 1 auto', overflow: 'auto' }}
+                title='modalFrame'
             />
         </Modal>
     );

@@ -20,8 +20,8 @@ const i18n = {
     ':try_again_later': '请15分钟后再尝试',
     // Menu
     ':console': '控制台',
-    ':role': '角色',
-    ':user': '用户',
+    ':role': '后台角色',
+    ':user': '后台用户',
     // Console
     ':user_profile': '用户资料',
     ':edit_profile': '编辑资料',

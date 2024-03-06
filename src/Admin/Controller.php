@@ -333,8 +333,8 @@ class Controller
         Form::create('my_profile')->copy('add', ['name', 'email']);
         Form::create('my_password')->copy('password');
 
-        Form::render('admin_user', function (string $action, array &$data) {
-            if ($action == 'request') {
+        Form::render('admin_user', function (string $event, array &$data) {
+            if ($event == Form::EVENT_REQUEST) {
                 if (in_array(Request::request('_form', ''), ['add', 'password', 'my_password'])) {
                     $data['auth_key'] = Utility::randomHex();
                 }

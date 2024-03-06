@@ -167,6 +167,11 @@ const Form = props => {
             } else if (fieldValue.type === 'richText') {
                 column.render = (dom, entity, index, action, schema) => richTextRender(schema);
                 column.renderFormItem = (schema, config, form) => richTextRender(schema, form);
+            } else if (fieldValue.type === 'color') {
+                column.fieldProps.showText = true;
+                column.fieldProps.defaultFormat = 'rgb';
+                column.fieldProps.style = { display: 'inline-flex' };
+                column.fieldProps.presets = false;
             }
 
             if (fieldValue.placeholder) {
@@ -266,6 +271,8 @@ const Form = props => {
                         for (const [key, value] of Object.entries(values)) {
                             if (global.config.field[key].type === 'upload') {
                                 values[key] = value.map(e => (e.response?.data?.name ?? e.name));
+                            } else if (global.config.field[key].type === 'color' && typeof value !== 'string') {
+                                values[key] = value.toRgbString();
                             }
                         }
                     }

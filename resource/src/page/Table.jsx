@@ -22,7 +22,7 @@ const Table = props => {
         refreshRate: 100
     });
 
-    let tableSearch;
+    let tableSearch = false;
 
     const columnsBuilder = (columnObj, expand) => {
         const columns = [];

@@ -113,12 +113,10 @@ class Table
      */
     public static function column(string $key): TableColumn
     {
-        if (!isset(self::$config[__FUNCTION__][$key])) {
-            self::$config[__FUNCTION__][$key] = [
-                'title' => $key,
-                'database' => true,
-            ];
-        }
+        self::$config[__FUNCTION__][$key] = [
+            'title' => $key,
+            'database' => true,
+        ];
         return new TableColumn(__FUNCTION__, $key);
     }
 
@@ -130,11 +128,9 @@ class Table
      */
     public static function expand(string $key): TableExpand
     {
-        if (!isset(self::$config[__FUNCTION__][$key])) {
-            self::$config[__FUNCTION__][$key] = [
-                'title' => $key,
-            ];
-        }
+        self::$config[__FUNCTION__][$key] = [
+            'title' => $key,
+        ];
         return new TableExpand(__FUNCTION__, $key);
     }
 

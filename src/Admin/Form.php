@@ -98,13 +98,11 @@ class Form
             throw new Exception('Missing form definition.');
         }
 
-        if (!isset(self::$config[self::$form][$key])) {
-            self::$config[self::$form][$key] = [
-                'title' => $key,
-                'database' => true,
-                'type' => 'text',
-            ];
-        }
+        self::$config[self::$form][$key] = [
+            'title' => $key,
+            'database' => true,
+            'type' => 'text',
+        ];
 
         return new FormField(self::$form, $key);
     }

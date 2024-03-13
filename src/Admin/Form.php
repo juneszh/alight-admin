@@ -151,7 +151,7 @@ class Form
                 if ($value && isset($value[$k]) && $field[$k]['type'] !== 'password') {
                     $field[$k]['value'] = $value[$k];
                 }
-                if (isset($field[$k]['value']) && (in_array($field[$k]['type'], ['checkbox', 'upload']) || ($field[$k]['typeProps']['mode'] ?? '') === 'multiple')) {
+                if (isset($field[$k]['value']) && $field[$k]['value'] !== ''  && (in_array($field[$k]['type'], ['checkbox', 'upload']) || ($field[$k]['typeProps']['mode'] ?? '') === 'multiple')) {
                     $field[$k]['value'] = explode($separator, $field[$k]['value']);
                 }
             }

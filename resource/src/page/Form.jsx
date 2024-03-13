@@ -98,7 +98,7 @@ const Form = props => {
                 colProps: { xs: 24 }
             };
 
-            if (fieldValue.value !== undefined) {
+            if (fieldValue.value !== undefined && fieldValue.value !== '') {
                 if (fieldValue.type === 'upload') {
                     column.initialValue = [];
                     if (notEmpty(fieldValue.value)) {

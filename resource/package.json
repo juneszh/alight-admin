@@ -11,9 +11,9 @@
     "tinymce": "node ./tinymce.copy.cjs"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.3.1",
+    "@ant-design/icons": "^5.3.3",
     "@ant-design/plots": "^1.2.6",
-    "@ant-design/pro-components": "^2.6.49",
+    "@ant-design/pro-components": "^2.6.50",
     "@tinymce/tinymce-react": "^4.3.2",
     "antd": "^5.15.2",
     "fs-extra": "^11.2.0",
@@ -24,13 +24,13 @@
     "tinymce-i18n": "^24.3.11"
   },
   "devDependencies": {
-    "@types/react": "^18.2.65",
-    "@types/react-dom": "^18.2.21",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react-swc": "^3.6.0",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.0",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.5",
+    "eslint-plugin-react-refresh": "^0.4.6",
     "vite": "^5.1.6"
   }
 }

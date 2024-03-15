@@ -56,6 +56,18 @@ class TableButton
     }
 
     /**
+     * Set theme color
+     *
+     * @param string $color 
+     * @return $this 
+     */
+    public function color(string $color)
+    {
+        Table::$config['button'][$this->index][__FUNCTION__] = $color;
+        return $this;
+    }
+
+    /**
      * Put in the specified column (Create _column column by default)
      * 
      * @param string $columnKey 

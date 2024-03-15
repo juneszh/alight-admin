@@ -45,6 +45,12 @@ class Table
         ALIGN_CENTER = 'center',
         ALIGN_RIGHT = 'right',
 
+        BUTTON_DEFAULT = 'default',
+        BUTTON_PRIMARY = 'primary',
+        BUTTON_DASHED = 'dashed',
+        BUTTON_TEXT = 'text',
+        BUTTON_LINK = 'link',
+
         FIXED_LEFT = 'left',
         FIXED_RIGHT = 'right',
 
@@ -76,11 +82,38 @@ class Table
         SORT_ASCEND = 'ascend',
         SORT_DESCEND = 'descend',
 
-        TYPE_DEFAULT = 'default',
-        TYPE_PRIMARY = 'primary',
-        TYPE_DASHED = 'dashed',
+        TYPE_PASSWORD = 'password',
+        TYPE_MONEY = 'money',
+        TYPE_TEXTAREA = 'textarea',
+        TYPE_DATE = 'date',
+        TYPE_DATE_TIME = 'dateTime',
+        TYPE_DATE_WEEK = 'dateWeek',
+        TYPE_DATE_MONTH = 'dateMonth',
+        TYPE_DATE_QUARTER = 'dateQuarter',
+        TYPE_DATE_YEAR = 'dateYear',
+        TYPE_DATE_RANGE = 'dateRange',
+        TYPE_DATE_TIME_RANGE = 'dateTimeRange',
+        TYPE_TIME = 'time',
+        TYPE_TIME_RANGE = 'timeRange',
         TYPE_TEXT = 'text',
-        TYPE_LINK = 'link';
+        TYPE_SELECT = 'select',
+        TYPE_TREE_SELECT = 'treeSelect',
+        TYPE_CHECK_BOX = 'checkbox',
+        TYPE_RATE = 'rate',
+        TYPE_RADIO = 'radio',
+        TYPE_RADIO_BUTTON = 'radioButton',
+        TYPE_PROGRESS = 'progress',
+        TYPE_PERCENT = 'percent',
+        TYPE_DIGIT = 'digit',
+        TYPE_SECOND = 'second',
+        TYPE_AVATAR = 'avatar',
+        TYPE_CODE = 'code',
+        TYPE_SWITCH = 'switch',
+        TYPE_FROM_NOW = 'fromNow',
+        TYPE_IMAGE = 'image',
+        TYPE_JSON_CODE = 'jsonCode',
+        TYPE_COLOR = 'color',
+        TYPE_CASCADER = 'cascader';
 
     /**
      * Create a button

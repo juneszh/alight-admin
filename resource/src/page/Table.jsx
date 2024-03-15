@@ -82,6 +82,10 @@ const Table = props => {
                     }
                 }
 
+                if (columnValue.type) {
+                    column.valueType = columnValue.type;
+                }
+
                 if (columnValue.sort) {
                     if (expand) {
                         column.sorter = (a, b) => {

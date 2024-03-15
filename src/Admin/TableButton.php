@@ -177,7 +177,7 @@ class TableButton
     /**
      * Set type
      *
-     * @param string $value Table::TYPE_*
+     * @param string $value Table::BUTTON_*
      * @return TableButton
      * 
      * @see https://ant.design/components/button/

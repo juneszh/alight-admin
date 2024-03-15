@@ -63,8 +63,7 @@ class TableColumn extends TableExpand
      * @param bool $raw
      * @return $this
      * 
-     * @see https://procomponents.ant.design/en-US/components/schema#valuetype-%E5%88%97%E8%A1%A8
-     * @see https://ant.design/components/overview/
+     * @see https://procomponents.ant.design/en-US/components/schema#valuetype-lists
      */
     public function search(string $valueType = 'text[~]', array $props = [], bool $raw = false)
     {
@@ -76,6 +75,27 @@ class TableColumn extends TableExpand
 
         if ($raw) {
             Table::$config[$this->type][$this->key][__FUNCTION__ . 'Raw'] = $raw;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set field (ProComponents) valueType
+     *
+     * @param string $value Table::TYPE_*
+     * @param array $props Props for Ant Design components
+     * @return $this
+     * 
+     * @see https://procomponents.ant.design/en-US/components/schema#valuetype-lists
+     */
+    public function type(string $valueType, array $props = [])
+    {
+        if ($props) {
+            $props['type'] = $valueType;
+            Table::$config[$this->type][$this->key][__FUNCTION__] = $props;
+        } else {
+            Table::$config[$this->type][$this->key][__FUNCTION__] = $valueType;
         }
 
         return $this;

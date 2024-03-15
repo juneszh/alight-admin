@@ -36,7 +36,7 @@ class FormField
      * Field confirm (e.g. password confirm)
      *
      * @param string $key
-     * @return FormField
+     * @return $this
      */
     public function confirm(string $key)
     {
@@ -60,7 +60,7 @@ class FormField
      * Set default
      *
      * @param mixed $value
-     * @return FormField
+     * @return $this
      */
     public function default($value)
     {
@@ -79,7 +79,7 @@ class FormField
     /**
      * Set disabled
      *
-     * @return FormField
+     * @return $this
      */
     public function disabled()
     {
@@ -91,7 +91,7 @@ class FormField
      * Set enum to replace value
      *
      * @param array $keyValues
-     * @return FormField
+     * @return $this
      * 
      * @example Basic [key=>value, key=>value]
      * @example Badge [key=>[text=>value, status=>status], key=>[text=>value, status=>status]]
@@ -119,7 +119,7 @@ class FormField
     /**
      * Hide field
      *
-     * @return FormField
+     * @return $this
      */
     public function hide()
     {
@@ -131,7 +131,7 @@ class FormField
      * Set placeholder
      *
      * @param string $value key
-     * @return FormField
+     * @return $this
      */
     public function placeholder(string $value)
     {
@@ -142,7 +142,7 @@ class FormField
     /**
      * Keep the raw data when submit (trim default)
      *
-     * @return FormField
+     * @return $this
      */
     public function raw()
     {
@@ -153,7 +153,7 @@ class FormField
     /**
      * Set readonly
      *
-     * @return FormField
+     * @return $this
      */
     public function readonly()
     {
@@ -164,7 +164,7 @@ class FormField
     /**
      * Set required
      *
-     * @return FormField
+     * @return $this
      */
     public function required()
     {
@@ -176,7 +176,7 @@ class FormField
      * Which role has permission to view
      *
      * @param array $roleValues
-     * @return FormField
+     * @return $this
      */
     public function role(array $roleValues)
     {
@@ -188,7 +188,7 @@ class FormField
      * Rules for field validation
      *
      * @param array $keyValues ['type' => 'string', 'min' => 6, 'max' => 20]
-     * @return FormField
+     * @return $this
      * 
      * @see https://ant.design/components/form/#Rule
      */
@@ -217,7 +217,7 @@ class FormField
      * Set tooltip
      *
      * @param string $value key
-     * @return FormField
+     * @return $this
      */
     public function tooltip(string $value)
     {
@@ -230,9 +230,9 @@ class FormField
      *
      * @param string $value Form::TYPE_*
      * @param array $props Props for Ant Design components. e.g. multiple select:['mode' => 'multiple'] or upload:['action' => 'api url', 'multiple' => true, 'data' => ['path' => 'test'], 'accept' => 'image/*,.pdf', 'basicUrl' => 'https://alight.cc']
-     * @return FormField
+     * @return $this
      * 
-     * @see https://procomponents.ant.design/en-US/components/schema#valuetype-%E5%88%97%E8%A1%A8
+     * @see https://procomponents.ant.design/en-US/components/schema#valuetype-lists
      * @see https://ant.design/components/overview/
      * @see https://ant.design/components/upload/#API
      */
@@ -244,7 +244,9 @@ class FormField
             $props['data']['tinymce'] = 1;
         }
 
-        Form::$config[$this->form][$this->key][__FUNCTION__ . 'Props'] = $props;
+        if ($props) {
+            Form::$config[$this->form][$this->key][__FUNCTION__ . 'Props'] = $props;
+        }
         return $this;
     }
 }

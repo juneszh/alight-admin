@@ -10,6 +10,8 @@ import ModelKit from '../lib/ModelKit';
 const Table = props => {
     localeInit(props.locale);
 
+    const isMobile = /Mobi/.test(window.navigator.userAgent);
+
     const actionRef = useRef();
     const modelRef = useRef();
 
@@ -375,7 +377,7 @@ const Table = props => {
                 rowKey='id'
                 rowSelection={notEmpty(global.config.batch.button) ? true : undefined}
                 scroll={{ x: 'max-content' }}
-                search={tableSearch}
+                search={tableSearch ? { defaultCollapsed: isMobile } : false}
                 style={{ padding: 24 }}
                 summary={notEmpty(global.config.summary) ? pageData => {
                     let sumVisible = false;

@@ -88,6 +88,7 @@ class TableColumn extends TableExpand
      * @return $this
      * 
      * @see https://procomponents.ant.design/en-US/components/schema#valuetype-lists
+     * @see https://procomponents.ant.design/en-US/components/field
      */
     public function type(string $valueType, array $props = [])
     {

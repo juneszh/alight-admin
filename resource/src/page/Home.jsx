@@ -18,7 +18,7 @@ const Home = props => {
     const [collapsedWidth, setCollapsedWidth] = useState(48);
     const [iframeSrc, setIframeSrc] = useState();
 
-    const menuAction = (e, item) => {
+    const menuAction = (e, item, itemKey, subKey) => {
         e.preventDefault();
         switch (item.action ?? 'iframe') {
             case 'form':
@@ -32,22 +32,26 @@ const Home = props => {
                 window.location.assign(item.url);
                 break;
             default:
+                window.history.replaceState({ itemKey: itemKey, subKey: subKey }, '', '#' + itemKey + '-' + subKey);
                 setIframeSrc(item.url);
                 break;
         }
     };
 
-    const defaultSelectedKeys = [];
-    const defaultOpenKeys = [];
+    let defaultSelectedKeys = [];
+    let defaultOpenKeys = [];
     let defaultIframeSrc;
+    const hashKey = window.location.hash ? window.location.hash.substring(1).split('-') : [];
     const iframeDefault = (item, itemKey, subKey) => {
-        if (!defaultIframeSrc && (item.action ?? 'iframe') === 'iframe') {
-            defaultIframeSrc = item.url;
-            if (subKey) {
-                defaultSelectedKeys.push('menu-' + itemKey + '-' + subKey);
-                defaultOpenKeys.push('menu-' + itemKey);
-            } else {
-                defaultSelectedKeys.push('menu-' + itemKey);
+        if ((item.action ?? 'iframe') === 'iframe') {
+            if (!defaultIframeSrc || (hashKey[0] == itemKey && hashKey[1] == subKey)) {
+                defaultIframeSrc = item.url;
+                if (subKey) {
+                    defaultSelectedKeys = ['menu-' + itemKey + '-' + subKey];
+                    defaultOpenKeys = ['menu-' + itemKey];
+                } else {
+                    defaultSelectedKeys = ['menu-' + itemKey ];
+                }
             }
         }
     };
@@ -62,19 +66,22 @@ const Home = props => {
             if (notEmpty(itemValue.sub)) {
                 item.children = [];
                 for (const [subKey, subValue] of Object.entries(itemValue.sub)) {
+                    if (itemKey === '1'){
+                        subValue.title = localeValue(subValue.title);
+                    }
                     let children = {
                         key: 'menu-' + itemKey + '-' + subKey,
-                        label: itemKey === '1' ? localeValue(subValue.title) : subValue.title,
+                        label: subValue.title,
                         icon: subValue.icon && Icons[subValue.icon] ? Icons[subValue.icon] : undefined,
                     };
                     if (subValue.url) {
                         iframeDefault(subValue, itemKey, subKey);
                         children.label = (
                             <a
-                                href={subValue.url + (subValue.url.indexOf('?') !== -1 ? '&' : '?') + '_title=' + (itemKey === '1' ? localeValue(subValue.title) : subValue.title)}
+                                href={subValue.url + (subValue.url.indexOf('?') !== -1 ? '&' : '?') + '_title=' + subValue.title}
                                 rel='noopener noreferrer'
-                                onClick={e => menuAction(e, subValue)}
-                            >{itemKey === '1' ? localeValue(subValue.title) : subValue.title}</a>
+                                onClick={e => menuAction(e, subValue, itemKey, subKey)}
+                            >{subValue.title}</a>
                         );
                     }
                     item.children.push(children);
@@ -86,7 +93,7 @@ const Home = props => {
                         <a
                             href={itemValue.url + (itemValue.url.indexOf('?') !== -1 ? '&' : '?') + '_title=' + itemValue.title}
                             rel='noopener noreferrer'
-                            onClick={e => menuAction(e, itemValue)}
+                            onClick={e => menuAction(e, itemValue, itemKey)}
                         >{itemValue.title}</a>
                     );
                 }

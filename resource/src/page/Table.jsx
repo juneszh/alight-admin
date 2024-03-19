@@ -31,14 +31,15 @@ const Table = props => {
         if (notEmpty(columnObj)) {
             let column = {};
             for (const [columnKey, columnValue] of Object.entries(columnObj)) {
-                if (columnValue.hide) {
-                    continue;
-                }
                 column = {
                     dataIndex: columnKey,
                     title: columnValue.locale ? localeValue(columnValue.title) : columnValue.title,
                     search: false
                 };
+
+                if (columnValue.hide) {
+                    column.hideInTable = true;
+                }
 
                 if (columnValue.search) {
                     tableSearch = true;

@@ -343,13 +343,15 @@ class Table
                 $callback(self::EVENT_REQUEST, $searchData);
             }
 
-            $count = Model::tableCount($table, $searchData);
-            $list = Model::tableSelect($table, $column, $searchData, $page, $limit, $order, $sort);
-
             $resData = [
-                'count' => $count,
-                'list' => $list,
+                'count' => 0,
+                'list' => [],
             ];
+
+            if ($table) {
+                $resData['count'] = Model::tableCount($table, $searchData);
+                $resData['list'] = Model::tableSelect($table, $column, $searchData, $page, $limit, $order, $sort);
+            }
 
             if (is_callable($callback)) {
                 $callback(self::EVENT_RESPONSE, $resData);

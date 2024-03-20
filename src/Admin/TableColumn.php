@@ -58,45 +58,18 @@ class TableColumn extends TableExpand
     /**
      * Set search (ProComponents) valueType
      *
-     * @param string $valueType Table::SEARCH_*
+     * @param string $valueType Table::TYPE_*
      * @param array $props Props for Ant Design components. e.g. multiple select:['mode' => 'multiple']
-     * @param bool $raw
      * @return $this
      * 
      * @see https://procomponents.ant.design/en-US/components/schema#valuetype-lists
      */
-    public function search(string $valueType = 'text[~]', array $props = [], bool $raw = false)
+    public function search(string $valueType = 'text', array $props = [])
     {
-        Table::$config[$this->type][$this->key][__FUNCTION__] = $valueType;
+        Table::$config[$this->type][$this->key][__FUNCTION__ . 'Type'] = $valueType;
 
         if ($props) {
             Table::$config[$this->type][$this->key][__FUNCTION__ . 'Props'] = $props;
-        }
-
-        if ($raw) {
-            Table::$config[$this->type][$this->key][__FUNCTION__ . 'Raw'] = $raw;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Set field (ProComponents) valueType
-     *
-     * @param string $value Table::TYPE_*
-     * @param array $props Props for Ant Design components
-     * @return $this
-     * 
-     * @see https://procomponents.ant.design/en-US/components/schema#valuetype-lists
-     * @see https://procomponents.ant.design/en-US/components/field
-     */
-    public function type(string $valueType, array $props = [])
-    {
-        if ($props) {
-            $props['type'] = $valueType;
-            Table::$config[$this->type][$this->key][__FUNCTION__] = $props;
-        } else {
-            Table::$config[$this->type][$this->key][__FUNCTION__] = $valueType;
         }
 
         return $this;

@@ -278,11 +278,11 @@ class Controller
 
         Table::column('id')->title('ID')->sort(Table::SORT_ASCEND);
         Table::column('account')->title(':account')->search()->sort();
-        Table::column('role_id')->title(':role')->search(Table::SEARCH_SELECT)->enum($roleEnum);
+        Table::column('role_id')->title(':role')->search(Table::TYPE_SELECT)->enum($roleEnum);
         Table::column('name')->title(':name')->search();
         Table::column('email')->title(':email')->search();
-        Table::column('status')->title(':status')->search(Table::SEARCH_SELECT)->enum($statusEnum);
-        Table::column('create_time')->title(':create_time')->search(Table::SEARCH_DATE_RANGE);
+        Table::column('status')->title(':status')->search(Table::TYPE_SELECT)->enum($statusEnum);
+        Table::column('create_time')->title(':create_time')->search(Table::TYPE_DATE_RANGE);
 
         Table::button('add')->title(':add')->toolbar();
         Table::button('edit')->title(':edit');

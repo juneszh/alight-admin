@@ -157,10 +157,6 @@ const Form = props => {
                 column.tooltip = fieldValue.tooltip;
             }
 
-            if (fieldValue.typeProps) {
-                column.fieldProps = fieldValue.typeProps;
-            }
-
             if (fieldValue.type === 'upload') {
                 column.render = (dom, entity, index, action, schema) => uploadRender(schema);
                 column.renderFormItem = (schema) => uploadRender(schema);
@@ -184,6 +180,10 @@ const Form = props => {
 
             if (['money', 'textarea', 'date', 'dateTime', 'dateWeek', 'dateMonth', 'dateQuarter', 'dateYear', 'dateRange', 'dateTimeRange', 'time', 'timeRange', 'progress', 'percent', 'digit', 'code', 'fromNow', 'jsonCode'].indexOf(fieldValue.type) !== -1) {
                 column.fieldProps.style = { width: '100%' };
+            }
+
+            if (fieldValue.typeProps) {
+                column.fieldProps = fieldValue.typeProps;
             }
 
             if (fieldValue.required) {

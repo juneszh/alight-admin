@@ -155,6 +155,28 @@ class TableExpand
         Table::$config[$this->type][$this->key][__FUNCTION__] = $value;
         return $this;
     }
+    
+    /**
+     * Set field (ProComponents) valueType
+     *
+     * @param string $value Table::TYPE_*
+     * @param array $props Props for Ant Design components
+     * @return $this
+     * 
+     * @see https://procomponents.ant.design/en-US/components/schema#valuetype-lists
+     * @see https://procomponents.ant.design/en-US/components/field
+     */
+    public function type(string $valueType, array $props = [])
+    {
+        if ($props) {
+            $props['type'] = $valueType;
+            Table::$config[$this->type][$this->key][__FUNCTION__] = $props;
+        } else {
+            Table::$config[$this->type][$this->key][__FUNCTION__] = $valueType;
+        }
+
+        return $this;
+    }
 
     /**
      * Set width (Support '{n}px' or '{n}%')

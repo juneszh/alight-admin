@@ -13,7 +13,7 @@
   "dependencies": {
     "@ant-design/icons": "^5.3.4",
     "@ant-design/plots": "^1.2.6",
-    "@ant-design/pro-components": "^2.6.50",
+    "@ant-design/pro-components": "^2.6.51",
     "@tinymce/tinymce-react": "^4.3.2",
     "antd": "^5.15.3",
     "fs-extra": "^11.2.0",
@@ -24,7 +24,7 @@
     "tinymce-i18n": "^24.3.11"
   },
   "devDependencies": {
-    "@types/react": "^18.2.66",
+    "@types/react": "^18.2.67",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react-swc": "^3.6.0",
     "eslint": "^8.57.0",

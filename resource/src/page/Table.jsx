@@ -41,30 +41,34 @@ const Table = props => {
                     column.hideInTable = true;
                 }
 
-                if (columnValue.search) {
+                if (columnValue.searchType) {
                     tableSearch = true;
+                    let valueTypeString = columnValue?.type?.type ?? columnValue.type;
 
-                    if (['dateRange', 'timeRange', 'dateTimeRange'].indexOf(columnValue.search) !== -1) {
-                        column.valueType = columnValue.search.slice(0, -4);
+                    if (['dateRange', 'timeRange', 'dateTimeRange'].indexOf(columnValue.searchType) !== -1 || (valueTypeString && columnValue.searchType !== valueTypeString)) {
                         let columnSearch = {
                             dataIndex: columnKey,
                             title: columnValue.locale ? localeValue(columnValue.title) : columnValue.title,
                             search: true,
                             hideInTable: true,
-                            valueType: columnValue.search
+                            valueType: columnValue.searchType
                         };
-                        if (columnValue.search === 'dateTimeRange') {
+                        if (columnValue.searchType === 'dateTimeRange') {
                             columnSearch.fieldProps = { showTime: { defaultValue: [dayjs('00:00:00', 'HH:mm:ss'), dayjs('23:59:59', 'HH:mm:ss')] } };
                         }
                         columns.push(columnSearch);
                     } else {
-                        column.valueType = columnValue.search;
+                        column.valueType = columnValue.searchType;
                         column.search = true;
                     }
 
                     if (columnValue.searchProps) {
                         column.fieldProps = columnValue.searchProps;
                     }
+                }
+                
+                if (columnValue.type) {
+                    column.valueType = columnValue.type;
                 }
 
                 if (columnValue.enum) {
@@ -83,10 +87,6 @@ const Table = props => {
                     } else {
                         column.valueEnum = columnValue.enum;
                     }
-                }
-
-                if (columnValue.type) {
-                    column.valueType = columnValue.type;
                 }
 
                 if (columnValue.sort) {

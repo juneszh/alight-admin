@@ -54,30 +54,6 @@ class Table
         FIXED_LEFT = 'left',
         FIXED_RIGHT = 'right',
 
-        SEARCH_MONEY = 'money',
-        SEARCH_DATE = 'date',
-        SEARCH_DATE_TIME = 'dateTime',
-        SEARCH_DATE_WEEK = 'dateWeek',
-        SEARCH_DATE_MONTH = 'dateMonth',
-        SEARCH_DATE_QUARTER = 'dateQuarter',
-        SEARCH_DATE_YEAR = 'dateYear',
-        SEARCH_DATE_RANGE = 'dateRange',
-        SEARCH_DATE_TIME_RANGE = 'dateTimeRange',
-        SEARCH_TIME = 'time',
-        SEARCH_TIME_RANGE = 'timeRange',
-        SEARCH_TEXT = 'text',
-        SEARCH_SELECT = 'select',
-        SEARCH_TREE_SELECT = 'treeSelect',
-        SEARCH_CHECKBOX = 'checkbox',
-        SEARCH_RADIO = 'radio',
-        SEARCH_RADIO_BUTTON = 'radioButton',
-        SEARCH_PERCENT = 'percent',
-        SEARCH_DIGIT = 'digit',
-        SEARCH_COLOR = 'color',
-        SEARCH_CASCADER = 'cascader',
-        //extension
-        SEARCH_TEXT_LIKE = 'text[~]',
-
         SORT_DEFAULT = '',
         SORT_ASCEND = 'ascend',
         SORT_DESCEND = 'descend',
@@ -221,10 +197,6 @@ class Table
                 foreach (Table::$config['column'] as $k => $v) {
                     if (isset($v['role']) && $v['role'] && !in_array($userInfo['role_id'], $v['role'])) {
                         continue;
-                    }
-
-                    if (isset($v['search']) && $v['search'] === 'text[~]') {
-                        $v['search'] = 'text';
                     }
 
                     $column[$k] = $v;
@@ -373,15 +345,15 @@ class Table
         $return = [];
         if ($column) {
             foreach ($column as $k => $v) {
-                if ($v['database'] && isset($v['search']) && isset($data[$k])) {
-                    $_v = isset($v['searchRaw']) ? $data[$k] : trim((string) $data[$k]);
+                if ($v['database'] && isset($v['searchType']) && isset($data[$k])) {
+                    $_v = $data[$k];
                     if ($_v || is_numeric($_v)) {
-                        if ($v['search'] === 'text[~]') {
+                        if ($v['searchType'] === 'text') {
                             $return[$k . '[~]'] = $_v;
-                        } elseif (in_array($v['search'], ['dateRange', 'dateTimeRange', 'timeRange'])) {
-                            $return[$k . '[<>]'] = explode(',', $_v);
-                        } elseif ($v['search'] === 'checkbox' || ($v['searchProps']['mode'] ?? '') === 'multiple') {
-                            $return[$k] = explode(',', $_v);
+                        } elseif (in_array($v['searchType'], ['dateRange', 'dateTimeRange', 'timeRange'])) {
+                            $return[$k . '[<>]'] = explode(',', (string) $_v);
+                        } elseif ($v['searchType'] === 'checkbox' || ($v['searchProps']['mode'] ?? '') === 'multiple') {
+                            $return[$k] = explode(',', (string) $_v);
                         } else {
                             $return[$k] = $_v;
                         }

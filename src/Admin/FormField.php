@@ -128,6 +128,17 @@ class FormField
     }
 
     /**
+     * Set display conditions
+     *
+     * @return $this
+     */
+    public function if(array $keyValues)
+    {
+        Form::$config[$this->form][$this->key][__FUNCTION__] = $keyValues;
+        return $this;
+    }
+
+    /**
      * Set placeholder
      *
      * @param string $value key

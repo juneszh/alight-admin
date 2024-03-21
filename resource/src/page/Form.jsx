@@ -3,7 +3,7 @@ import { message } from 'antd';
 import { BetaSchemaForm, ProFormUploadDragger } from '@ant-design/pro-components';
 import { useResizeDetector } from 'react-resize-detector';
 import { Editor } from '@tinymce/tinymce-react';
-import global, { ajax, inIframe, localeInit, localeValue, notEmpty, postMessage, redirect } from '../lib/Util';
+import global, { ajax, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util';
 
 const Form = props => {
     localeInit(props.locale);
@@ -85,10 +85,8 @@ const Form = props => {
     let layout = 'horizontal';
     let showButton = false;
     if (notEmpty(global.config.field)) {
-        let column = {};
-
         for (const [fieldKey, fieldValue] of Object.entries(global.config.field)) {
-            column = {
+            const column = {
                 dataIndex: fieldKey,
                 title: fieldValue.locale ? localeValue(fieldValue.title) : fieldValue.title,
                 valueType: fieldValue.type,
@@ -121,16 +119,10 @@ const Form = props => {
                     if (typeof fieldValue.value === 'object') {
                         column.initialValue = [];
                         for (const valueValue of Object.values(fieldValue.value)) {
-                            if (typeof valueValue === 'number') {
-                                column.initialValue.push(valueValue.toString());
-                            } else {
-                                column.initialValue.push(valueValue);
-                            }
+                            column.initialValue.push(numberToString(valueValue));
                         }
-                    } else if (typeof fieldValue.value === 'number') {
-                        column.initialValue = fieldValue.value.toString();
                     } else {
-                        column.initialValue = fieldValue.value;
+                        column.initialValue = numberToString(fieldValue.value);
                     }
                 }
             }
@@ -178,7 +170,7 @@ const Form = props => {
                 column.fieldProps.disabled = fieldValue.disabled;
             }
 
-            if (['money', 'textarea', 'date', 'dateTime', 'dateWeek', 'dateMonth', 'dateQuarter', 'dateYear', 'dateRange', 'dateTimeRange', 'time', 'timeRange', 'progress', 'percent', 'digit', 'code', 'fromNow', 'jsonCode'].indexOf(fieldValue.type) !== -1) {
+            if (['money', 'textarea', 'date', 'dateTime', 'dateWeek', 'dateMonth', 'dateQuarter', 'dateYear', 'dateRange', 'dateTimeRange', 'time', 'timeRange', 'progress', 'percent', 'digit', 'digitRange', 'code', 'fromNow', 'jsonCode'].indexOf(fieldValue.type) !== -1) {
                 column.fieldProps.style = { width: '100%' };
             }
 
@@ -228,7 +220,17 @@ const Form = props => {
                 column.formItemProps.wrapperCol = fieldValue.grid ?? { sm: 14 }
             }
 
-            columns.push(column);
+            if (notEmpty(fieldValue.if)) {
+                columns.push({
+                    valueType: 'dependency',
+                    name: Object.keys(fieldValue.if),
+                    columns: (record) => {
+                        return ifResult(fieldValue.if, record) ? [column] : [];
+                    },
+                });
+            } else {
+                columns.push(column);
+            }
         }
     }
 

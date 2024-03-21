@@ -4,7 +4,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import { useResizeDetector } from 'react-resize-detector';
 import dayjs from 'dayjs';
-import global, { ajax, localeInit, localeValue, notEmpty } from '../lib/Util';
+import global, { ajax, ifResult, localeInit, localeValue, notEmpty } from '../lib/Util';
 import ModelKit from '../lib/ModelKit';
 
 const Table = props => {
@@ -29,12 +29,11 @@ const Table = props => {
     const columnsBuilder = (columnObj, expand) => {
         const columns = [];
         if (notEmpty(columnObj)) {
-            let column = {};
             for (const [columnKey, columnValue] of Object.entries(columnObj)) {
-                column = {
+                const column = {
                     dataIndex: columnKey,
                     title: columnValue.locale ? localeValue(columnValue.title) : columnValue.title,
-                    search: false
+                    search: false,
                 };
 
                 if (columnValue.hide) {
@@ -43,10 +42,10 @@ const Table = props => {
 
                 if (columnValue.searchType) {
                     tableSearch = true;
-                    let valueTypeString = columnValue?.type?.type ?? columnValue.type;
+                    const valueTypeString = columnValue?.type?.type ?? columnValue.type;
 
-                    if (['dateRange', 'timeRange', 'dateTimeRange'].indexOf(columnValue.searchType) !== -1 || (valueTypeString && columnValue.searchType !== valueTypeString)) {
-                        let columnSearch = {
+                    if (['dateRange', 'timeRange', 'dateTimeRange', 'digitRange'].indexOf(columnValue.searchType) !== -1 || (valueTypeString && columnValue.searchType !== valueTypeString)) {
+                        const columnSearch = {
                             dataIndex: columnKey,
                             title: columnValue.locale ? localeValue(columnValue.title) : columnValue.title,
                             search: true,
@@ -66,7 +65,7 @@ const Table = props => {
                         column.fieldProps = columnValue.searchProps;
                     }
                 }
-                
+
                 if (columnValue.type) {
                     column.valueType = columnValue.type;
                 }
@@ -140,55 +139,10 @@ const Table = props => {
                     }
                 } else if (columnValue.button) {
                     column.render = (text, record) => {
-                        let buttons = [];
+                        const buttons = [];
                         if (notEmpty(columnValue.button)) {
                             for (const [buttonKey, buttonValue] of Object.entries(columnValue.button)) {
-                                let buttonShow = true;
-                                if (notEmpty(buttonValue.if)) {
-                                    for (const [ifKey, ifValue] of Object.entries(buttonValue.if)) {
-                                        if (Array.isArray(ifValue)) {
-                                            if (ifValue.indexOf(record[ifKey]) === -1) {
-                                                buttonShow = false;
-                                                continue;
-                                            }
-                                        } else {
-                                            let ifSign = ifKey.slice(-3);
-                                            if (ifSign === '>=]') {
-                                                if (record[ifKey.slice(0, -4)] < ifValue) {
-                                                    buttonShow = false;
-                                                    continue;
-                                                }
-                                            } else if (ifSign === '<=]') {
-                                                if (record[ifKey.slice(0, -4)] > ifValue) {
-                                                    buttonShow = false;
-                                                    continue;
-                                                }
-                                            } else if (ifSign === '[>]') {
-                                                if (record[ifKey.slice(0, -3)] <= ifValue) {
-                                                    buttonShow = false;
-                                                    continue;
-                                                }
-                                            } else if (ifSign === '[<]') {
-                                                if (record[ifKey.slice(0, -3)] >= ifValue) {
-                                                    buttonShow = false;
-                                                    continue;
-                                                }
-                                            } else if (ifSign === '[!]') {
-                                                if (record[ifKey.slice(0, -3)] === ifValue) {
-                                                    buttonShow = false;
-                                                    continue;
-                                                }
-                                            } else {
-                                                if (record[ifKey] !== ifValue) {
-                                                    buttonShow = false;
-                                                    continue;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (buttonShow) {
+                                if (ifResult(buttonValue.if, record)) {
                                     buttons.push(
                                         <ConfigProvider theme={buttonValue.color ? { token: { colorPrimary: buttonValue.color } } : undefined}>
                                             <Button
@@ -383,19 +337,21 @@ const Table = props => {
                 summary={notEmpty(global.config.summary) ? pageData => {
                     let sumVisible = false;
                     let avgVisible = false;
-                    let sumCells = [];
-                    let avgCells = [];
+                    const sumCells = [];
+                    const avgCells = [];
 
                     if (notEmpty(mainColumns) && notEmpty(pageData)) {
                         let titleIndex = '0';
-                        let summaryColumns = [];
+                        const summaryColumns = [];
 
                         if (notEmpty(global.config.batch.button)) {
                             titleIndex = '1';
-                            summaryColumns.push('_batch')
+                            summaryColumns.push('_batch');
                         }
                         for (const column of Object.values(mainColumns)) {
-                            summaryColumns.push(column.dataIndex)
+                            if (!column.hideInTable) {
+                                summaryColumns.push(column.dataIndex);
+                            }
                         }
 
                         for (const [index, key] of Object.entries(summaryColumns)) {

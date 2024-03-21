@@ -56,6 +56,7 @@ class Form
         TYPE_PROGRESS = 'progress',
         TYPE_PERCENT = 'percent',
         TYPE_DIGIT = 'digit',
+        TYPE_DIGIT_RANGE = 'digitRange',
         TYPE_SECOND = 'second',
         TYPE_AVATAR = 'avatar',
         TYPE_CODE = 'code',

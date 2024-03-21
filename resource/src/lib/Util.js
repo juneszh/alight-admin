@@ -41,6 +41,54 @@ const ajax = async (url, data) => {
         });
 };
 
+const ifResult = (ifKeyValue, values) => {
+    let result = true;
+    if (notEmpty(ifKeyValue)) {
+        for (const [ifKey, ifValue] of Object.entries(ifKeyValue)) {
+            if (Array.isArray(ifValue)) {
+                if (ifValue.map(String).indexOf(numberToString(values[ifKey])) === -1) {
+                    result = false;
+                    continue;
+                }
+            } else {
+                let ifSign = ifKey.slice(-3);
+                if (ifSign === '>=]') {
+                    if (values[ifKey.slice(0, -4)] < ifValue) {
+                        result = false;
+                        continue;
+                    }
+                } else if (ifSign === '<=]') {
+                    if (values[ifKey.slice(0, -4)] > ifValue) {
+                        result = false;
+                        continue;
+                    }
+                } else if (ifSign === '[>]') {
+                    if (values[ifKey.slice(0, -3)] <= ifValue) {
+                        result = false;
+                        continue;
+                    }
+                } else if (ifSign === '[<]') {
+                    if (values[ifKey.slice(0, -3)] >= ifValue) {
+                        result = false;
+                        continue;
+                    }
+                } else if (ifSign === '[!]') {
+                    if (numberToString(values[ifKey.slice(0, -3)]) === numberToString(ifValue)) {
+                        result = false;
+                        continue;
+                    }
+                } else {
+                    if (numberToString(values[ifKey]) !== numberToString(ifValue)) {
+                        result = false;
+                        continue;
+                    }
+                }
+            }
+        }
+    }
+    return result;
+}
+
 const inIframe = () => {
     try {
         return window.self !== window.top;
@@ -61,6 +109,8 @@ const notEmpty = obj => {
     return obj && (Object.getPrototypeOf(obj) === Object.prototype || Object.getPrototypeOf(obj) === Array.prototype) && Object.keys(obj).length !== 0;
 };
 
+const numberToString = value => (typeof value === 'number' ? value.toString() : value);
+
 const postMessage = data => {
     window.parent.postMessage(data, window.location.origin);
 };
@@ -74,4 +124,4 @@ const redirect = url => {
 };
 
 export default $global;
-export { ajax, inIframe, localeInit, localeValue, notEmpty, postMessage, redirect };
+export { ajax, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect };

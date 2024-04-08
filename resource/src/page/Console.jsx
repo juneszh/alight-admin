@@ -1,14 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
-import { Avatar, Card, Col, Modal, Row } from 'antd';
+import { Avatar, Card, Col, List, Modal, Row, Typography } from 'antd';
 import { EditOutlined, ExclamationCircleOutlined, LockOutlined, PoweroffOutlined } from '@ant-design/icons';
-import Plots from '@ant-design/plots';
+import { Area, Bar, Base, BidirectionalBar, Box, Bullet, CirclePacking, Column, DualAxes, Funnel, Gauge, Heatmap, Histogram, Line, Liquid, Mix, Pie, Radar, RadialBar, Rose, Sankey, Scatter, Stock, Sunburst, Tiny, Treemap, Venn, Violin, Waterfall, WordCloud } from '@ant-design/plots';
 import global, { ajax, localeInit, localeValue, notEmpty, redirect } from '../lib/Util';
 import ModelKit from '../lib/ModelKit';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+dayjs.extend(relativeTime);
+
+const { Text, Link } = Typography;
 
 const Console = props => {
     localeInit(props.locale);
 
     const modelRef = useRef();
+
+    const [userData, setUserData] = useState({});
+    const [noticeCount, setNoticeCount] = useState(0);
+    const [noticeList, setNoticeList] = useState([]);
+    const [noticeLoad, setNoticeLoad] = useState(false);
 
     const chartDataInit = {};
     if (notEmpty(global.config.chart)) {
@@ -17,6 +27,37 @@ const Console = props => {
         }
     }
     const [chartData, setChartData] = useState(chartDataInit);
+
+    const getProfile = () => {
+        ajax(global.path + '/console/user').then(result => {
+            if (notEmpty(result.data)) {
+                setUserData(result.data);
+            }
+        });
+    };
+
+    const getNotice = (page = 1) => {
+        setNoticeLoad(true);
+        ajax(global.path + '/console/notice/list?page=' + page).then(result => {
+            if (notEmpty(result.data)) {
+                setNoticeCount(result.data.count);
+                setNoticeList(result.data.list);
+            }
+        }).finally(()=>{
+            setNoticeLoad(false);
+        });
+    };
+
+    const showNotice = (id, title) => {
+        modelRef.current?.modalShow({
+            action: 'form',
+            title: title,
+            url: global.path + '/console/notice/form',
+        }, {
+            _form: 'read',
+            _id: id,
+        });
+    }
 
     const editProfile = () => {
         modelRef.current?.modalShow({
@@ -27,7 +68,7 @@ const Console = props => {
             _form: 'my_profile'
         }, {
             done: () => {
-                window.location.reload();
+                getProfile();
             }
         });
     };
@@ -60,75 +101,73 @@ const Console = props => {
         config.data = chartData[key];
         switch (component) {
             case 'Area':
-                return <Plots.Area {...config} />;
+                return <Area {...config} />;
             case 'Bar':
-                return <Plots.Bar {...config} />;
+                return <Bar {...config} />;
+            case 'Base':
+                return <Base {...config} />;
             case 'BidirectionalBar':
-                return <Plots.BidirectionalBar {...config} />;
+                return <BidirectionalBar {...config} />;
             case 'Box':
-                return <Plots.Box {...config} />;
+                return <Box {...config} />;
             case 'Bullet':
-                return <Plots.Bullet {...config} />;
-            case 'Chord':
-                return <Plots.Chord {...config} />;
+                return <Bullet {...config} />;
             case 'CirclePacking':
-                return <Plots.CirclePacking {...config} />;
+                return <CirclePacking {...config} />;
             case 'Column':
-                return <Plots.Column {...config} />;
+                return <Column {...config} />;
             case 'DualAxes':
-                return <Plots.DualAxes {...config} />;
-            case 'Facet':
-                return <Plots.Facet {...config} />;
+                return <DualAxes {...config} />;
             case 'Funnel':
-                return <Plots.Funnel {...config} />;
+                return <Funnel {...config} />;
             case 'Gauge':
-                return <Plots.Gauge {...config} />;
+                return <Gauge {...config} />;
             case 'Heatmap':
-                return <Plots.Heatmap {...config} />;
+                return <Heatmap {...config} />;
             case 'Histogram':
-                return <Plots.Histogram {...config} />;
+                return <Histogram {...config} />;
             case 'Line':
-                return <Plots.Line {...config} />;
+                return <Line {...config} />;
             case 'Liquid':
-                return <Plots.Liquid {...config} />;
+                return <Liquid {...config} />;
             case 'Mix':
-                return <Plots.Mix {...config} />;
+                return <Mix {...config} />;
             case 'Pie':
-                return <Plots.Pie {...config} />;
-            case 'Progress':
-                return <Plots.Progress {...config} />;
+                return <Pie {...config} />;
             case 'Radar':
-                return <Plots.Radar {...config} />;
+                return <Radar {...config} />;
             case 'RadialBar':
-                return <Plots.RadialBar {...config} />;
-            case 'RingProgress':
-                return <Plots.RingProgress {...config} />;
+                return <RadialBar {...config} />;
             case 'Rose':
-                return <Plots.Rose {...config} />;
+                return <Rose {...config} />;
             case 'Sankey':
-                return <Plots.Sankey {...config} />;
+                return <Sankey {...config} />;
             case 'Scatter':
-                return <Plots.Scatter {...config} />;
+                return <Scatter {...config} />;
             case 'Stock':
-                return <Plots.Stock {...config} />;
+                return <Stock {...config} />;
             case 'Sunburst':
-                return <Plots.Sunburst {...config} />;
+                return <Sunburst {...config} />;
             case 'TinyArea':
-                return <Plots.TinyArea {...config} />;
+                return <Tiny.Area {...config} />;
             case 'TinyColumn':
-                return <Plots.TinyColumn {...config} />;
+                return <Tiny.Column {...config} />;
             case 'TinyLine':
-                return <Plots.TinyLine {...config} />;
+                return <Tiny.Line {...config} />;
+            case 'TinyProgress':
+                return <Tiny.Progress {...config} />;
+            case 'TinyRing':
+                return <Tiny.Ring {...config} />;
             case 'Treemap':
-                return <Plots.Treemap {...config} />;
+                return <Treemap {...config} />;
             case 'Venn':
-                return <Plots.Venn {...config} />;
+                return <Venn {...config} />;
             case 'Violin':
-                return <Plots.Violin {...config} />;
+                return <Violin {...config} />;
             case 'Waterfall':
-                return <Plots.Waterfall {...config} />;
+                return <Waterfall {...config} />;
             case 'WordCloud':
-                return <Plots.WordCloud {...config} />;
+                return <WordCloud {...config} />;
             default:
                 return null;
         }
@@ -140,7 +179,7 @@ const Console = props => {
             for (const [chartKey, chartValue] of Object.entries(global.config.chart)) {
                 charts.push(
                     <Col key={chartKey} {...chartValue.grid}>
-                        <Card>{chartComponent(chartKey, chartValue.component, chartValue.config)}</Card>
+                        <Card title={chartValue.title ?? undefined}>{chartComponent(chartKey, chartValue.component, chartValue.config)}</Card>
                     </Col>
                 );
             }
@@ -149,6 +188,8 @@ const Console = props => {
     };
 
     useEffect(() => {
+        getProfile();
+        getNotice();
         if (notEmpty(global.config.chart)) {
             for (const [chartKey, chartValue] of Object.entries(global.config.chart)) {
                 if (chartValue.api) {
@@ -168,7 +209,7 @@ const Console = props => {
     return (
         <div style={{ backgroundColor: '#f0f2f5', height: 'auto', minHeight: '100vh', padding: 24 }}>
             <Row gutter={[16, 16]}>
-                <Col xs={24} sm={12} md={8} lg={6} xxl={4}>
+                <Col xs={24} sm={24} md={8} lg={6} xxl={4}>
                     <Card
                         actions={[
                             <EditOutlined key={1} title={localeValue(':edit_profile')} onClick={editProfile} />,
@@ -178,10 +219,50 @@ const Console = props => {
                         title={localeValue(':user_profile')}
                     >
                         <Card.Meta
-                            avatar={<Avatar src={global.config.user.avatar} size={94} />}
-                            description={<><p>{global.config.user.account}</p><p>{global.config.user.role}</p></>}
-                            style={{ height: 103 }}
-                            title={global.config.user.name}
+                            avatar={<Avatar src={userData.avatar} size={94} />}
+                            description={<><p>{userData.account}</p><p>{userData.role}</p></>}
+                            style={{ height: 110 }}
+                            title={userData.name}
+                        />
+                    </Card>
+                </Col>
+                <Col xs={24} sm={24} md={16} lg={18} xxl={20}>
+                    <Card>
+                        <List
+                            dataSource={noticeList}
+                            loading={noticeLoad}
+                            pagination={{
+                                hideOnSinglePage: true,
+                                onChange: (page) => {
+                                    getNotice(page);
+                                },
+                                pageSize: 4,
+                                size: 'small',
+                                style: { position: 'absolute', right: 0, bottom: 0 },
+                                total: noticeCount
+                            }}
+                            renderItem={(item) => (
+                                <List.Item extra={<span title={dayjs(item.create_time * 1000).format('YYYY-MM-DD HH:mm:ss')}>{dayjs(item.create_time * 1000).fromNow()}</span>}>
+                                    {(item.has_content ?
+                                        <List.Item.Meta
+                                            title={<Link
+                                                ellipsis={true}
+                                                onClick={() => { showNotice(item.id, item.title) }}
+                                                style={{ paddingRight: 16 }}
+                                            >{item.title}</Link>}
+                                        />
+                                        :
+                                        <List.Item.Meta
+                                            title={<Text
+                                                ellipsis={{ tooltip: true }}
+                                                style={{ paddingRight: 16, width: '100%' }}
+                                            >{item.title}</Text>}
+                                        />
+                                    )}
+                                </List.Item>
+                            )}
+                            size='small'
+                            style={{ height: 206 }}
                         />
                     </Card>
                 </Col>

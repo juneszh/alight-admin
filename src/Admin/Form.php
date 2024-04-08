@@ -192,8 +192,6 @@ class Form
             ];
 
             if ($rsId || $rsIds) {
-                Model::userLog($userId, true);
-
                 if (is_callable($callback)) {
                     $callback(self::EVENT_RESPONSE, $resData);
                 }

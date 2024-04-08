@@ -282,8 +282,6 @@ class Table
                 $callback(self::EVENT_RENDER, $renderData);
             }
 
-            Model::userLog($userId);
-
             Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => Request::request('_title', ''), 'script' => Admin::globalScript('Table', $renderData)]);
         } else {
             $page = Request::request('current', 1);

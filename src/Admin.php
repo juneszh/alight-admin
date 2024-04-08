@@ -16,6 +16,7 @@ namespace Alight;
 use Alight\Admin\Auth;
 use Alight\Admin\Config as AdminConfig;
 use Alight\Admin\Controller;
+use Alight\Admin\Model;
 use Composer\InstalledVersions;
 use Exception;
 use Symfony\Component\VarExporter\Exception\ExceptionInterface;
@@ -48,6 +49,9 @@ class Admin
         Route::get('logout', [Controller::class, 'logout'])->cache(0);
         Route::get('captcha', [Controller::class, 'captcha'])->cache(0);
         Route::get('console', [Controller::class, 'console'])->auth();
+        Route::get('console/user', [Controller::class, 'consoleUser'])->auth();
+        Route::get('console/notice/list', [Controller::class, 'consoleNoticeList'])->auth();
+        Route::get('console/notice/form', [Controller::class, 'consoleNoticeForm'])->auth();
         Route::get('role/table', [Controller::class, 'roleTable'])->auth();
         Route::any('role/form', [Controller::class, 'roleForm'])->auth();
         Route::get('user/table', [Controller::class, 'userTable'])->auth();
@@ -295,7 +299,7 @@ class Admin
                 'DEFAULT \'0\'',
             ],
             'status' => [
-                'TINYINT(1)',
+                'TINYINT',
                 'UNSIGNED',
                 'NOT NULL',
                 'DEFAULT \'1\'',
@@ -337,44 +341,24 @@ class Admin
             }
         }
 
-        $db->create('admin_log', [
+        $db->create('admin_notice', [
             'id' => [
                 'INT',
                 'UNSIGNED',
                 'NOT NULL',
                 'AUTO_INCREMENT',
             ],
-            'user_id' => [
-                'SMALLINT',
-                'UNSIGNED',
+            'user_ids' => [
+                'JSON',
                 'NOT NULL',
-                'DEFAULT \'0\'',
             ],
-            'date' => [
-                'DATE',
+            'title' => [
+                'VARCHAR(255)',
                 'NOT NULL',
-                'DEFAULT \'2022-08-02\'',
+                'DEFAULT \'\'',
             ],
-            'hour' => [
-                'TINYINT',
-                'UNSIGNED',
-                'NOT NULL',
-                'DEFAULT \'0\'',
-            ],
-            'view' => [
-                'SMALLINT',
-                'UNSIGNED',
-                'NOT NULL',
-                'DEFAULT \'0\'',
-            ],
-            'edit' => [
-                'SMALLINT',
-                'UNSIGNED',
-                'NOT NULL',
-                'DEFAULT \'0\'',
-            ],
-            'ip' => [
-                'VARCHAR(45)',
+            'content' => [
+                'VARCHAR(1000)',
                 'NOT NULL',
                 'DEFAULT \'\'',
             ],
@@ -384,7 +368,6 @@ class Admin
                 'DEFAULT CURRENT_TIMESTAMP',
             ],
             'PRIMARY KEY (<id>)',
-            'UNIQUE INDEX <user_id_date_hour> (<user_id>, <date>, <hour>)',
         ], [
             'ENGINE' => 'InnoDB',
             'DEFAULT CHARSET' => 'utf8mb4',
@@ -470,5 +453,24 @@ class Admin
         }
         $dest = App::root(self::PUBLIC);
         exec('rm -rf ' . $dest . ' && rm -f ' . $source . '/index.html && mv ' . $source . ' ' . $dest);
+    }
+
+    /**
+     * Add a notice via callback
+     * 
+     * @param string $title 
+     * @param string $content 
+     * @param array $toRole 
+     * @param array $toUser 
+     * @param null|callable $callback
+     * @throws Exception 
+     * @throws PDOException 
+     */
+    public static function notice(string $title, string $content = '', array $toRole = [], array $toUser = [], ?callable $callback = null)
+    {
+        $userIds = Model::addNotice($title, $content, $toRole, $toUser);
+        if (is_callable($callback)) {
+            $callback(['to_role' => $toRole, 'to_user' => $toUser, 'title' => $title, 'content' => $content, 'user_ids' => $userIds]);
+        }
     }
 }

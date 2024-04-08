@@ -15,7 +15,6 @@ namespace Alight\Admin;
 
 use Alight\Cache;
 use Alight\Database;
-use Alight\Request;
 use Exception;
 use ErrorException;
 use InvalidArgumentException;
@@ -32,24 +31,25 @@ class Model
      * @param string $table 
      * @param null|int $id 
      * @param null|int $ttl 
+     * @param array $where 
      * @return array 
      * @throws Exception 
      * @throws ErrorException 
      * @throws ExceptionInvalidArgumentException 
      * @throws CacheException 
      */
-    public static function getCacheData(string $table, ?int $id = null, ?int $ttl = 86400): array
+    public static function getCacheData(string $table, ?int $id = null, ?int $ttl = 86400, $where = []): array
     {
         $cache6 = Cache::psr6();
-        $cacheKey = 'alight.' . $table . ($id === null ? '' : '.' . $id);
+        $cacheKey = 'alight.' . $table . ($id === null ? '' : '.' . $id) . ($where ? '.' . md5(json_encode($where)) : '');
 
-        $result = $cache6->get($cacheKey, function (ItemInterface $item) use ($table, $id, $ttl) {
+        $result = $cache6->get($cacheKey, function (ItemInterface $item) use ($table, $id, $ttl, $where) {
             $db = Database::init();
             if ($id === null) {
-                $result = $db->select($table, '*', ['ORDER' => ['id' => 'ASC']]);
+                $result = $db->select($table, '*', $where ?: ['ORDER' => ['id' => 'ASC']]);
                 $item->tag('alight.' . $table . '.list');
             } elseif ($id > 0) {
-                $result = $db->get($table, '*', ['id' => $id]);
+                $result = $db->get($table, '*', $where ?: ['id' => $id]);
             } else {
                 $result = [];
             }
@@ -144,74 +144,82 @@ class Model
         return self::getCacheData('admin_user', $id);
     }
 
+
     /**
-     * Log user behavior 
-     * 
-     * @param int $userId 
-     * @param bool $edit 
+     * Add a notice
+     *  
+     * @param string $title 
+     * @param string $content 
+     * @param array $toRole 
+     * @param array $toUser
+     * @return array 
      * @throws Exception 
-     * @throws InvalidArgumentException 
      * @throws PDOException 
      */
-    public static function userLog(int $userId, bool $edit = false)
+    public static function addNotice(string $title, string $content = '', array $toRole = [], array $toUser = []): array
     {
-        $table = 'admin_log';
-        $now = time();
-        $date = date('Y-m-d', $now);
-        $hour = date('G', $now);
-
         $db = Database::init();
-        if ($db->has($table, ['user_id' => $userId, 'date' => $date, 'hour' => $hour])) {
-            $db->update($table, $edit ? ['edit[+]' => 1] : ['view[+]' => 1], ['user_id' => $userId, 'date' => $date, 'hour' => $hour]);
+
+        if (!$toRole && !$toUser) {
+            $userIds = $db->select('admin_user', 'id', ['status' => 1]) ?: [];
         } else {
-            $db->insert($table, [
-                'user_id' => $userId,
-                'date' => $date,
-                'hour' => $hour,
-                'view' => $edit ? 0 : 1,
-                'edit' => $edit ? 1 : 0,
-                'ip' => Request::ip()
-            ]);
+            $userIds = $toUser ? array_map('intval', $toUser) : [];
+            if ($toRole) {
+                $roleUserIds = $db->select('admin_user', 'id', ['role_id' => $toRole, 'status' => 1]) ?: [];
+                if ($roleUserIds) {
+                    $userIds = array_values(array_unique(array_merge($roleUserIds, $userIds)));
+                }
+            }
         }
+
+        $db->insert('admin_notice', [
+            'user_ids' => json_encode($userIds),
+            'title' => $title,
+            'content' => $content,
+        ]);
+
+        return $db->id() ? $userIds : [];
     }
 
     /**
-     * Get user behavior logs by date
+     * Get a list of notifications based on user_id and role_id
      * 
      * @param int $userId 
-     * @param string $date 
+     * @param int $roleId 
+     * @param int $page 
+     * @param int $limit 
      * @return array 
      * @throws Exception 
      * @throws ErrorException 
      * @throws ExceptionInvalidArgumentException 
-     * @throws ExceptionInvalidArgumentException 
-     * @throws InvalidArgumentException 
-     * @throws PDOException 
+     * @throws CacheException 
      */
-    public static function getUserDateLog(int $userId, string $date): array
+    public static function getNoticeList(int $userId, int $roleId, int $page = 1, int $limit = 4): array
     {
-        $cache6 = Cache::psr6();
-        $cacheKey = 'alight.admin_log.user_date.' . $userId . '_' . str_replace('-', '', $date);
+        $data = [
+            'count' => 0,
+            'list' => [],
+        ];
 
-        $result = $cache6->get($cacheKey, function (ItemInterface $item) use ($userId, $date) {
-            $now = time();
-            $today = date('Y-m-d', $now);
+        $start = $page > 1 ? ($page - 1) * $limit : 0;
 
-            $db = Database::init();
-            if ($date === $today) {
-                $result = $db->select('admin_log', ['hour' => ['view', 'edit']], ['user_id' => $userId, 'date' => $date, 'hour[<]' => date('G', $now)]);
-                $cacheTime = 3600 - ($now - strtotime(date('Y-m-d H:00:00', $now)));
-            } else {
-                $result = $db->select('admin_log', ['hour' => ['view', 'edit']], ['user_id' => $userId, 'date' => $date]);
-                $cacheTime = 86400;
+        $db = Database::init();
+        $where = $db::raw('WHERE JSON_CONTAINS(<user_ids>, \'' . $userId . '\') ORDER BY <id> DESC LIMIT 40');
+
+        $list = self::getCacheData('admin_notice', null, 300, $where);
+        if ($list) {
+            $data['count'] = count($list);
+            foreach (array_slice($list, $start, $limit)  as $_info) {
+                $data['list'][] = [
+                    'id' => $_info['id'],
+                    'title' => $_info['title'],
+                    'create_time' => strtotime($_info['create_time']),
+                    'has_content' => $_info['content'] ? true : false,
+                ];
             }
+        }
 
-            $item->expiresAfter($cacheTime);
-            $item->tag(['alight.admin_log', 'alight.admin_log.list']);
-            return $result;
-        });
-
-        return $result ?: [];
+        return $data;
     }
 
     /**
@@ -227,13 +235,7 @@ class Model
     public static function tableCount(string $table, array $search = []): int
     {
         $db = Database::init();
-
-        $where = [];
-        if ($search) {
-            $where['AND'] = $search;
-        }
-
-        $count = $db->count($table, '*', $where);
+        $count = $db->count($table, '*', $search);
 
         return $count ?: 0;
     }
@@ -259,7 +261,7 @@ class Model
 
         $where = [];
         if ($search) {
-            $where['AND'] = $search;
+            $where = $search;
         }
 
         $start = $page > 1 ? ($page - 1) * $limit : 0;
@@ -282,6 +284,7 @@ class Model
 
         return $data ?: [];
     }
+
     /**
      * Insert data for Form
      * 
@@ -386,7 +389,7 @@ class Model
 
         if ($result->rowCount()) {
             $cache6 = Cache::psr6();
-            $cacheKeys = ['alight.' .$table];
+            $cacheKeys = ['alight.' . $table];
             foreach ($ids as $_id) {
                 $cacheKeys[] = 'alight.' . $table . '.' . $_id;
             }

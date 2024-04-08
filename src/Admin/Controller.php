@@ -19,9 +19,6 @@ use Alight\Cache;
 use Alight\Request;
 use Alight\Response;
 use Alight\Utility;
-use DateInterval;
-use DatePeriod;
-use DateTime;
 use Exception;
 use ErrorException;
 use InvalidArgumentException as GlobalInvalidArgumentException;
@@ -44,11 +41,10 @@ class Controller
         $userId = Auth::getUserId();
         Auth::store($userId, true);
 
-        $title = Config::get('title');
         $roleId = Auth::checkRole([]);
         $menu = Menu::build($roleId);
 
-        Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => $title, 'script' => Admin::globalScript('Home', ['menu' => $menu])]);
+        Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => Config::get('title'), 'script' => Admin::globalScript('Home', ['menu' => $menu])]);
     }
 
     /**
@@ -80,9 +76,16 @@ class Controller
         $captchaHash = Utility::randomHex();
 
         $cache = Cache::init();
-        $cache->set('alight.admin_captcha.' . $captchaHash, $code, 300);
+        $cacheTime = 300;
+        $cache->set('alight.admin_captcha.' . $captchaHash, $code, $cacheTime);
 
-        setcookie('admin_captcha', $captchaHash, time() + 300, '/' . Config::get('path'), '.' . Request::host());
+        setcookie('admin_captcha', $captchaHash, [
+            'expires' => time() + $cacheTime,
+            'path' => '/' . Config::get('path'),
+            'domain' => '.' . Request::host(),
+            'httponly' => true,
+            'samesite' => 'Strict',
+        ]);
 
         header('Content-type: image/jpeg');
         $builder->output();
@@ -115,7 +118,13 @@ class Controller
             $cacheKey = 'alight.admin_captcha.' . $captchaHash;
             $captchaCodeCache = $cache->get($cacheKey);
             $cache->delete($cacheKey);
-            setcookie('admin_captcha', '', 0, '/' . Config::get('path'), '.' . Request::host());
+            setcookie('admin_captcha', '', [
+                'expires' => 0,
+                'path' => '/' . Config::get('path'),
+                'domain' => '.' . Request::host(),
+                'httponly' => true,
+                'samesite' => 'Strict',
+            ]);
 
             if (!$captchaCodeCache || $captchaCode != $captchaCodeCache) {
                 Response::api(1002, ':invalid_captcha');
@@ -179,38 +188,82 @@ class Controller
      */
     public static function console()
     {
-        $userId = Auth::getUserId();
-
-        if (!Request::isAjax()) {
-            Model::userLog($userId);
-
-            Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => Config::get('title'), 'script' => Admin::globalScript('Console', Console::build($userId))]);
-        } else {
-            $resData = [];
-
-            $now = time();
-            $tomorrow = date('Y-m-d', $now + 86400);
-            $lastWeek = date('Y-m-d', $now - 86400 * 6);
-            $datePeriod = new DatePeriod(
-                new DateTime($lastWeek),
-                new DateInterval('P1D'),
-                new DateTime($tomorrow)
-            );
-            foreach ($datePeriod as $value) {
-                $log = Model::getUserDateLog($userId, $value->format('Y-m-d'));
-                for ($hour = 0; $hour < 24; $hour++) {
-                    $resData[] = [
-                        'date' => $value->format('n-d'),
-                        'time' => $hour . ':00',
-                        'show' => isset($log[$hour]) ? 1 : 0,
-                        'color' => isset($log[$hour]) ? $log[$hour]['view'] + $log[$hour]['edit'] : 0,
-                        'title' => "\u{1F50D}" . ' ' . ($log[$hour]['view'] ?? 0) . ' ' . "\u{1F4BE}" . ' ' . ($log[$hour]['edit'] ?? 0),
-                    ];
-                }
-            }
-
-            Response::api(0, null, ['data' => $resData]);
+        $consoleFile = App::root(Config::get('console'));
+        if ($consoleFile && file_exists($consoleFile)) {
+            require $consoleFile;
         }
+
+        $chart = Console::$config;
+        foreach ($chart as $k => $v) {
+            if (!$v || (isset($v['role']) && $v['role'] && !in_array($userInfo['role_id'], $v['role']))) {
+                unset($chart[$k]);
+            }
+        }
+
+        Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => Config::get('title'), 'script' => Admin::globalScript('Console', ['chart' => $chart])]);
+    }
+
+    /**
+     * user profile api in console page
+     */
+    public static function consoleUser()
+    {
+        $userId = Auth::getUserId();
+        $userInfo = Model::getUserInfo($userId);
+
+        preg_match('/^(\d{5,11})@qq\.com$/', $userInfo['email'], $match);
+        if (isset($match[1])) {
+            $avatar = 'https://q.qlogo.cn/g?b=qq&nk=' . $match[1] . '&s=100';
+        } else {
+            $avatarDomain = Config::get('cravatar') ? 'cravatar.cn' : 'www.libravatar.org';
+            $avatar = 'https://' . $avatarDomain . '/avatar/' . ($userInfo['email'] ? md5(strtolower(trim($userInfo['email']))) : '') . '?s=100&d=mp';
+        }
+
+        $roleEnum = Utility::arrayFilter(Model::getRoleList(), ['id' => $userInfo['role_id']]);
+        $roleName = $roleEnum ? reset($roleEnum)['name'] : '';
+
+
+        $consoleFile = App::root(Config::get('console'));
+        if ($consoleFile && file_exists($consoleFile)) {
+            require $consoleFile;
+        }
+
+        $resData =  [
+            'id' => $userId,
+            'avatar' => $avatar,
+            'account' => $userInfo['account'],
+            'name' => $userInfo['name'],
+            'role' => $roleName,
+        ];
+
+        Response::api(0, null, $resData);
+    }
+
+    /**
+     * notice list api in console page
+     */
+    public static function consoleNoticeList()
+    {
+        $page = Request::request('page', 1);
+
+        $userId = Auth::getUserId();
+        $userInfo = Model::getUserInfo($userId);
+
+        $resData = Model::getNoticeList($userInfo['id'], $userInfo['role_id'], $page);
+
+        Response::api(0, null, $resData);
+    }
+
+    /**
+     * notice details form page
+     */
+    public static function consoleNoticeForm()
+    {
+        Form::create('read');
+        Form::field('content')->title('')->type(Form::TYPE_TEXTAREA)->readonly();
+        Form::field('create_time')->title('')->readonly();
+
+        Form::render('admin_notice');
     }
 
     /**

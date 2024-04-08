@@ -158,8 +158,15 @@ class Auth
         $cacheItem->tag('alight.admin_user');
         $cache6->save($cacheItem);
 
-        setcookie(self::COOKIE_AUTH, $auth, time() + $cacheTime, '/' . Config::get('path'), '.' . Request::host());
-        setcookie(self::COOKIE_SESSION, $session, time() + $cacheTime, '/' . Config::get('path'), '.' . Request::host());
+        $cookieOptions = [
+            'expires' => time() + $cacheTime, 
+            'path' => '/' . Config::get('path'), 
+            'domain' => '.' . Request::host(), 
+            'httponly' => true, 
+            'samesite' => 'Strict',
+        ];
+        setcookie(self::COOKIE_AUTH, $auth, $cookieOptions);
+        setcookie(self::COOKIE_SESSION, $session, $cookieOptions);
     }
 
     /**
@@ -179,8 +186,15 @@ class Auth
             $cache->delete($cacheKey);
         }
 
-        setcookie(self::COOKIE_AUTH, '', 0, '/' . Config::get('path'), '.' . Request::host());
-        setcookie(self::COOKIE_SESSION, '', 0, '/' . Config::get('path'), '.' . Request::host());
+        $cookieOptions = [
+            'expires' => 0, 
+            'path' => '/' . Config::get('path'), 
+            'domain' => '.' . Request::host(), 
+            'httponly' => true, 
+            'samesite' => 'Strict',
+        ];
+        setcookie(self::COOKIE_AUTH, '', $cookieOptions);
+        setcookie(self::COOKIE_SESSION, '', $cookieOptions);
     }
 
     /**

@@ -125,7 +125,7 @@ class Table
     {
         self::$config[__FUNCTION__][$key] = [
             'title' => $key,
-            'database' => true,
+            'database' => ($key !== '_column'),
         ];
         return new TableColumn(__FUNCTION__, $key);
     }

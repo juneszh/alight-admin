@@ -215,8 +215,8 @@ class Controller
         if (isset($match[1])) {
             $avatar = 'https://q.qlogo.cn/g?b=qq&nk=' . $match[1] . '&s=100';
         } else {
-            $avatarDomain = Config::get('cravatar') ? 'cravatar.cn' : 'www.libravatar.org';
-            $avatar = 'https://' . $avatarDomain . '/avatar/' . ($userInfo['email'] ? md5(strtolower(trim($userInfo['email']))) : '') . '?s=100&d=mp';
+            $avatarDomain = Config::get('cravatar') ? 'cravatar.cn' : 'seccdn.libravatar.org';
+            $avatar = 'https://' . $avatarDomain . '/avatar/' . md5(strtolower(trim($userInfo['email']))) . '?s=100&d=mp';
         }
 
         $roleEnum = Utility::arrayFilter(Model::getRoleList(), ['id' => $userInfo['role_id']]);

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button, Card, Col, ConfigProvider, message, Modal, Row, Space, Statistic } from 'antd';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button, Card, Col, ConfigProvider, message, Modal, Popover, QRCode, Row, Space, Statistic } from 'antd';
+import { ExclamationCircleOutlined, ScanOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import { useResizeDetector } from 'react-resize-detector';
 import dayjs from 'dayjs';
@@ -67,7 +67,11 @@ const Table = props => {
                 }
 
                 if (columnValue.type) {
-                    column.valueType = columnValue.type;
+                    if (columnValue.type === 'qrcode') {
+                        column.render = (text) => <Popover overlayInnerStyle={{ padding: 0 }} content={<QRCode value={text} bordered={false} />} ><ScanOutlined style={{ color: '#1677ff', cursor: 'pointer' }} /></Popover>;
+                    } else {
+                        column.valueType = columnValue.type;
+                    }
                 }
 
                 if (columnValue.enum) {
@@ -167,7 +171,6 @@ const Table = props => {
         }
         return columns;
     }
-
     const mainColumns = columnsBuilder(global.config.column);
     const expandColumns = columnsBuilder(global.config.expand, true);
 

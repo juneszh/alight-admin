@@ -101,7 +101,7 @@ const Login = props => {
                                 alt='captcha'
                                 onClick={buildCaptcha}
                                 src={captcha}
-                                style={{ cursor: 'pointer', height: 'min-content' }}
+                                style={{ cursor: 'pointer', height: 'min-content', borderRadius: 8 }}
                             ></img>
                         </div>
                     </Form.Item>

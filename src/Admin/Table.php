@@ -90,7 +90,9 @@ class Table
         TYPE_IMAGE = 'image',
         TYPE_JSON_CODE = 'jsonCode',
         TYPE_COLOR = 'color',
-        TYPE_CASCADER = 'cascader';
+        TYPE_CASCADER = 'cascader',
+        //extension
+        TYPE_QRCODE = 'qrcode';
 
     /**
      * Create a button

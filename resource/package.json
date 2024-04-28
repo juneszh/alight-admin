@@ -12,25 +12,25 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.6",
-    "@ant-design/plots": "^2.1.15",
-    "@ant-design/pro-components": "^2.7.0",
+    "@ant-design/plots": "^2.2.1",
+    "@ant-design/pro-components": "^2.7.1",
     "@tinymce/tinymce-react": "^4.3.2",
-    "antd": "^5.16.1",
+    "antd": "^5.16.4",
     "fs-extra": "^11.2.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-resize-detector": "^10.0.1",
     "tinymce": "^6.8.3",
     "tinymce-i18n": "^24.3.11"
   },
   "devDependencies": {
-    "@types/react": "^18.2.74",
-    "@types/react-dom": "^18.2.24",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.6.0",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.1",
-    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.6",
-    "vite": "^5.2.8"
+    "vite": "^5.2.10"
   }
 }

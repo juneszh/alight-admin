@@ -109,7 +109,16 @@ const notEmpty = obj => {
     return obj && (Object.getPrototypeOf(obj) === Object.prototype || Object.getPrototypeOf(obj) === Array.prototype) && Object.keys(obj).length !== 0;
 };
 
-const numberToString = value => (typeof value === 'number' ? value.toString() : value);
+const numberToString = value => {
+    if (typeof value === 'object' && notEmpty(value)) {
+        for (const [valueKey, valueValue] of Object.entries(value)) {
+            value[valueKey] = numberToString(valueValue);
+        }
+    } else if (typeof value === 'number') {
+        value = value.toString();
+    }
+    return value;
+};
 
 const postMessage = data => {
     window.parent.postMessage(data, window.location.origin);

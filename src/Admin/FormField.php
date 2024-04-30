@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace Alight\Admin;
 
+use Exception;
+
 class FormField
 {
     private string $form;
     private string $key;
+    private string $subKey;
 
     /**
      * Define the configuration index
@@ -25,11 +28,21 @@ class FormField
      * @param string $key 
      * @return $this 
      */
-    public function __construct(string $form, string $key)
+    public function __construct(string $form, string $key, string $subKey)
     {
         $this->form = $form;
         $this->key = $key;
+        $this->subKey = $subKey;
         return $this;
+    }
+
+    private function config(string $key, $value)
+    {
+        if ($this->subKey) {
+            Form::$config[$this->form][$this->key]['sub'][$this->subKey][$key] = $value;
+        } else {
+            Form::$config[$this->form][$this->key][$key] = $value;
+        }
     }
 
     /**
@@ -40,7 +53,7 @@ class FormField
      */
     public function confirm(string $key)
     {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $key;
+        $this->config(__FUNCTION__, $key);
         return $this;
     }
 
@@ -52,7 +65,7 @@ class FormField
      */
     public function database(bool $value)
     {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $value;
+        $this->config(__FUNCTION__, $value);
         return $this;
     }
 
@@ -64,7 +77,7 @@ class FormField
      */
     public function default($value)
     {
-        Form::$config[$this->form][$this->key]['value'] = $value;
+        $this->config('value', $value);
         return $this;
     }
 
@@ -73,7 +86,11 @@ class FormField
      */
     public function delete()
     {
-        unset(Form::$config[$this->form][$this->key]);
+        if ($this->subKey) {
+            unset(Form::$config[$this->form][$this->key]['sub'][$this->subKey]);
+        } else {
+            unset(Form::$config[$this->form][$this->key]);
+        }
     }
 
     /**
@@ -83,7 +100,7 @@ class FormField
      */
     public function disabled()
     {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = true;
+        $this->config(__FUNCTION__, true);
         return $this;
     }
 
@@ -99,8 +116,7 @@ class FormField
      */
     public function enum(array $keyValues)
     {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $keyValues;
-
+        $this->config(__FUNCTION__, $keyValues);
         return $this;
     }
 
@@ -112,7 +128,7 @@ class FormField
      */
     public function grid(array $value)
     {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $value;
+        $this->config(__FUNCTION__, $value);
         return $this;
     }
 
@@ -123,7 +139,7 @@ class FormField
      */
     public function hide()
     {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = true;
+        $this->config(__FUNCTION__, true);
         return $this;
     }
 
@@ -134,7 +150,7 @@ class FormField
      */
     public function if(array $keyValues)
     {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $keyValues;
+        $this->config(__FUNCTION__, $keyValues);
         return $this;
     }
 
@@ -146,7 +162,7 @@ class FormField
      */
     public function placeholder(string $value)
     {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $value;
+        $this->config(__FUNCTION__, $value);
         return $this;
     }
 
@@ -157,7 +173,7 @@ class FormField
      */
     public function raw()
     {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = true;
+        $this->config(__FUNCTION__, true);
         return $this;
     }
 
@@ -168,7 +184,7 @@ class FormField
      */
     public function readonly()
     {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = true;
+        $this->config(__FUNCTION__, true);
         return $this;
     }
 
@@ -179,7 +195,7 @@ class FormField
      */
     public function required()
     {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = true;
+        $this->config(__FUNCTION__, true);
         return $this;
     }
 
@@ -191,7 +207,7 @@ class FormField
      */
     public function role(array $roleValues)
     {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $roleValues;
+        $this->config(__FUNCTION__, $roleValues);
         return $this;
     }
 
@@ -205,7 +221,7 @@ class FormField
      */
     public function rules(array $keyValues)
     {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $keyValues;
+        $this->config(__FUNCTION__, $keyValues);
         return $this;
     }
 
@@ -217,9 +233,9 @@ class FormField
      */
     public function title(string $value)
     {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $value;
+        $this->config(__FUNCTION__, $value);
         if (substr($value, 0, 1) === ':') {
-            Form::$config[$this->form][$this->key]['locale'] = true;
+            $this->config('locale', true);
         }
         return $this;
     }
@@ -232,7 +248,7 @@ class FormField
      */
     public function tooltip(string $value)
     {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $value;
+        $this->config(__FUNCTION__, $value);
         return $this;
     }
 
@@ -249,14 +265,16 @@ class FormField
      */
     public function type(string $valueType, array $props = [])
     {
-        Form::$config[$this->form][$this->key][__FUNCTION__] = $valueType;
+        $this->config(__FUNCTION__, $valueType);
 
-        if ($valueType === 'richText') {
+        if ($valueType === Form::TYPE_RICH_TEXT) {
             $props['data']['tinymce'] = 1;
+        } elseif ($valueType === Form::TYPE_GROUP) {
+            $this->database(false);
         }
 
         if ($props) {
-            Form::$config[$this->form][$this->key][__FUNCTION__ . 'Props'] = $props;
+            $this->config(__FUNCTION__ . 'Props', $props);
         }
         return $this;
     }

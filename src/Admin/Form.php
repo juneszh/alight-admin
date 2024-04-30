@@ -26,6 +26,7 @@ class Form
 {
     public static array $config = [];
     private static string $form;
+    private static string $key;
 
     public const
         EVENT_RENDER = 'render',
@@ -49,7 +50,7 @@ class Form
         TYPE_TEXT = 'text',
         TYPE_SELECT = 'select',
         TYPE_TREE_SELECT = 'treeSelect',
-        TYPE_CHECK_BOX = 'checkbox',
+        TYPE_CHECKBOX = 'checkbox',
         TYPE_RATE = 'rate',
         TYPE_RADIO = 'radio',
         TYPE_RADIO_BUTTON = 'radioButton',
@@ -66,6 +67,9 @@ class Form
         TYPE_JSON_CODE = 'jsonCode',
         TYPE_COLOR = 'color',
         TYPE_CASCADER = 'cascader',
+        TYPE_GROUP = 'group',
+        TYPE_FORM_LIST = 'formList',
+        TYPE_FORM_SET = 'formSet',
         //extension
         TYPE_UPLOAD = 'upload',
         TYPE_RICH_TEXT = 'richText';
@@ -79,6 +83,7 @@ class Form
     public static function create(string $form): FormOption
     {
         self::$form = $form;
+        self::$key = '';
         if (!isset(self::$config[$form])) {
             self::$config[$form] = [];
         }
@@ -98,14 +103,44 @@ class Form
         if (!self::$form) {
             throw new Exception('Missing form definition.');
         }
-
+        self::$key = $key;
         self::$config[self::$form][$key] = [
             'title' => $key,
             'database' => true,
-            'type' => 'text',
+            'type' => self::TYPE_TEXT,
         ];
 
-        return new FormField(self::$form, $key);
+        return new FormField(self::$form, $key, '');
+    }
+
+    /**
+     * Create a form sub field
+     * 
+     * @param string $subKey 
+     * @return FormField 
+     * @throws Exception 
+     */
+    public static function subField(string $subKey): FormField
+    {
+        if (!self::$form) {
+            throw new Exception('Missing form definition.');
+        }
+        if (!self::$key) {
+            throw new Exception('Missing key definition.');
+        }
+        $database = false;
+        if (self::$config[self::$form][self::$key]['type'] === self::TYPE_GROUP) {
+            $database = true;
+        } elseif (self::$config[self::$form][self::$key]['type'] === self::TYPE_FORM_SET) {
+            $subKey = self::$key . '[' . $subKey . ']';
+        }
+        self::$config[self::$form][self::$key]['sub'][$subKey] = [
+            'title' => $subKey,
+            'database' => $database,
+            'type' => self::TYPE_TEXT,
+        ];
+
+        return new FormField(self::$form, self::$key, $subKey);
     }
 
     /**
@@ -149,11 +184,11 @@ class Form
                 $value = Model::formGet($table, $_id);
             }
             foreach ($field as $k => $v) {
-                if ($value && isset($value[$k]) && $field[$k]['type'] !== 'password') {
+                if ($value && isset($value[$k]) && $field[$k]['type'] !== self::TYPE_PASSWORD) {
                     $field[$k]['value'] = $value[$k];
                 }
-                if (isset($field[$k]['value']) && $field[$k]['value'] !== ''  && (in_array($field[$k]['type'], ['checkbox', 'upload']) || ($field[$k]['typeProps']['mode'] ?? '') === 'multiple')) {
-                    $field[$k]['value'] = explode($separator, $field[$k]['value']);
+                if (isset($field[$k]['value']) && is_string($field[$k]['value']) && (in_array($field[$k]['type'], [self::TYPE_CHECKBOX, self::TYPE_FORM_LIST, self::TYPE_FORM_SET, self::TYPE_UPLOAD]) || ($field[$k]['typeProps']['mode'] ?? '') === 'multiple')) {
+                    $field[$k]['value'] = json_decode($field[$k]['value'], true);
                 }
             }
 
@@ -212,7 +247,6 @@ class Form
     private static function dataFilter(array $field, array $data): array
     {
         $return = [];
-        $separator = (string) Config::get('separator');
         foreach ($field as $k => $v) {
             if ($v['database'] && !isset($v['disabled'])) {
                 if (isset($data[$k])) {
@@ -221,13 +255,18 @@ class Form
                             Response::api(400, ':status_400');
                             exit;
                         }
-                    } elseif ($v['type'] === 'password') {
+                    } elseif ($v['type'] === self::TYPE_PASSWORD) {
                         $return[$k] = password_hash($data[$k], PASSWORD_DEFAULT);
                     } elseif (is_array($data[$k])) {
-                        $return[$k] = join($separator, $data[$k]);
+                        $return[$k] = json_encode($data[$k], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
                     } else {
                         $return[$k] = isset($v['raw']) ? $data[$k] : trim((string) $data[$k]);
                     }
+                }
+            } elseif ($v['type'] === self::TYPE_GROUP && isset($v['sub'])) {
+                $_return = self::dataFilter($v['sub'], $data);
+                if ($_return) {
+                    $return = array_merge($return, $_return);
                 }
             }
         }

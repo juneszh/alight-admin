@@ -81,159 +81,175 @@ const Form = props => {
         />
     );
 
-    const columns = [];
     let layout = 'horizontal';
     let showButton = false;
-    if (notEmpty(global.config.field)) {
-        for (const [fieldKey, fieldValue] of Object.entries(global.config.field)) {
-            const column = {
-                dataIndex: fieldKey,
-                title: fieldValue.locale ? localeValue(fieldValue.title) : fieldValue.title,
-                valueType: fieldValue.type,
-                fieldProps: {},
-                formItemProps: { rules: [] },
-                proFieldProps: {},
-                colProps: { xs: 24 }
-            };
 
-            if (fieldValue.value !== undefined && fieldValue.value !== '') {
-                if (fieldValue.type === 'upload') {
-                    column.initialValue = [];
-                    if (notEmpty(fieldValue.value)) {
-                        let basicUrl = fieldValue?.typeProps?.basicUrl ?? window.location.origin;
-                        for (const value of Object.values(fieldValue.value)) {
-                            if (value) {
-                                let fileUrl = value;
-                                if (fileUrl.substring(0, 4) !== 'http') {
-                                    fileUrl = basicUrl + (fileUrl[0] === '/' ? '' : '/') + fileUrl;
-                                }
-                                column.initialValue.push({
-                                    status: 'done',
-                                    name: value,
-                                    url: fileUrl,
-                                });
-                            }
-                        }
-                    }
+    if (notEmpty(global.config.field)) {
+        for (const fieldValue of Object.values(global.config.field)) {
+            if (['textarea', 'code', 'jsonCode', 'richText', 'group', 'formList', 'formSet'].indexOf(fieldValue.type) !== -1) {
+                layout = 'vertical';
+                break;
+            }
+        }
+    }
+
+    const columnsBuilder = (columnObj) => {
+        const columns = [];
+        if (notEmpty(columnObj)) {
+            for (const [fieldKey, fieldValue] of Object.entries(columnObj)) {
+                const column = {
+                    dataIndex: fieldKey,
+                    title: fieldValue.locale ? localeValue(fieldValue.title) : fieldValue.title,
+                    valueType: fieldValue.type,
+                    fieldProps: {},
+                    formItemProps: { rules: [] },
+                    proFieldProps: {}
+                };
+
+                if (layout === 'vertical') {
+                    column.colProps = fieldValue.grid ?? { span: 24 };
                 } else {
-                    if (typeof fieldValue.value === 'object') {
+                    column.colProps = { span: 24 };
+                    column.formItemProps.labelCol = { sm: 6 };
+                    column.formItemProps.wrapperCol = fieldValue.grid ?? { sm: 14 };
+                }
+
+                if (fieldValue.value !== undefined && fieldValue.value !== '') {
+                    if (fieldValue.type === 'upload') {
                         column.initialValue = [];
-                        for (const valueValue of Object.values(fieldValue.value)) {
-                            column.initialValue.push(numberToString(valueValue));
+                        if (notEmpty(fieldValue.value)) {
+                            let basicUrl = fieldValue?.typeProps?.basicUrl ?? window.location.origin;
+                            for (const value of Object.values(fieldValue.value)) {
+                                if (value) {
+                                    let fileUrl = value;
+                                    if (fileUrl.substring(0, 4) !== 'http') {
+                                        fileUrl = basicUrl + (fileUrl[0] === '/' ? '' : '/') + fileUrl;
+                                    }
+                                    column.initialValue.push({
+                                        status: 'done',
+                                        name: value,
+                                        url: fileUrl,
+                                    });
+                                }
+                            }
                         }
                     } else {
                         column.initialValue = numberToString(fieldValue.value);
                     }
                 }
-            }
 
-            if (fieldValue.enum) {
-                if (fieldValue.locale) {
-                    column.valueEnum = {};
-                    for (const [enumKey, enumValue] of Object.entries(fieldValue.enum)) {
-                        if (typeof enumValue === 'string') {
-                            column.valueEnum[enumKey] = localeValue(enumValue);
+                if (fieldValue.required) {
+                    column.formItemProps.rules.push({ required: true });
+                }
+
+                if (fieldValue.rules) {
+                    if (Array.isArray(fieldValue.rules)) {
+                        column.formItemProps.rules = [...column.formItemProps.rules, ...fieldValue.rules];
+                    } else {
+                        column.formItemProps.rules.push(fieldValue.rules);
+                    }
+                }
+
+                if (['group', 'formList', 'formSet'].indexOf(fieldValue.type) !== -1) {
+                    if (fieldValue.sub) {
+                        if (fieldValue.type === 'formList') {
+                            column.columns = [{ valueType: 'group', columns: columnsBuilder(fieldValue.sub) }];
                         } else {
-                            column.valueEnum[enumKey] = enumValue;
-                            if (enumValue.text) {
-                                column.valueEnum[enumKey].text = localeValue(enumValue.text);
+                            column.columns = columnsBuilder(fieldValue.sub);
+                        }
+                    }
+                } else {
+                    if (fieldValue.enum) {
+                        if (fieldValue.locale) {
+                            column.valueEnum = {};
+                            for (const [enumKey, enumValue] of Object.entries(fieldValue.enum)) {
+                                if (typeof enumValue === 'string') {
+                                    column.valueEnum[enumKey] = localeValue(enumValue);
+                                } else {
+                                    column.valueEnum[enumKey] = enumValue;
+                                    if (enumValue.text) {
+                                        column.valueEnum[enumKey].text = localeValue(enumValue.text);
+                                    }
+                                }
                             }
+                        } else {
+                            column.valueEnum = fieldValue.enum;
                         }
                     }
-                } else {
-                    column.valueEnum = fieldValue.enum;
-                }
-            }
 
-            if (fieldValue.tooltip) {
-                column.tooltip = fieldValue.tooltip;
-            }
-
-            if (fieldValue.type === 'upload') {
-                column.render = (dom, entity, index, action, schema) => uploadRender(schema);
-                column.renderFormItem = (schema) => uploadRender(schema);
-            } else if (fieldValue.type === 'richText') {
-                column.render = (dom, entity, index, action, schema) => richTextRender(schema);
-                column.renderFormItem = (schema, config, form) => richTextRender(schema, form);
-            } else if (fieldValue.type === 'color') {
-                column.fieldProps.showText = true;
-                column.fieldProps.defaultFormat = 'rgb';
-                column.fieldProps.style = { display: 'inline-flex' };
-                column.fieldProps.presets = false;
-            }
-
-            if (fieldValue.placeholder) {
-                column.fieldProps.placeholder = fieldValue.placeholder;
-            }
-
-            if (fieldValue.disabled) {
-                column.fieldProps.disabled = fieldValue.disabled;
-            }
-
-            if (['money', 'textarea', 'date', 'dateTime', 'dateWeek', 'dateMonth', 'dateQuarter', 'dateYear', 'dateRange', 'dateTimeRange', 'time', 'timeRange', 'progress', 'percent', 'digit', 'digitRange', 'code', 'fromNow', 'jsonCode'].indexOf(fieldValue.type) !== -1) {
-                column.fieldProps.style = { width: '100%' };
-            }
-
-            if (fieldValue.typeProps) {
-                column.fieldProps = fieldValue.typeProps;
-            }
-
-            if (fieldValue.required) {
-                column.formItemProps.rules.push({ required: true });
-            }
-
-            if (fieldValue.rules) {
-                if (Array.isArray(fieldValue.rules)) {
-                    column.formItemProps.rules = [...column.formItemProps.rules, ...fieldValue.rules];
-                } else {
-                    column.formItemProps.rules.push(fieldValue.rules);
-                }
-            }
-
-            if (fieldValue.confirm) {
-                column.formItemProps.rules.push(({ getFieldValue }) => ({
-                    validator: (rule, value) => {
-                        if (!value || getFieldValue(fieldValue.confirm) === value) {
-                            return Promise.resolve();
-                        }
-                        const fieldTitle = localeValue(global.config.field[fieldValue.confirm].title);
-                        const confirmField = localeValue(':confirm_field').replace('{{field}}', fieldTitle);
-                        return Promise.reject(new Error(confirmField));
+                    if (fieldValue.tooltip) {
+                        column.tooltip = fieldValue.tooltip;
                     }
-                }));
-            }
 
-            if (fieldValue.hide) {
-                column.formItemProps.hidden = fieldValue.hide;
-            }
+                    if (fieldValue.type === 'upload') {
+                        column.render = (dom, entity, index, action, schema) => uploadRender(schema);
+                        column.renderFormItem = (schema) => uploadRender(schema);
+                    } else if (fieldValue.type === 'richText') {
+                        column.render = (dom, entity, index, action, schema) => richTextRender(schema);
+                        column.renderFormItem = (schema, config, form) => richTextRender(schema, form);
+                    } else if (fieldValue.type === 'color') {
+                        column.fieldProps.showText = true;
+                        column.fieldProps.defaultFormat = 'rgb';
+                        column.fieldProps.style = { display: 'inline-flex' };
+                        column.fieldProps.presets = false;
+                    }
 
-            if (fieldValue.readonly) {
-                column.proFieldProps.readonly = fieldValue.readonly;
-            } else {
-                showButton = true;
-            }
+                    if (fieldValue.placeholder) {
+                        column.fieldProps.placeholder = fieldValue.placeholder;
+                    }
 
-            if (['textarea', 'code', 'jsonCode', 'richText'].indexOf(fieldValue.type) !== -1) {
-                layout = 'vertical';
-            } else {
-                column.formItemProps.labelCol = { sm: 6 }
-                column.formItemProps.wrapperCol = fieldValue.grid ?? { sm: 14 }
-            }
+                    if (fieldValue.disabled) {
+                        column.fieldProps.disabled = fieldValue.disabled;
+                    }
 
-            if (notEmpty(fieldValue.if)) {
-                columns.push({
-                    valueType: 'dependency',
-                    name: Object.keys(fieldValue.if),
-                    columns: (record) => {
-                        return ifResult(fieldValue.if, record) ? [column] : [];
-                    },
-                });
-            } else {
-                columns.push(column);
+                    if (['money', 'textarea', 'date', 'dateTime', 'dateWeek', 'dateMonth', 'dateQuarter', 'dateYear', 'dateRange', 'dateTimeRange', 'time', 'timeRange', 'progress', 'percent', 'digit', 'digitRange', 'code', 'fromNow', 'jsonCode'].indexOf(fieldValue.type) !== -1) {
+                        column.fieldProps.style = { width: '100%' };
+                    }
+
+                    if (fieldValue.typeProps) {
+                        column.fieldProps = fieldValue.typeProps;
+                    }
+
+                    if (fieldValue.confirm) {
+                        column.formItemProps.rules.push(({ getFieldValue }) => ({
+                            validator: (rule, value) => {
+                                if (!value || getFieldValue(fieldValue.confirm) === value) {
+                                    return Promise.resolve();
+                                }
+                                const fieldTitle = localeValue(columnObj[fieldValue.confirm].title);
+                                const confirmField = localeValue(':confirm_field').replace('{{field}}', fieldTitle);
+                                return Promise.reject(new Error(confirmField));
+                            }
+                        }));
+                    }
+
+                    if (fieldValue.hide) {
+                        column.formItemProps.hidden = fieldValue.hide;
+                    }
+
+                    if (fieldValue.readonly) {
+                        column.proFieldProps.readonly = fieldValue.readonly;
+                    } else {
+                        showButton = true;
+                    }
+                }
+
+                if (notEmpty(fieldValue.if)) {
+                    columns.push({
+                        valueType: 'dependency',
+                        name: Object.keys(fieldValue.if),
+                        columns: (record) => {
+                            return ifResult(fieldValue.if, record) ? [column] : [];
+                        },
+                    });
+                } else {
+                    columns.push(column);
+                }
             }
         }
+        return columns;
     }
-
+    const mainColumns = columnsBuilder(global.config.field);
 
     const getMessage = useCallback(event => {
         if (event.origin === window.location.origin) {
@@ -262,7 +278,7 @@ const Form = props => {
     return (
         <div ref={rootSize.ref}>
             <BetaSchemaForm
-                columns={columns}
+                columns={mainColumns}
                 formRef={formRef}
                 grid={true}
                 labelWrap={true}
@@ -271,14 +287,18 @@ const Form = props => {
                 onFinish={async (values) => {
                     if (notEmpty(global.config.field)) {
                         for (const [key, value] of Object.entries(values)) {
-                            if (global.config.field[key].type === 'upload') {
-                                values[key] = value.map(e => (e.response?.data?.name ?? e.name));
-                            } else if (global.config.field[key].type === 'color' && typeof value !== 'string') {
-                                values[key] = value.toRgbString();
+                            if (global.config.field[key]) {
+                                if (global.config.field[key].type === 'upload') {
+                                    values[key] = value.map(e => (e.response?.data?.name ?? e.name));
+                                } else if (global.config.field[key].type === 'color') {
+                                    if (typeof value !== 'string') {
+                                        values[key] = value.toRgbString();
+                                    }
+                                }
                             }
                         }
                     }
-                    ajax(window.location.href, values).then(result => {
+                    return ajax(window.location.href, values).then(result => {
                         if (result && result.error === 0) {
                             if (inIframe()) {
                                 postMessage(result);

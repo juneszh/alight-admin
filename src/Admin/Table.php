@@ -74,7 +74,7 @@ class Table
         TYPE_TEXT = 'text',
         TYPE_SELECT = 'select',
         TYPE_TREE_SELECT = 'treeSelect',
-        TYPE_CHECK_BOX = 'checkbox',
+        TYPE_CHECKBOX = 'checkbox',
         TYPE_RATE = 'rate',
         TYPE_RADIO = 'radio',
         TYPE_RADIO_BUTTON = 'radioButton',
@@ -349,11 +349,11 @@ class Table
                 if ($v['database'] && isset($v['searchType']) && isset($data[$k])) {
                     $_v = $data[$k];
                     if ($_v || is_numeric($_v)) {
-                        if ($v['searchType'] === 'text') {
+                        if ($v['searchType'] === self::TYPE_TEXT) {
                             $return[$k . '[~]'] = $_v;
-                        } elseif (in_array($v['searchType'], ['dateRange', 'dateTimeRange', 'timeRange'])) {
+                        } elseif (in_array($v['searchType'], [self::TYPE_DATE_RANGE, self::TYPE_DATE_TIME_RANGE, self::TYPE_TIME_RANGE])) {
                             $return[$k . '[<>]'] = explode(',', (string) $_v);
-                        } elseif ($v['searchType'] === 'checkbox' || ($v['searchProps']['mode'] ?? '') === 'multiple') {
+                        } elseif ($v['searchType'] === self::TYPE_CHECKBOX || ($v['searchProps']['mode'] ?? '') === 'multiple') {
                             $return[$k] = explode(',', (string) $_v);
                         } else {
                             $return[$k] = $_v;

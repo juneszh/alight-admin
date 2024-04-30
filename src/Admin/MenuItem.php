@@ -35,6 +35,15 @@ class MenuItem
         return $this;
     }
 
+    private function config(string $key, $value)
+    {
+        if ($this->subIndex) {
+            Menu::$config[$this->index]['sub'][$this->subIndex][$key] = $value;
+        } else {
+            Menu::$config[$this->index][$key] = $value;
+        }
+    }
+
     /**
      * Set click action
      *
@@ -44,11 +53,7 @@ class MenuItem
      */
     public function action(string $value)
     {
-        if ($this->subIndex) {
-            Menu::$config[$this->index]['sub'][$this->subIndex][__FUNCTION__] = $value;
-        } else {
-            Menu::$config[$this->index][__FUNCTION__] = $value;
-        }
+        $this->config(__FUNCTION__, $value);
         return $this;
     }
 
@@ -63,11 +68,7 @@ class MenuItem
      */
     public function icon(string $value)
     {
-        if ($this->subIndex) {
-            Menu::$config[$this->index]['sub'][$this->subIndex][__FUNCTION__] = $value;
-        } else {
-            Menu::$config[$this->index][__FUNCTION__] = $value;
-        }
+        $this->config(__FUNCTION__, $value);
         return $this;
     }
 
@@ -79,11 +80,7 @@ class MenuItem
      */
     public function role(array $roleValues)
     {
-        if ($this->subIndex) {
-            Menu::$config[$this->index]['sub'][$this->subIndex][__FUNCTION__] = $roleValues;
-        } else {
-            Menu::$config[$this->index][__FUNCTION__] = $roleValues;
-        }
+        $this->config(__FUNCTION__, $roleValues);
         return $this;
     }
 
@@ -95,11 +92,7 @@ class MenuItem
      */
     public function url(string $value)
     {
-        if ($this->subIndex) {
-            Menu::$config[$this->index]['sub'][$this->subIndex][__FUNCTION__] = Admin::url($value);
-        } else {
-            Menu::$config[$this->index][__FUNCTION__] = Admin::url($value);
-        }
+        $this->config(__FUNCTION__, Admin::url($value));
         return $this;
     }
 }

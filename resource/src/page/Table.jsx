@@ -193,7 +193,7 @@ const Table = props => {
         params._form = button.form;
         if (notEmpty(record)) {
             if (arrayRecord) {
-                params._ids = record.join(global.join);
+                params._ids = record.join(global.separator);
             } else {
                 params._id = record.id;
             }

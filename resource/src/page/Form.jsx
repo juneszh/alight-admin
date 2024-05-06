@@ -4,6 +4,7 @@ import { BetaSchemaForm, ProFormUploadDragger } from '@ant-design/pro-components
 import { useResizeDetector } from 'react-resize-detector';
 import { Editor } from '@tinymce/tinymce-react';
 import global, { ajax, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util';
+import { isString } from 'antd/es/button';
 
 const Form = props => {
     localeInit(props.locale);
@@ -116,6 +117,9 @@ const Form = props => {
 
                 if (fieldValue.value !== undefined && fieldValue.value !== '') {
                     if (fieldValue.type === 'upload') {
+                        if (isString(fieldValue.value)) {
+                            fieldValue.value = [fieldValue.value];
+                        }
                         column.initialValue = [];
                         if (notEmpty(fieldValue.value)) {
                             let basicUrl = fieldValue?.typeProps?.basicUrl ?? window.location.origin;
@@ -290,6 +294,9 @@ const Form = props => {
                             if (global.config.field[key]) {
                                 if (global.config.field[key].type === 'upload') {
                                     values[key] = value.map(e => (e.response?.data?.name ?? e.name));
+                                    if (!global.config.field[key]?.typeProps?.multiple) {
+                                        values[key] = values[key][0];
+                                    }
                                 } else if (global.config.field[key].type === 'color') {
                                     if (typeof value !== 'string') {
                                         values[key] = value.toRgbString();

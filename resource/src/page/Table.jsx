@@ -68,7 +68,7 @@ const Table = props => {
 
                 if (columnValue.type) {
                     if (columnValue.type === 'qrcode') {
-                        column.render = (text) => <Popover overlayInnerStyle={{ padding: 0 }} content={<QRCode value={text} bordered={false} />} ><ScanOutlined style={{ color: '#1677ff', cursor: 'pointer' }} /></Popover>;
+                        column.render = (text) => <Popover content={<QRCode value={text} bordered={false} />} ><ScanOutlined style={{ color: '#1677ff', cursor: 'pointer' }} /></Popover>;
                     } else {
                         column.valueType = columnValue.type;
                     }

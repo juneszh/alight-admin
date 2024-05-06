@@ -26,8 +26,6 @@ class Menu
 
     public const
         ACTION_IFRAME = 'iframe',
-        ACTION_FORM = 'form',
-        ACTION_PAGE = 'page',
         ACTION_POPUP = 'popup',
         ACTION_REDIRECT = 'redirect';
 

@@ -188,7 +188,7 @@ class Form
                 if ($value && isset($value[$k]) && $field[$k]['type'] !== self::TYPE_PASSWORD) {
                     $field[$k]['value'] = $value[$k];
                 }
-                if (isset($field[$k]['value']) && Utility::isJson($field[$k]['value']) && (in_array($field[$k]['type'], [self::TYPE_CHECKBOX, self::TYPE_FORM_LIST, self::TYPE_FORM_SET, self::TYPE_UPLOAD]) || ($field[$k]['typeProps']['mode'] ?? '') === 'multiple')) {
+                if (isset($field[$k]['value']) && Utility::isJson($field[$k]['value']) && (in_array($field[$k]['type'], [self::TYPE_CHECKBOX, self::TYPE_FORM_LIST, self::TYPE_FORM_SET, self::TYPE_UPLOAD]) || ($field[$k]['typeProps']['mode'] ?? ''))) {
                     $field[$k]['value'] = json_decode($field[$k]['value'], true);
                 }
             }

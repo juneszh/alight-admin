@@ -114,6 +114,7 @@ const Home = props => {
             const hashKey = e.newURL.split('#')[1];
             changeIFrame(hashKey);
         })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

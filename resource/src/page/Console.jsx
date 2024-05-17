@@ -5,8 +5,6 @@ import { Area, Bar, Base, BidirectionalBar, Box, Bullet, CirclePacking, Column, 
 import global, { ajax, localeInit, localeValue, notEmpty, redirect } from '../lib/Util';
 import ModelKit from '../lib/ModelKit';
 import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-dayjs.extend(relativeTime);
 
 const { Text, Link } = Typography;
 
@@ -242,7 +240,7 @@ const Console = props => {
                                 total: noticeCount
                             }}
                             renderItem={(item) => (
-                                <List.Item extra={<span title={dayjs(item.create_time * 1000).format('YYYY-MM-DD HH:mm:ss')}>{dayjs(item.create_time * 1000).fromNow()}</span>}>
+                                <List.Item extra={<span title={dayjs(item.create_time * 1000).format('YYYY-MM-DD HH:mm:ss')}>{dayjs(item.create_time * 1000).format('MM-DD HH:mm')}</span>}>
                                     {(item.has_content ?
                                         <List.Item.Meta
                                             title={<Link

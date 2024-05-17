@@ -206,7 +206,7 @@ class Model
         $db = Database::init();
         $where = $db::raw('WHERE JSON_CONTAINS(<user_ids>, \'' . $userId . '\') ORDER BY <id> DESC LIMIT 40');
 
-        $list = self::getCacheData('admin_notice', null, 300, $where);
+        $list = self::getCacheData('admin_notice', null, 60, $where);
         if ($list) {
             $data['count'] = count($list);
             foreach (array_slice($list, $start, $limit)  as $_info) {

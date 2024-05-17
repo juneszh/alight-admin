@@ -304,8 +304,6 @@ Finally, we will get the console page as:
     * [Vite](https://vitejs.dev/)
     * [Ant Design](https://ant.design/)
     * [TinyMCE](https://www.tiny.cloud/tinymce/)
-    * [fs-extra](https://github.com/jprichardson/node-fs-extra)
-    * [react-resize-detector](https://github.com/maslianok/react-resize-detector)
 
 ## License
 * [MIT license](./LICENSE)

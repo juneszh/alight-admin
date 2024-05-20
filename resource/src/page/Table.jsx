@@ -148,11 +148,10 @@ const Table = props => {
                             for (const [buttonKey, buttonValue] of Object.entries(columnValue.button)) {
                                 if (ifResult(buttonValue.if, record)) {
                                     buttons.push(
-                                        <ConfigProvider theme={buttonValue.color ? { token: { colorPrimary: buttonValue.color } } : undefined}>
+                                        <ConfigProvider key={buttonKey} theme={buttonValue.color ? { token: { colorPrimary: buttonValue.color } } : undefined}>
                                             <Button
                                                 danger={buttonValue.danger ?? undefined}
                                                 href={buttonHref(buttonValue, record)}
-                                                key={`column-botton-${columnKey}-${buttonKey}`}
                                                 onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, record); }}
                                                 size='small'
                                                 type={buttonValue.type ?? 'default'}
@@ -264,11 +263,10 @@ const Table = props => {
     if (notEmpty(global.config.toolbar.button)) {
         for (const [buttonKey, buttonValue] of Object.entries(global.config.toolbar.button)) {
             toolbarActions.push(
-                <ConfigProvider theme={buttonValue.color ? { token: { colorPrimary: buttonValue.color } } : undefined}>
+                <ConfigProvider key={buttonKey} theme={buttonValue.color ? { token: { colorPrimary: buttonValue.color } } : undefined}>
                     <Button
                         danger={buttonValue.danger ?? undefined}
                         href={buttonHref(buttonValue)}
-                        key={`toolbar-botton-${buttonKey}`}
                         onClick={(e) => { e.preventDefault(); buttonAction(buttonValue); }}
                         type={buttonValue.type ?? 'primary'}
                     >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
@@ -364,7 +362,7 @@ const Table = props => {
                                 let result = sum.toFixed(precision);
                                 sumVisible = true;
                                 sumCells.push(
-                                    <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
+                                    <ProTable.Summary.Cell className='ant-table-column-sort' index={index} key={key}>
                                         {index === titleIndex ? <><span style={{ float: 'left' }}>{localeValue(':sum')}</span>{result}</> : result}
                                     </ProTable.Summary.Cell>
                                 );
@@ -372,25 +370,25 @@ const Table = props => {
                                     avgVisible = true;
                                     result = (sum / pageData.length).toFixed(precision);
                                     avgCells.push(
-                                        <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
+                                        <ProTable.Summary.Cell className='ant-table-column-sort' index={index} key={key}>
                                             {index === titleIndex ? <><span style={{ float: 'left' }}>{localeValue(':avg')}</span>{result}</> : result}
                                         </ProTable.Summary.Cell>
                                     );
                                 } else {
                                     avgCells.push(
-                                        <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
+                                        <ProTable.Summary.Cell className='ant-table-column-sort' index={index} key={key}>
                                             {index === titleIndex ? <span style={{ float: 'left' }}>{localeValue(':avg')}</span> : undefined}
                                         </ProTable.Summary.Cell>
                                     );
                                 }
                             } else {
                                 sumCells.push(
-                                    <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
+                                    <ProTable.Summary.Cell className='ant-table-column-sort' index={index} key={key}>
                                         {index === titleIndex ? <span style={{ float: 'left' }}>{localeValue(':sum')}</span> : undefined}
                                     </ProTable.Summary.Cell>
                                 );
                                 avgCells.push(
-                                    <ProTable.Summary.Cell className='ant-table-column-sort' index={index} >
+                                    <ProTable.Summary.Cell className='ant-table-column-sort' index={index} key={key}>
                                         {index === titleIndex ? <span style={{ float: 'left' }}>{localeValue(':avg')}</span> : undefined}
                                     </ProTable.Summary.Cell>
                                 );
@@ -410,11 +408,10 @@ const Table = props => {
                     if (notEmpty(global.config.batch.button)) {
                         for (const [buttonKey, buttonValue] of Object.entries(global.config.batch.button)) {
                             buttons.push(
-                                <ConfigProvider theme={buttonValue.color ? { token: { colorPrimary: buttonValue.color } } : undefined}>
+                                <ConfigProvider key={buttonKey} theme={buttonValue.color ? { token: { colorPrimary: buttonValue.color } } : undefined}>
                                     <Button
                                         danger={buttonValue.danger ?? undefined}
                                         href={buttonHref(buttonValue, selectedRowKeys)}
-                                        key={`batch-botton-${buttonKey}`}
                                         onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, selectedRowKeys); }}
                                         type={buttonValue.type ?? 'primary'}
                                     >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
@@ -432,7 +429,7 @@ const Table = props => {
                             statValue = requestStatistic[key] ?? statValue;
                         }
                         statistic.push(
-                            <Col>
+                            <Col key={key}>
                                 <Statistic
                                     style={{ textAlign: 'center' }}
                                     title={value.title}

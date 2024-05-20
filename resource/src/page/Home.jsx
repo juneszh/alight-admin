@@ -46,9 +46,9 @@ const Home = props => {
             hashKey = '1-1';
         }
         if (openKeys.length === 0) {
-            setOpenKeys(['menu-' + hashKey.split('-')[0]]);
+            setOpenKeys([hashKey.split('-')[0]]);
         }
-        setSelectedKeys(['menu-' + hashKey]);
+        setSelectedKeys([hashKey]);
         setIframeSrc(iFrameMap[hashKey].url);
         window.document.title = iFrameMap[hashKey].title;
     }
@@ -59,7 +59,7 @@ const Home = props => {
     if (notEmpty(global.config.menu)) {
         for (const [itemKey, itemValue] of Object.entries(global.config.menu)) {
             let item = {
-                key: 'menu-' + itemKey,
+                key: itemKey,
                 label: itemValue.title
             };
             if (itemKey == 1) {
@@ -72,7 +72,7 @@ const Home = props => {
                         subValue.title = localeValue(subValue.title);
                     }
                     let children = {
-                        key: 'menu-' + itemKey + '-' + subKey,
+                        key: itemKey + '-' + subKey,
                         label: subValue.title,
                         icon: subValue.icon && Icons[subValue.icon] ? Icons[subValue.icon] : undefined,
                     };

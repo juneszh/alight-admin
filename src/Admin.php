@@ -91,7 +91,6 @@ class Admin
         $global = [
             'title' => $admin['title'],
             'locale' => $admin['locale'],
-            'separator' => $admin['separator'],
             'path' => self::url(),
             'page' => $page,
             'config' => $config,
@@ -348,6 +347,11 @@ class Admin
                 'NOT NULL',
                 'AUTO_INCREMENT',
             ],
+            'unique_id' => [
+                'VARCHAR(32)',
+                'NOT NULL',
+                'DEFAULT \'\'',
+            ],
             'user_ids' => [
                 'JSON',
                 'NOT NULL',
@@ -362,12 +366,19 @@ class Admin
                 'NOT NULL',
                 'DEFAULT \'\'',
             ],
+            'interval' => [
+                'INT',
+                'UNSIGNED',
+                'NOT NULL',
+                'DEFAULT \'0\'',
+            ],
             'create_time' => [
                 'TIMESTAMP',
                 'NOT NULL',
                 'DEFAULT CURRENT_TIMESTAMP',
             ],
             'PRIMARY KEY (<id>)',
+            'INDEX <unique_id_create_time> (<unique_id>, <create_time>)',
         ], [
             'ENGINE' => 'InnoDB',
             'DEFAULT CHARSET' => 'utf8mb4',
@@ -462,15 +473,19 @@ class Admin
      * @param string $content 
      * @param array $toRole 
      * @param array $toUser 
-     * @param null|callable $callback
+     * @param null|string $uniqueId 
+     * @param int $interval 
      * @throws Exception 
      * @throws PDOException 
      */
-    public static function notice(string $title, string $content = '', array $toRole = [], array $toUser = [], ?callable $callback = null)
+    public static function notice(string $title, string $content = '', array $toRole = [], array $toUser = [], ?string $uniqueId = null, int $interval = 60)
     {
-        $userIds = Model::addNotice($title, $content, $toRole, $toUser);
-        if (is_callable($callback)) {
-            $callback(['to_role' => $toRole, 'to_user' => $toUser, 'title' => $title, 'content' => $content, 'user_ids' => $userIds]);
+        $userIds = Model::addNotice($title, $content, $toRole, $toUser, $uniqueId, $interval);
+        if ($userIds) {
+            $callback = AdminConfig::get('noticeCallback');
+            if (is_callable($callback)) {
+                $callback(['to_role' => $toRole, 'to_user' => $toUser, 'title' => $title, 'content' => $content, 'user_ids' => $userIds]);
+            }
         }
     }
 }

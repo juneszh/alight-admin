@@ -162,10 +162,9 @@ class Form
         $_form = Request::request('_form', '');
         $_title = Request::request('_title', '');
 
-        $separator = (string) Config::get('separator');
         $_ids = Request::request('_ids');
         if ($_ids) {
-            $_ids = is_string($_ids) ? explode($separator, $_ids) : (array) $_ids;
+            $_ids = is_string($_ids) ? explode('|', $_ids) : (array) $_ids;
             $_ids = array_values(array_filter(array_map('intval', $_ids)));
         }
 

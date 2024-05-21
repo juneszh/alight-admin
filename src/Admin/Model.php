@@ -152,11 +152,13 @@ class Model
      * @param string $content 
      * @param array $toRole 
      * @param array $toUser
+     * @param null|string $uniqueId 
+     * @param int $interval 
      * @return array 
      * @throws Exception 
      * @throws PDOException 
      */
-    public static function addNotice(string $title, string $content = '', array $toRole = [], array $toUser = []): array
+    public static function addNotice(string $title, string $content = '', array $toRole = [], array $toUser = [], ?string $uniqueId = null, int $interval = 60): array
     {
         $db = Database::init();
 
@@ -172,10 +174,21 @@ class Model
             }
         }
 
+        if ($uniqueId === null) {
+            $uniqueId = md5(json_encode([$title, $content, $userIds]));
+        }
+
+        $last = $db->get('admin_notice', ['interval', 'create_time'], ['unique_id' => $uniqueId, 'ORDER' => ['create_time' => 'DESC']]);
+        if ($last && time() < strtotime($last['create_time']) + $last['interval']){
+            return [];
+        }
+
         $db->insert('admin_notice', [
+            'unique_id' => $uniqueId,
             'user_ids' => json_encode($userIds),
             'title' => $title,
             'content' => $content,
+            'interval' => $interval,
         ]);
 
         return $db->id() ? $userIds : [];

@@ -473,14 +473,14 @@ class Admin
      * @param string $content 
      * @param array $toRole 
      * @param array $toUser 
-     * @param null|string $uniqueId 
      * @param int $interval 
+     * @param null|string $uniqueId 
      * @throws Exception 
      * @throws PDOException 
      */
-    public static function notice(string $title, string $content = '', array $toRole = [], array $toUser = [], ?string $uniqueId = null, int $interval = 60)
+    public static function notice(string $title, string $content = '', array $toRole = [], array $toUser = [], int $interval = 60, ?string $uniqueId = null)
     {
-        $userIds = Model::addNotice($title, $content, $toRole, $toUser, $uniqueId, $interval);
+        $userIds = Model::addNotice($title, $content, $toRole, $toUser, $interval, $uniqueId);
         if ($userIds) {
             $callback = AdminConfig::get('noticeCallback');
             if (is_callable($callback)) {

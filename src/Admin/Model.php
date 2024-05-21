@@ -152,13 +152,13 @@ class Model
      * @param string $content 
      * @param array $toRole 
      * @param array $toUser
-     * @param null|string $uniqueId 
      * @param int $interval 
+     * @param null|string $uniqueId 
      * @return array 
      * @throws Exception 
      * @throws PDOException 
      */
-    public static function addNotice(string $title, string $content = '', array $toRole = [], array $toUser = [], ?string $uniqueId = null, int $interval = 60): array
+    public static function addNotice(string $title, string $content = '', array $toRole = [], array $toUser = [], int $interval = 60, ?string $uniqueId = null): array
     {
         $db = Database::init();
 

@@ -179,7 +179,7 @@ class Model
         }
 
         $last = $db->get('admin_notice', ['interval', 'create_time'], ['unique_id' => $uniqueId, 'ORDER' => ['create_time' => 'DESC']]);
-        if ($last && time() < strtotime($last['create_time']) + $last['interval']){
+        if ($last && time() < strtotime($last['create_time']) + $last['interval']) {
             return [];
         }
 
@@ -217,10 +217,12 @@ class Model
         $start = $page > 1 ? ($page - 1) * $limit : 0;
 
         $db = Database::init();
-        $where = $db::raw('WHERE JSON_CONTAINS(<user_ids>, \'' . $userId . '\') ORDER BY <id> DESC LIMIT 40');
+        $where = $db::raw('WHERE JSON_CONTAINS(<user_ids>, \'' . $userId . '\') ORDER BY <id> DESC LIMIT 100');
 
         $list = self::getCacheData('admin_notice', null, 60, $where);
         if ($list) {
+            $readList = self::getNoticeReadList($userId);
+
             $data['count'] = count($list);
             foreach (array_slice($list, $start, $limit)  as $_info) {
                 $data['list'][] = [
@@ -228,11 +230,66 @@ class Model
                     'title' => $_info['title'],
                     'create_time' => strtotime($_info['create_time']),
                     'has_content' => $_info['content'] ? true : false,
+                    'read' => in_array($_info['id'], $readList),
                 ];
             }
         }
 
         return $data;
+    }
+
+    /**
+     * Get a list of notifications IDs that the user has read
+     * 
+     * @param int $userId 
+     * @return array 
+     * @throws Exception 
+     * @throws ExceptionInvalidArgumentException 
+     * @throws ErrorException 
+     * @throws CacheException 
+     */
+    public static function getNoticeReadList(int $userId): array
+    {
+        $cache = Cache::psr16();
+        $cacheKey = 'alight.admin_notice_read.list.' . $userId;
+
+        if ($cache->has($cacheKey)) {
+            return $cache->get($cacheKey);
+        }
+
+        $db = Database::init();
+        $list = $db->select('admin_notice_read', 'notice_id', ['user_id' => $userId, 'ORDER' => ['notice_id' => 'DESC'], 'LIMIT' => 100]) ?: [];
+
+        $cache->set($cacheKey, $list, 86400);
+
+        return $list;
+    }
+
+    /**
+     * Add user read notification
+     * 
+     * @param int $userId 
+     * @param int $noticeId 
+     * @throws Exception 
+     * @throws ExceptionInvalidArgumentException 
+     * @throws ErrorException 
+     * @throws CacheException 
+     * @throws PDOException 
+     */
+    public static function addNoticeRead(int $userId, int $noticeId)
+    {
+        $readList = self::getNoticeReadList($userId);
+        if (!in_array($noticeId, $readList)) {
+            $db = Database::init();
+            if (!$db->has('admin_notice_read', ['user_id' => $userId, 'notice_id' => $noticeId])) {
+                $db->insert('admin_notice_read', ['user_id' => $userId, 'notice_id' => $noticeId]);
+                if ($db->id()) {
+                    $cache = Cache::psr16();
+                    $cacheKey = 'alight.admin_notice_read.list.' . $userId;
+                    $cache->delete($cacheKey);
+                }
+            }
+        }
     }
 
     /**

@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Avatar, Card, Col, List, Modal, Row, Typography } from 'antd';
-import { EditOutlined, ExclamationCircleOutlined, LockOutlined, PoweroffOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, EditOutlined, ExclamationCircleOutlined, LockOutlined, PoweroffOutlined } from '@ant-design/icons';
 import { Area, Bar, Base, BidirectionalBar, Box, Bullet, CirclePacking, Column, DualAxes, Funnel, Gauge, Heatmap, Histogram, Line, Liquid, Mix, Pie, Radar, RadialBar, Rose, Sankey, Scatter, Stock, Sunburst, Tiny, Treemap, Venn, Violin, Waterfall, WordCloud } from '@ant-design/plots';
 import global, { ajax, localeInit, localeValue, notEmpty, redirect } from '../lib/Util';
 import ModelKit from '../lib/ModelKit';
 import dayjs from 'dayjs';
 
-const { Text, Link } = Typography;
+const { Text } = Typography;
 
 const Console = props => {
     localeInit(props.locale);
@@ -41,20 +41,32 @@ const Console = props => {
                 setNoticeCount(result.data.count);
                 setNoticeList(result.data.list);
             }
-        }).finally(()=>{
+        }).finally(() => {
             setNoticeLoad(false);
         });
     };
 
-    const showNotice = (id, title) => {
-        modelRef.current?.modalShow({
-            action: 'form',
-            title: title,
-            url: global.path + '/console/notice/form',
-        }, {
-            _form: 'read',
-            _id: id,
-        });
+    const readNotice = (item, index) => {
+        if (!noticeList[index].read) {
+            const newList = noticeList.map((v, i) => {
+                if (i === index) {
+                    v.read = true;
+                }
+                return v;
+            });
+            setNoticeList(newList);
+            ajax(global.path + '/console/notice/read', { id: item.id });
+        }
+        if (item.has_content) {
+            modelRef.current?.modalShow({
+                action: 'form',
+                title: item.title,
+                url: global.path + '/console/notice/form',
+            }, {
+                _form: 'read',
+                _id: item.id,
+            });
+        }
     }
 
     const editProfile = () => {
@@ -239,24 +251,16 @@ const Console = props => {
                                 style: { position: 'absolute', right: 0, bottom: 0 },
                                 total: noticeCount
                             }}
-                            renderItem={(item) => (
+                            renderItem={(item, index) => (
                                 <List.Item extra={<span title={dayjs(item.create_time * 1000).format('YYYY-MM-DD HH:mm:ss')}>{dayjs(item.create_time * 1000).format('MM-DD HH:mm')}</span>}>
-                                    {(item.has_content ?
-                                        <List.Item.Meta
-                                            title={<Link
-                                                ellipsis={true}
-                                                onClick={() => { showNotice(item.id, item.title) }}
-                                                style={{ paddingRight: 16 }}
-                                            >{item.title}</Link>}
-                                        />
-                                        :
-                                        <List.Item.Meta
-                                            title={<Text
-                                                ellipsis={{ tooltip: true }}
-                                                style={{ paddingRight: 16, width: '100%' }}
-                                            >{item.title}</Text>}
-                                        />
-                                    )}
+                                    <List.Item.Meta
+                                        title={<Text
+                                            ellipsis={{ tooltip: true, suffix: (item.has_content ? <InfoCircleOutlined key={item.id} style={{ paddingLeft: 10 }} /> : undefined) }}
+                                            onClick={() => { readNotice(item, index) }}
+                                            style={{ width: '100%', cursor: ((item.has_content || !item.read) ? 'pointer' : undefined) }}
+                                            strong={item.read ? false : true}
+                                        >{item.title}{item.read}</Text>}
+                                    />
                                 </List.Item>
                             )}
                             size='small'

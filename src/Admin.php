@@ -52,6 +52,7 @@ class Admin
         Route::get('console/user', [Controller::class, 'consoleUser'])->auth();
         Route::get('console/notice/list', [Controller::class, 'consoleNoticeList'])->auth();
         Route::get('console/notice/form', [Controller::class, 'consoleNoticeForm'])->auth();
+        Route::post('console/notice/read', [Controller::class, 'consoleNoticeRead'])->auth();
         Route::get('role/table', [Controller::class, 'roleTable'])->auth();
         Route::any('role/form', [Controller::class, 'roleForm'])->auth();
         Route::get('user/table', [Controller::class, 'userTable'])->auth();
@@ -379,6 +380,37 @@ class Admin
             ],
             'PRIMARY KEY (<id>)',
             'INDEX <unique_id_create_time> (<unique_id>, <create_time>)',
+        ], [
+            'ENGINE' => 'InnoDB',
+            'DEFAULT CHARSET' => 'utf8mb4',
+        ]);
+
+        $db->create('admin_notice_read', [
+            'id' => [
+                'INT',
+                'UNSIGNED',
+                'NOT NULL',
+                'AUTO_INCREMENT',
+            ],
+            'user_id' => [
+                'SMALLINT',
+                'UNSIGNED',
+                'NOT NULL',
+                'DEFAULT \'0\'',
+            ],
+            'notice_id' => [
+                'INT',
+                'UNSIGNED',
+                'NOT NULL',
+                'DEFAULT \'0\'',
+            ],
+            'create_time' => [
+                'TIMESTAMP',
+                'NOT NULL',
+                'DEFAULT CURRENT_TIMESTAMP',
+            ],
+            'PRIMARY KEY (<id>)',
+            'UNIQUE INDEX <user_id_notice_id> (<user_id>, <notice_id>)',
         ], [
             'ENGINE' => 'InnoDB',
             'DEFAULT CHARSET' => 'utf8mb4',

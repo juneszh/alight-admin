@@ -22,7 +22,9 @@ use Alight\Utility;
 use Exception;
 use ErrorException;
 use InvalidArgumentException as GlobalInvalidArgumentException;
+use OutOfBoundsException;
 use PDOException;
+use Psr\SimpleCache\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 class Controller
@@ -183,8 +185,11 @@ class Controller
         Response::redirect(Admin::url('login'));
     }
 
-    /** 
+    /**
      * Console page
+     * 
+     * @throws OutOfBoundsException 
+     * @throws Exception 
      */
     public static function console()
     {
@@ -204,7 +209,12 @@ class Controller
     }
 
     /**
-     * user profile api in console page
+     * User profile api in console page
+     * 
+     * @throws Exception 
+     * @throws ErrorException 
+     * @throws InvalidArgumentException 
+     * @throws CacheException 
      */
     public static function consoleUser()
     {
@@ -240,7 +250,12 @@ class Controller
     }
 
     /**
-     * notice list api in console page
+     * Notice list api in console page
+     * 
+     * @throws Exception 
+     * @throws ErrorException 
+     * @throws InvalidArgumentException 
+     * @throws CacheException 
      */
     public static function consoleNoticeList()
     {
@@ -255,7 +270,14 @@ class Controller
     }
 
     /**
-     * notice details form page
+     * Notice details form page
+     * 
+     * @throws Exception 
+     * @throws ErrorException 
+     * @throws InvalidArgumentException 
+     * @throws OutOfBoundsException 
+     * @throws GlobalInvalidArgumentException 
+     * @throws PDOException 
      */
     public static function consoleNoticeForm()
     {
@@ -264,6 +286,26 @@ class Controller
         Form::field('create_time')->title('')->readonly();
 
         Form::render('admin_notice');
+    }
+
+    /**
+     * Mark notice as read api
+     * 
+     * @throws Exception 
+     * @throws ErrorException 
+     * @throws InvalidArgumentException 
+     * @throws CacheException 
+     * @throws PDOException 
+     */
+    public static function consoleNoticeRead()
+    {
+        $noticeId = Request::request('id', 0);
+
+        $userId = Auth::getUserId();
+
+        Model::addNoticeRead($userId, $noticeId);
+
+        Response::api(0);
     }
 
     /**

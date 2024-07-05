@@ -50,8 +50,8 @@ class Admin
         Route::get('captcha', [Controller::class, 'captcha'])->cache(0);
         Route::get('console', [Controller::class, 'console'])->auth();
         Route::get('console/user', [Controller::class, 'consoleUser'])->auth();
-        Route::get('console/notice/list', [Controller::class, 'consoleNoticeList'])->auth()->cache(60, ['private']);
-        Route::get('console/notice/form', [Controller::class, 'consoleNoticeForm'])->auth()->cache(86400, ['private']);
+        Route::get('console/notice/list', [Controller::class, 'consoleNoticeList'])->auth()->cache(60, 0);
+        Route::get('console/notice/form', [Controller::class, 'consoleNoticeForm'])->auth()->cache(86400, 0);
         Route::post('console/notice/read', [Controller::class, 'consoleNoticeRead'])->auth();
         Route::get('role/table', [Controller::class, 'roleTable'])->auth();
         Route::any('role/form', [Controller::class, 'roleForm'])->auth();

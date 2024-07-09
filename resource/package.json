@@ -15,7 +15,7 @@
     "@ant-design/plots": "^2.2.5",
     "@ant-design/pro-components": "^2.7.10",
     "@tinymce/tinymce-react": "^5.1.1",
-    "antd": "^5.19.0",
+    "antd": "^5.19.1",
     "fs-extra": "^11.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

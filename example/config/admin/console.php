@@ -4,23 +4,11 @@ declare(strict_types=1);
 
 use Alight\Admin\Console;
 
-Console::chart(Console::CHART_HEATMAP)->config([
-    'height' => 200,
-    'yField' => 'date',
-    'xField' => 'time',
-    'shape' => 'circle',
-    'colorField' => 'color',
-    'sizeField' => 'show',
-    'sizeRatio' => 0.5,
-    'reflect' => 'y',
-    'xAxis' => [
-        'position' => 'top',
-        'grid' => null,
-    ],
-    'tooltip' => [
-        'title' => 'title',
-        'domStyles' => [
-            'g2-tooltip-list' => ['display' => 'none']
-        ]
-    ],
-])->api('console')->grid(['xs' => 24, 'sm' => 12, 'md' => 16, 'lg' => 18, 'xxl' => 20]);
+// Console::chart(Console::CHART_LINE)->config([
+//     'height' => 200,
+//     'xField' => 'date',
+//     'yField' => 'value',
+//     'colorField' => 'category',
+//     'shapeField' => 'smooth',
+//     'sizeField' => 2,
+// ])->api('console/member')->grid(['xs' => 24, 'sm' => 24, 'md' => 24, 'lg' => 12, 'xxl' => 12]);

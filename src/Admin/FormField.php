@@ -42,29 +42,34 @@ class FormField
 
     /**
      * Common initialization config
-     *
+     * 
+     * @param bool $force
      */
-    private function init()
+    private function init(bool $force = false)
     {
         if ($this->subKey) {
-            $database = false;
-            if (Form::$config[$this->form][$this->key]['type'] === Form::TYPE_GROUP) {
-                $database = true;
-            } elseif (Form::$config[$this->form][$this->key]['type'] === Form::TYPE_FORM_SET) {
-                $this->subKey = $this->key . '[' . $this->subKey . ']';
-            }
+            if (!isset(Form::$config[$this->form][$this->key]['sub'][$this->subKey]) || $force) {
+                $database = false;
+                if (Form::$config[$this->form][$this->key]['type'] === Form::TYPE_GROUP) {
+                    $database = true;
+                } elseif (Form::$config[$this->form][$this->key]['type'] === Form::TYPE_FORM_SET) {
+                    $this->subKey = $this->key . '[' . $this->subKey . ']';
+                }
 
-            Form::$config[$this->form][$this->key]['sub'][$this->subKey] = [
-                'title' => $this->subKey,
-                'database' => $database,
-                'type' => Form::TYPE_TEXT,
-            ];
+                Form::$config[$this->form][$this->key]['sub'][$this->subKey] = [
+                    'title' => $this->subKey,
+                    'database' => $database,
+                    'type' => Form::TYPE_TEXT,
+                ];
+            }
         } else {
-            Form::$config[$this->form][$this->key] = [
-                'title' => $this->key,
-                'database' => true,
-                'type' => Form::TYPE_TEXT,
-            ];
+            if (!isset(Form::$config[$this->form][$this->key]) || $force) {
+                Form::$config[$this->form][$this->key] = [
+                    'title' => $this->key,
+                    'database' => true,
+                    'type' => Form::TYPE_TEXT,
+                ];
+            }
         }
     }
 
@@ -245,7 +250,7 @@ class FormField
      */
     public function reset()
     {
-        $this->init();
+        $this->init(true);
         return $this;
     }
 

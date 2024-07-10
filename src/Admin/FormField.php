@@ -60,6 +60,7 @@ class FormField
                     'title' => $this->subKey,
                     'database' => $database,
                     'type' => Form::TYPE_TEXT,
+                    'typeProps' => [],
                 ];
             }
         } else {
@@ -68,6 +69,7 @@ class FormField
                     'title' => $this->key,
                     'database' => true,
                     'type' => Form::TYPE_TEXT,
+                    'typeProps' => [],
                 ];
             }
         }
@@ -83,9 +85,17 @@ class FormField
     private function config(string $key, $value)
     {
         if ($this->subKey) {
-            Form::$config[$this->form][$this->key]['sub'][$this->subKey][$key] = $value;
+            if ($value === null) {
+                unset(Form::$config[$this->form][$this->key]['sub'][$this->subKey][$key]);
+            } else {
+                Form::$config[$this->form][$this->key]['sub'][$this->subKey][$key] = $value;
+            }
         } else {
-            Form::$config[$this->form][$this->key][$key] = $value;
+            if ($value === null) {
+                unset(Form::$config[$this->form][$this->key][$key]);
+            } else {
+                Form::$config[$this->form][$this->key][$key] = $value;
+            }
         }
     }
 
@@ -97,19 +107,19 @@ class FormField
      */
     public function confirm(string $key)
     {
-        $this->config(__FUNCTION__, $key);
+        $this->config(__FUNCTION__, $key ?: null);
         return $this;
     }
 
     /**
      * Whether to bind the database
      * 
-     * @param bool $value 
+     * @param bool $bool 
      * @return $this 
      */
-    public function database(bool $value)
+    public function database(bool $bool)
     {
-        $this->config(__FUNCTION__, $value);
+        $this->config(__FUNCTION__, $bool);
         return $this;
     }
 
@@ -140,11 +150,12 @@ class FormField
     /**
      * Set disabled
      *
+     * @param bool $bool 
      * @return $this
      */
-    public function disabled()
+    public function disabled(bool $bool = true)
     {
-        $this->config(__FUNCTION__, true);
+        $this->config(__FUNCTION__, $bool ?: null);
         return $this;
     }
 
@@ -160,7 +171,7 @@ class FormField
      */
     public function enum(array $keyValues)
     {
-        $this->config(__FUNCTION__, $keyValues);
+        $this->config(__FUNCTION__, $keyValues ?: null);
         return $this;
     }
 
@@ -172,74 +183,79 @@ class FormField
      */
     public function grid(array $value)
     {
-        $this->config(__FUNCTION__, $value);
+        $this->config(__FUNCTION__, $value ?: null);
         return $this;
     }
 
     /**
      * Hide field
      *
+     * @param bool $bool 
      * @return $this
      */
-    public function hide()
+    public function hide(bool $bool = true)
     {
-        $this->config(__FUNCTION__, true);
+        $this->config(__FUNCTION__, $bool ?: null);
         return $this;
     }
 
     /**
      * Set display conditions
      *
+     * @param array $keyValues
      * @return $this
      */
     public function if(array $keyValues)
     {
-        $this->config(__FUNCTION__, $keyValues);
+        $this->config(__FUNCTION__, $keyValues ?: null);
         return $this;
     }
 
     /**
      * Set placeholder
      *
-     * @param string $value key
+     * @param string $value
      * @return $this
      */
     public function placeholder(string $value)
     {
-        $this->config(__FUNCTION__, $value);
+        $this->config(__FUNCTION__, $value ?: null);
         return $this;
     }
 
     /**
      * Keep the raw data when submit (trim default)
      *
+     * @param bool $bool 
      * @return $this
      */
-    public function raw()
+    public function raw(bool $bool = true)
     {
-        $this->config(__FUNCTION__, true);
+        $this->config(__FUNCTION__, $bool ?: null);
         return $this;
     }
 
     /**
      * Set readonly
      *
+     * @param bool $bool 
      * @return $this
      */
-    public function readonly()
+    public function readonly(bool $bool = true)
     {
-        $this->config(__FUNCTION__, true);
+        $this->config(__FUNCTION__, $bool ?: null);
         return $this;
     }
 
     /**
      * Set required
      *
+     * @param bool $bool 
      * @return $this
      */
-    public function required()
+    public function required(bool $bool = true)
     {
-        $this->config(__FUNCTION__, true);
+        $this->config(__FUNCTION__, $bool ?: null);
         return $this;
     }
 
@@ -262,7 +278,7 @@ class FormField
      */
     public function role(array $roleValues)
     {
-        $this->config(__FUNCTION__, $roleValues);
+        $this->config(__FUNCTION__, $roleValues ?: null);
         return $this;
     }
 
@@ -276,7 +292,7 @@ class FormField
      */
     public function rules(array $keyValues)
     {
-        $this->config(__FUNCTION__, $keyValues);
+        $this->config(__FUNCTION__, $keyValues ?: null);
         return $this;
     }
 
@@ -303,7 +319,7 @@ class FormField
      */
     public function tooltip(string $value)
     {
-        $this->config(__FUNCTION__, $value);
+        $this->config(__FUNCTION__, $value ?: null);
         return $this;
     }
 
@@ -328,9 +344,8 @@ class FormField
             $this->database(false);
         }
 
-        if ($props) {
-            $this->config(__FUNCTION__ . 'Props', $props);
-        }
+        $this->config(__FUNCTION__ . 'Props', $props);
+
         return $this;
     }
 }

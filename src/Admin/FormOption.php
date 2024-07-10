@@ -28,6 +28,11 @@ class FormOption
     public function __construct(string $form)
     {
         $this->form = $form;
+
+        if (!isset(Form::$config[$this->form])) {
+            Form::$config[$this->form] = [];
+        }
+
         return $this;
     }
 

@@ -23,11 +23,26 @@ class TableButton
      * Define the configuration index
      * 
      * @param int $index 
+     * @param string $form 
      * @return $this 
      */
-    public function __construct(int $index)
+    public function __construct(int $index, string $form)
     {
         $this->index = $index;
+        
+        $defaultUrl = '';
+        if ($_SERVER['REQUEST_URI'] ?? '') {
+            $defaultUrl = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/')) . '/form';
+        }
+        
+        Table::$config['button'][$this->index] = [
+            'form' => $form,
+            'title' => $form,
+            'url' => $defaultUrl ?: Admin::url(),
+            'action' => 'form',
+            'place' => '_column',
+        ];
+
         return $this;
     }
 

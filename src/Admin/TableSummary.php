@@ -26,6 +26,11 @@ class TableSummary
     public function __construct(string $key)
     {
         $this->key = $key;
+
+        Table::$config['summary'][$this->key] = [
+            'precision' => 2,
+        ];
+
         return $this;
     }
 

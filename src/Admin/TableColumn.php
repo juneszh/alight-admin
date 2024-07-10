@@ -26,9 +26,11 @@ class TableColumn extends TableExpand
      */
     public function __construct(string $type, string $key)
     {
-        parent::__construct($type, $key);
         $this->type = $type;
         $this->key = $key;
+
+        parent::__construct($type, $key);
+
         return $this;
     }
 

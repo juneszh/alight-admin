@@ -65,11 +65,7 @@ class Console
     public static function chart(string $component): ConsoleChart
     {
         ++self::$index;
-        self::$config[self::$index] = [
-            'component' => $component,
-            'grid' => ['span' => 24],
-        ];
-
-        return new ConsoleChart(self::$index);
+        
+        return new ConsoleChart(self::$index, $component);
     }
 }

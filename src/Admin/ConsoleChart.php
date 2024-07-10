@@ -23,11 +23,18 @@ class ConsoleChart
      * Define the configuration index
      * 
      * @param int $index 
+     * @param string $component 
      * @return $this 
      */
-    public function __construct(int $index)
+    public function __construct(int $index, string $component)
     {
         $this->index = $index;
+        
+        Console::$config[$this->index] = [
+            'component' => $component,
+            'grid' => ['span' => 24],
+        ];
+
         return $this;
     }
 

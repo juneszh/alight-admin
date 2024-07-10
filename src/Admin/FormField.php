@@ -26,6 +26,7 @@ class FormField
      * 
      * @param string $form 
      * @param string $key 
+     * @param string $subKey 
      * @return $this 
      */
     public function __construct(string $form, string $key, string $subKey)
@@ -33,9 +34,47 @@ class FormField
         $this->form = $form;
         $this->key = $key;
         $this->subKey = $subKey;
+
+        $this->init();
+
         return $this;
     }
 
+    /**
+     * Common initialization config
+     *
+     */
+    private function init()
+    {
+        if ($this->subKey) {
+            $database = false;
+            if (Form::$config[$this->form][$this->key]['type'] === Form::TYPE_GROUP) {
+                $database = true;
+            } elseif (Form::$config[$this->form][$this->key]['type'] === Form::TYPE_FORM_SET) {
+                $this->subKey = $this->key . '[' . $this->subKey . ']';
+            }
+
+            Form::$config[$this->form][$this->key]['sub'][$this->subKey] = [
+                'title' => $this->subKey,
+                'database' => $database,
+                'type' => Form::TYPE_TEXT,
+            ];
+        } else {
+            Form::$config[$this->form][$this->key] = [
+                'title' => $this->key,
+                'database' => true,
+                'type' => Form::TYPE_TEXT,
+            ];
+        }
+    }
+
+    /**
+     * Common setting config values
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
     private function config(string $key, $value)
     {
         if ($this->subKey) {
@@ -196,6 +235,17 @@ class FormField
     public function required()
     {
         $this->config(__FUNCTION__, true);
+        return $this;
+    }
+
+    /**
+     * Reset this field to default settings
+     *
+     * @return $this
+     */
+    public function reset()
+    {
+        $this->init();
         return $this;
     }
 

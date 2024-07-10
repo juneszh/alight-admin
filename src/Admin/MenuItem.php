@@ -26,15 +26,35 @@ class MenuItem
      * 
      * @param int $index 
      * @param int $subIndex 
+     * @param string $title 
      * @return $this  
      */
-    public function __construct(int $index, int $subIndex)
+    public function __construct(int $index, int $subIndex, string $title)
     {
         $this->index = $index;
         $this->subIndex = $subIndex;
+
+        if ($this->subIndex) {
+            Menu::$config[$this->index]['sub'][$this->subIndex] = [
+                'title' => $title,
+                'locale' =>  substr($title, 0, 1) === ':' ? true : false,
+            ];
+        } else {
+            Menu::$config[$this->index] = [
+                'title' => $title
+            ];
+        }
+
         return $this;
     }
 
+    /**
+     * Common setting config values
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
     private function config(string $key, $value)
     {
         if ($this->subIndex) {

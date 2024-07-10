@@ -85,9 +85,6 @@ class Form
     {
         self::$form = $form;
         self::$key = '';
-        if (!isset(self::$config[$form])) {
-            self::$config[$form] = [];
-        }
 
         return new FormOption(self::$form);
     }
@@ -104,14 +101,10 @@ class Form
         if (!self::$form) {
             throw new Exception('Missing form definition.');
         }
+        
         self::$key = $key;
-        self::$config[self::$form][$key] = [
-            'title' => $key,
-            'database' => true,
-            'type' => self::TYPE_TEXT,
-        ];
 
-        return new FormField(self::$form, $key, '');
+        return new FormField(self::$form, self::$key, '');
     }
 
     /**
@@ -126,20 +119,10 @@ class Form
         if (!self::$form) {
             throw new Exception('Missing form definition.');
         }
+        
         if (!self::$key) {
             throw new Exception('Missing key definition.');
         }
-        $database = false;
-        if (self::$config[self::$form][self::$key]['type'] === self::TYPE_GROUP) {
-            $database = true;
-        } elseif (self::$config[self::$form][self::$key]['type'] === self::TYPE_FORM_SET) {
-            $subKey = self::$key . '[' . $subKey . ']';
-        }
-        self::$config[self::$form][self::$key]['sub'][$subKey] = [
-            'title' => $subKey,
-            'database' => $database,
-            'type' => self::TYPE_TEXT,
-        ];
 
         return new FormField(self::$form, self::$key, $subKey);
     }

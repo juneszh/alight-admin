@@ -39,11 +39,8 @@ class Menu
     {
         ++self::$index;
         self::$subIndex = 0;
-        self::$config[self::$index] = [
-            'title' => $title
-        ];
 
-        return new MenuItem(self::$index, self::$subIndex);
+        return new MenuItem(self::$index, self::$subIndex, $title);
     }
 
     /**
@@ -60,12 +57,8 @@ class Menu
         }
 
         ++self::$subIndex;
-        self::$config[self::$index]['sub'][self::$subIndex] = [
-            'title' => $title,
-            'locale' =>  substr($title, 0, 1) === ':' ? true : false,
-        ];
 
-        return new MenuItem(self::$index, self::$subIndex);
+        return new MenuItem(self::$index, self::$subIndex, $title);
     }
 
     /**

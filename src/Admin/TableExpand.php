@@ -28,6 +28,12 @@ class TableExpand
     {
         $this->type = $type;
         $this->key = $key;
+
+        Table::$config[$this->type][$this->key] = [
+            'title' => $this->key,
+            'database' => ($this->type === 'column' && $this->key !== '_column'),
+        ];
+
         return $this;
     }
 

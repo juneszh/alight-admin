@@ -26,6 +26,12 @@ class TableStatistic
     public function __construct(string $key)
     {
         $this->key = $key;
+
+        Table::$config['statistic'][$this->key] = [
+            'key' => $this->key,
+            'title' => $this->key,
+        ];
+
         return $this;
     }
 

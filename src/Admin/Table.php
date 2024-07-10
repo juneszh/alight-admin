@@ -103,18 +103,8 @@ class Table
     public static function button(string $form): TableButton
     {
         ++self::$buttonIndex;
-        $defaultUrl = '';
-        if ($_SERVER['REQUEST_URI'] ?? '') {
-            $defaultUrl = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/')) . '/form';
-        }
-        self::$config[__FUNCTION__][self::$buttonIndex] = [
-            'form' => $form,
-            'title' => $form,
-            'url' => $defaultUrl ?: Admin::url(),
-            'action' => 'form',
-            'place' => '_column',
-        ];
-        return new TableButton(self::$buttonIndex);
+
+        return new TableButton(self::$buttonIndex, $form);
     }
 
     /**
@@ -125,10 +115,6 @@ class Table
      */
     public static function column(string $key): TableColumn
     {
-        self::$config[__FUNCTION__][$key] = [
-            'title' => $key,
-            'database' => ($key !== '_column'),
-        ];
         return new TableColumn(__FUNCTION__, $key);
     }
 
@@ -140,9 +126,6 @@ class Table
      */
     public static function expand(string $key): TableExpand
     {
-        self::$config[__FUNCTION__][$key] = [
-            'title' => $key,
-        ];
         return new TableExpand(__FUNCTION__, $key);
     }
 
@@ -154,10 +137,6 @@ class Table
      */
     public static function summary(string $key): TableSummary
     {
-        self::$config[__FUNCTION__][$key] = [
-            'precision' => 2,
-        ];
-
         return new TableSummary($key);
     }
 
@@ -169,11 +148,6 @@ class Table
      */
     public static function statistic(string $key): TableStatistic
     {
-        self::$config[__FUNCTION__][$key] = [
-            'key' => $key,
-            'title' => $key,
-        ];
-
         return new TableStatistic($key);
     }
 

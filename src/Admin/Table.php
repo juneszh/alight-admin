@@ -45,11 +45,9 @@ class Table
         ALIGN_CENTER = 'center',
         ALIGN_RIGHT = 'right',
 
-        BUTTON_DEFAULT = 'default',
-        BUTTON_PRIMARY = 'primary',
-        BUTTON_DASHED = 'dashed',
-        BUTTON_TEXT = 'text',
-        BUTTON_LINK = 'link',
+        COLOR_DEFAULT = 'default',
+        COLOR_PRIMARY = 'primary',
+        COLOR_DANGER = 'danger',
 
         FIXED_LEFT = 'left',
         FIXED_RIGHT = 'right',
@@ -92,7 +90,14 @@ class Table
         TYPE_COLOR = 'color',
         TYPE_CASCADER = 'cascader',
         //extension
-        TYPE_QRCODE = 'qrcode';
+        TYPE_QRCODE = 'qrcode',
+
+        VARIANT_OUTLINED = 'outlined',
+        VARIANT_DASHED = 'dashed',
+        VARIANT_SOLID = 'solid',
+        VARIANT_FILLED = 'filled',
+        VARIANT_TEXT = 'text',
+        VARIANT_LINK = 'link';
 
     /**
      * Create a button

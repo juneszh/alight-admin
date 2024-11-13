@@ -381,7 +381,7 @@ class Controller
 
         Table::button('add')->title(':add')->toolbar();
         Table::button('edit')->title(':edit');
-        Table::button('password')->title(':password')->danger();
+        Table::button('password')->title(':password')->color(Table::COLOR_DANGER);
 
         Table::render('admin_user');
     }

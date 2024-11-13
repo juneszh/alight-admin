@@ -4,8 +4,8 @@ import { ExclamationCircleOutlined, ScanOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import { useResizeDetector } from 'react-resize-detector';
 import dayjs from 'dayjs';
-import global, { ajax, ifResult, localeInit, localeValue, notEmpty } from '../lib/Util';
-import ModelKit from '../lib/ModelKit';
+import global, { ajax, ifResult, localeInit, localeValue, notEmpty } from '../lib/Util.js';
+import ModelKit from '../lib/ModelKit.jsx';
 
 const Table = props => {
     localeInit(props.locale);
@@ -25,6 +25,8 @@ const Table = props => {
     });
 
     let tableSearch = false;
+
+    const buttonColor = ['default', 'primary', 'danger'];
 
     const columnsBuilder = (columnObj, expand) => {
         const columns = [];
@@ -148,13 +150,14 @@ const Table = props => {
                             for (const [buttonKey, buttonValue] of Object.entries(columnValue.button)) {
                                 if (ifResult(buttonValue.if, record)) {
                                     buttons.push(
-                                        <ConfigProvider key={buttonKey} theme={buttonValue.color ? { token: { colorPrimary: buttonValue.color } } : undefined}>
+                                        <ConfigProvider key={buttonKey} theme={buttonValue.color && !buttonColor.includes(buttonValue.color) ? { token: { colorPrimary: buttonValue.color } } : undefined}>
                                             <Button
-                                                danger={buttonValue.danger ?? undefined}
+                                                autoInsertSpace={false}
+                                                color={buttonValue.color ? (buttonColor.includes(buttonValue.color) ? buttonValue.color : 'primary') : 'default'}
                                                 href={buttonHref(buttonValue, record)}
                                                 onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, record); }}
                                                 size='small'
-                                                type={buttonValue.type ?? 'default'}
+                                                variant={buttonValue.variant ?? (buttonValue.color ? 'solid' : undefined)}
                                             >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
                                         </ConfigProvider>
                                     );
@@ -263,12 +266,13 @@ const Table = props => {
     if (notEmpty(global.config.toolbar.button)) {
         for (const [buttonKey, buttonValue] of Object.entries(global.config.toolbar.button)) {
             toolbarActions.push(
-                <ConfigProvider key={buttonKey} theme={buttonValue.color ? { token: { colorPrimary: buttonValue.color } } : undefined}>
+                <ConfigProvider key={buttonKey} theme={buttonValue.color && !buttonColor.includes(buttonValue.color) ? { token: { colorPrimary: buttonValue.color } } : undefined}>
                     <Button
                         danger={buttonValue.danger ?? undefined}
+                        color={buttonValue.color && buttonColor.includes(buttonValue.color) ? buttonValue.color : 'primary'}
                         href={buttonHref(buttonValue)}
                         onClick={(e) => { e.preventDefault(); buttonAction(buttonValue); }}
-                        type={buttonValue.type ?? 'primary'}
+                        variant={buttonValue.variant ?? 'solid'}
                     >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
                 </ConfigProvider>
             );
@@ -408,12 +412,12 @@ const Table = props => {
                     if (notEmpty(global.config.batch.button)) {
                         for (const [buttonKey, buttonValue] of Object.entries(global.config.batch.button)) {
                             buttons.push(
-                                <ConfigProvider key={buttonKey} theme={buttonValue.color ? { token: { colorPrimary: buttonValue.color } } : undefined}>
+                                <ConfigProvider key={buttonKey} theme={buttonValue.color && !buttonColor.includes(buttonValue.color) ? { token: { colorPrimary: buttonValue.color } } : undefined}>
                                     <Button
-                                        danger={buttonValue.danger ?? undefined}
+                                        color={buttonValue.color && buttonColor.includes(buttonValue.color) ? buttonValue.color : 'primary'}
                                         href={buttonHref(buttonValue, selectedRowKeys)}
                                         onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, selectedRowKeys); }}
-                                        type={buttonValue.type ?? 'primary'}
+                                        variant={buttonValue.variant ?? 'solid'}
                                     >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
                                 </ConfigProvider>
                             );

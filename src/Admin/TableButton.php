@@ -71,9 +71,9 @@ class TableButton
     }
 
     /**
-     * Set theme color
+     * Set color
      *
-     * @param string $color 
+     * @param string $color Table::COLOR_* or css format color
      * @return $this 
      */
     public function color(string $color)
@@ -96,17 +96,6 @@ class TableButton
             }
             Table::$config['button'][$this->index]['place'] = $columnKey;
         }
-        return $this;
-    }
-
-    /**
-     * Set danger
-     * 
-     * @return $this 
-     */
-    public function danger()
-    {
-        Table::$config['button'][$this->index][__FUNCTION__] = true;
         return $this;
     }
 
@@ -190,14 +179,14 @@ class TableButton
     }
 
     /**
-     * Set type
+     * Set variant
      *
-     * @param string $value Table::BUTTON_*
+     * @param string $value Table::VARIANT_*
      * @return TableButton
      * 
      * @see https://ant.design/components/button/
      */
-    public function type(string $value)
+    public function variant(string $value)
     {
         Table::$config['button'][$this->index][__FUNCTION__] = $value;
         return $this;

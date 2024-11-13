@@ -19,10 +19,6 @@ use Alight\Admin\Controller;
 use Alight\Admin\Model;
 use Composer\InstalledVersions;
 use Exception;
-use Symfony\Component\VarExporter\Exception\ExceptionInterface;
-use InvalidArgumentException;
-use OutOfBoundsException;
-use PDOException;
 use PharData;
 use Symfony\Component\VarExporter\VarExporter;
 
@@ -58,7 +54,7 @@ class Admin
         Route::get('user/table', [Controller::class, 'userTable'])->auth();
         Route::any('user/form', [Controller::class, 'userForm'])->auth();
         Route::post('upload', [Controller::class, 'upload'])->auth();
-        Route::get('result/{status:\d+}', [Controller::class, 'result']);
+        Route::get('result/{status}[/{message}]', [Controller::class, 'result']);
     }
 
     /**
@@ -127,11 +123,6 @@ class Admin
 
     /**
      * Initialize the configuration and database tables
-     * 
-     * @throws Exception 
-     * @throws ExceptionInterface 
-     * @throws InvalidArgumentException 
-     * @throws PDOException 
      */
     public static function install()
     {
@@ -145,8 +136,6 @@ class Admin
 
     /**
      * Insert the admin sample configuration to app.php
-     * 
-     * @throws ExceptionInterface 
      */
     private static function insertConfig()
     {
@@ -220,10 +209,6 @@ class Admin
 
     /**
      * Create the database tables for admin, and return the first Administrator account
-     * 
-     * @throws Exception 
-     * @throws InvalidArgumentException 
-     * @throws PDOException 
      */
     private static function createTable()
     {
@@ -464,7 +449,6 @@ class Admin
      * Get package version from composer
      * 
      * @return string|null 
-     * @throws OutOfBoundsException 
      */
     public static function version(): ?string
     {
@@ -476,7 +460,6 @@ class Admin
      * Get package install path from composer
      * 
      * @return null|string 
-     * @throws OutOfBoundsException 
      */
     public static function path(): ?string
     {
@@ -487,7 +470,6 @@ class Admin
      * Move the dist files to public
      * 
      * @param $source 
-     * @throws OutOfBoundsException 
      */
     public static function publish($source)
     {
@@ -507,8 +489,6 @@ class Admin
      * @param array $toUser 
      * @param int $interval 
      * @param null|string $uniqueId 
-     * @throws Exception 
-     * @throws PDOException 
      */
     public static function notice(string $title, string $content = '', array $toRole = [], array $toUser = [], int $interval = 60, ?string $uniqueId = null)
     {

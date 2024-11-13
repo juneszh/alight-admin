@@ -51,8 +51,8 @@ const Error = props => {
                 <Result
                     extra={global.config.status === 200 ? closeButton() : (global.config.status === 401 ? loginButton() : undefined)}
                     status={global.config.status === 200 ? 'success' : (global.config.status === 401 ? 403 : global.config.status)}
-                    subTitle={global.config.status === 200 ? undefined : localeValue(':status_' + global.config.status)}
-                    title={global.config.status === 200 ? localeValue(':success') : global.config.status}
+                    subTitle={global.config.status === 200 || typeof global.config.status === 'string' ? undefined : localeValue(':status_' + global.config.status)}
+                    title={global.config.status === 200 ? localeValue(':success') : (global.config.message ?? global.config.status)}
                 />
             </Col>
         </Row>

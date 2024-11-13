@@ -19,24 +19,12 @@ use Alight\Cache;
 use Alight\Request;
 use Alight\Response;
 use Alight\Utility;
-use Exception;
-use ErrorException;
-use InvalidArgumentException as GlobalInvalidArgumentException;
-use OutOfBoundsException;
-use PDOException;
-use Psr\SimpleCache\CacheException;
-use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 class Controller
 {
 
     /**
      * Home page
-     * 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
      */
     public static function index()
     {
@@ -52,22 +40,19 @@ class Controller
     /**
      * Result page
      * 
-     * @throws Exception 
+     * @param mixed $status 
+     * @param mixed $message 
      */
-    public static function result($status)
+    public static function result($status, $message = null)
     {
-        $status = in_array($status, [200, 401, 403, 404, 500]) ? (int) $status : 404;
+        $status = in_array($status, [200, 401, 403, 404, 500]) ? (int) $status : $status;
+        $message = $message ? urldecode($message) : null;
 
-        Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => Config::get('title'), 'script' => Admin::globalScript('Result', ['status' => $status])]);
+        Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => Config::get('title'), 'script' => Admin::globalScript('Result', ['status' => $status, 'message' => $message])]);
     }
 
     /**
      * Captcha image
-     * 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
      */
     public static function captcha()
     {
@@ -95,13 +80,6 @@ class Controller
 
     /**
      * Login page
-     * 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
-     * @throws GlobalInvalidArgumentException 
-     * @throws PDOException 
      */
     public static function login()
     {
@@ -172,11 +150,6 @@ class Controller
 
     /**
      * User logout
-     * 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
      */
     public static function logout()
     {
@@ -187,9 +160,6 @@ class Controller
 
     /**
      * Console page
-     * 
-     * @throws OutOfBoundsException 
-     * @throws Exception 
      */
     public static function console()
     {
@@ -210,11 +180,6 @@ class Controller
 
     /**
      * User profile api in console page
-     * 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws CacheException 
      */
     public static function consoleUser()
     {
@@ -251,11 +216,6 @@ class Controller
 
     /**
      * Notice list api in console page
-     * 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws CacheException 
      */
     public static function consoleNoticeList()
     {
@@ -271,13 +231,6 @@ class Controller
 
     /**
      * Notice details form page
-     * 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws OutOfBoundsException 
-     * @throws GlobalInvalidArgumentException 
-     * @throws PDOException 
      */
     public static function consoleNoticeForm()
     {
@@ -290,12 +243,6 @@ class Controller
 
     /**
      * Mark notice as read api
-     * 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws CacheException 
-     * @throws PDOException 
      */
     public static function consoleNoticeRead()
     {
@@ -310,13 +257,6 @@ class Controller
 
     /**
      * Role table page and api
-     * 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
-     * @throws GlobalInvalidArgumentException 
-     * @throws PDOException 
      */
     public static function roleTable()
     {
@@ -334,13 +274,6 @@ class Controller
 
     /**
      * Role form page and api
-     * 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
-     * @throws GlobalInvalidArgumentException 
-     * @throws PDOException 
      */
     public static function roleForm()
     {
@@ -356,13 +289,6 @@ class Controller
 
     /**
      * User table page and api
-     * 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
-     * @throws GlobalInvalidArgumentException 
-     * @throws PDOException 
      */
     public static function userTable()
     {
@@ -388,13 +314,6 @@ class Controller
 
     /**
      * User form page and api
-     * 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
-     * @throws GlobalInvalidArgumentException 
-     * @throws PDOException 
      */
     public static function userForm()
     {
@@ -439,8 +358,6 @@ class Controller
 
     /**
      * File upload api
-     * 
-     * @throws Exception 
      */
     public static function upload()
     {

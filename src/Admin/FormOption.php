@@ -42,7 +42,6 @@ class FormOption
      * @param string $form 
      * @param array $fields 
      * @return $this 
-     * @throws Exception 
      */
     public function copy(string $form, array $fields = [])
     {

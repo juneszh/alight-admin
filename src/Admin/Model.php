@@ -15,12 +15,6 @@ namespace Alight\Admin;
 
 use Alight\Cache;
 use Alight\Database;
-use Exception;
-use ErrorException;
-use InvalidArgumentException;
-use PDOException;
-use Psr\SimpleCache\CacheException;
-use Symfony\Component\Cache\Exception\InvalidArgumentException as ExceptionInvalidArgumentException;
 use Symfony\Contracts\Cache\ItemInterface;
 
 class Model
@@ -33,10 +27,6 @@ class Model
      * @param null|int $ttl 
      * @param array $where 
      * @return array 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws ExceptionInvalidArgumentException 
-     * @throws CacheException 
      */
     public static function getCacheData(string $table, ?int $id = null, ?int $ttl = 86400, $where = []): array
     {
@@ -65,10 +55,6 @@ class Model
      * Get role list
      * 
      * @return array 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws ExceptionInvalidArgumentException 
-     * @throws CacheException 
      */
     public static function getRoleList(): array
     {
@@ -80,10 +66,6 @@ class Model
      * 
      * @param string $account 
      * @return int 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws ExceptionInvalidArgumentException 
-     * @throws ExceptionInvalidArgumentException 
      */
     public static function getUserIdByAccount(string $account): int
     {
@@ -107,10 +89,6 @@ class Model
      * 
      * @param string $key 
      * @return int 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws ExceptionInvalidArgumentException 
-     * @throws ExceptionInvalidArgumentException 
      */
     public static function getUserIdByKey(string $key): int
     {
@@ -134,10 +112,6 @@ class Model
      * 
      * @param int $id 
      * @return array 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws ExceptionInvalidArgumentException 
-     * @throws ExceptionInvalidArgumentException 
      */
     public static function getUserInfo(int $id): array
     {
@@ -155,8 +129,6 @@ class Model
      * @param int $interval 
      * @param null|string $uniqueId 
      * @return array 
-     * @throws Exception 
-     * @throws PDOException 
      */
     public static function addNotice(string $title, string $content = '', array $toRole = [], array $toUser = [], int $interval = 60, ?string $uniqueId = null): array
     {
@@ -202,10 +174,6 @@ class Model
      * @param int $page 
      * @param int $limit 
      * @return array 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws ExceptionInvalidArgumentException 
-     * @throws CacheException 
      */
     public static function getNoticeList(int $userId, int $roleId, int $page = 1, int $limit = 4): array
     {
@@ -243,10 +211,6 @@ class Model
      * 
      * @param int $userId 
      * @return array 
-     * @throws Exception 
-     * @throws ExceptionInvalidArgumentException 
-     * @throws ErrorException 
-     * @throws CacheException 
      */
     public static function getNoticeReadList(int $userId): array
     {
@@ -270,11 +234,6 @@ class Model
      * 
      * @param int $userId 
      * @param int $noticeId 
-     * @throws Exception 
-     * @throws ExceptionInvalidArgumentException 
-     * @throws ErrorException 
-     * @throws CacheException 
-     * @throws PDOException 
      */
     public static function addNoticeRead(int $userId, int $noticeId)
     {
@@ -298,9 +257,6 @@ class Model
      * @param string $table 
      * @param array $search 
      * @return int
-     * @throws Exception 
-     * @throws InvalidArgumentException 
-     * @throws PDOException 
      */
     public static function tableCount(string $table, array $search = []): int
     {
@@ -321,9 +277,6 @@ class Model
      * @param string $order 
      * @param string $sort 
      * @return array
-     * @throws Exception 
-     * @throws InvalidArgumentException 
-     * @throws PDOException 
      */
     public static function tableSelect(string $table, array $field, array $search = [], int $page = 1, int $limit = 20, string $order = 'id', string $sort = 'asc'): array
     {
@@ -361,11 +314,6 @@ class Model
      * @param string $table 
      * @param array $data 
      * @return int 
-     * @throws Exception 
-     * @throws PDOException 
-     * @throws ErrorException 
-     * @throws ExceptionInvalidArgumentException 
-     * @throws ExceptionInvalidArgumentException 
      */
     public static function formInsert(string $table, array $data): int
     {
@@ -393,7 +341,6 @@ class Model
      * @param string $table 
      * @param int $id 
      * @return array 
-     * @throws Exception 
      */
     public static function formGet(string $table, int $id): array
     {
@@ -410,13 +357,7 @@ class Model
      * @param string $table 
      * @param array $data 
      * @param int $id 
-     * @return int 
-     * @throws Exception 
-     * @throws InvalidArgumentException 
-     * @throws PDOException 
-     * @throws ErrorException 
-     * @throws ExceptionInvalidArgumentException 
-     * @throws ExceptionInvalidArgumentException 
+     * @return int  
      */
     public static function formUpdate(string $table, array $data, int $id): int
     {
@@ -445,12 +386,6 @@ class Model
      * @param array $data 
      * @param array $ids 
      * @return array 
-     * @throws Exception 
-     * @throws InvalidArgumentException 
-     * @throws PDOException 
-     * @throws ErrorException 
-     * @throws ExceptionInvalidArgumentException 
-     * @throws ExceptionInvalidArgumentException 
      */
     public static function formUpdateMultiple(string $table, array $data, array $ids): array
     {

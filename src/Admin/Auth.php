@@ -18,9 +18,6 @@ use Alight\Request;
 use Alight\Response;
 use Alight\Router;
 use Alight\Utility;
-use Exception;
-use ErrorException;
-use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 class Auth
 {
@@ -31,10 +28,6 @@ class Auth
      * Verify authorization
      * 
      * @return int 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
      */
     public static function verify(): int
     {
@@ -95,10 +88,6 @@ class Auth
      * Get authorized user id
      * 
      * @return int 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
      */
     public static function getUserId(): int
     {
@@ -129,10 +118,6 @@ class Auth
      * 
      * @param int $userId 
      * @param bool $renew 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
      */
     public static function store(int $userId, bool $renew = false)
     {
@@ -159,10 +144,10 @@ class Auth
         $cache6->save($cacheItem);
 
         $cookieOptions = [
-            'expires' => time() + $cacheTime, 
-            'path' => '/' . Config::get('path'), 
-            'domain' => '.' . Request::host(), 
-            'httponly' => true, 
+            'expires' => time() + $cacheTime,
+            'path' => '/' . Config::get('path'),
+            'domain' => '.' . Request::host(),
+            'httponly' => true,
             'samesite' => 'Strict',
         ];
         setcookie(self::COOKIE_AUTH, $auth, $cookieOptions);
@@ -170,12 +155,7 @@ class Auth
     }
 
     /**
-     * Clear login session
-     * 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
+     * Clear login session 
      */
     public static function clear()
     {
@@ -187,10 +167,10 @@ class Auth
         }
 
         $cookieOptions = [
-            'expires' => 0, 
-            'path' => '/' . Config::get('path'), 
-            'domain' => '.' . Request::host(), 
-            'httponly' => true, 
+            'expires' => 0,
+            'path' => '/' . Config::get('path'),
+            'domain' => '.' . Request::host(),
+            'httponly' => true,
             'samesite' => 'Strict',
         ];
         setcookie(self::COOKIE_AUTH, '', $cookieOptions);
@@ -202,10 +182,6 @@ class Auth
      * 
      * @param array $roleIds 
      * @return int 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
      */
     public static function checkRole(array $roleIds)
     {

@@ -14,9 +14,7 @@ declare(strict_types=1);
 namespace Alight\Admin;
 
 use Alight\App;
-use ErrorException;
 use Exception;
-use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 class Menu
 {
@@ -48,7 +46,6 @@ class Menu
      * 
      * @param string $title 
      * @return MenuItem 
-     * @throws Exception 
      */
     public static function subItem(string $title): MenuItem
     {
@@ -66,10 +63,6 @@ class Menu
      * 
      * @param int $roleId 
      * @return array 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
      */
     public static function build(int $roleId): array
     {

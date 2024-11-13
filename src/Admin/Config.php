@@ -36,7 +36,6 @@ class Config
      * Merge default configuration and user configuration
      * 
      * @param string $key 
-     * @throws Exception 
      */
     public static function init(string $key = '')
     {

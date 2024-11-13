@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Alight\Admin;
 
-use Exception;
-
 class FormField
 {
     private string $form;

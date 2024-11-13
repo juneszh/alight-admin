@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Alight\Admin;
 
 use Alight\Admin;
-use Exception;
 
 class MenuItem
 {
@@ -68,8 +67,7 @@ class MenuItem
      * Set click action
      *
      * @param string $value Menu::ACTION_*
-     * @return $this  
-     * @throws Exception 
+     * @return $this
      */
     public function action(string $value)
     {

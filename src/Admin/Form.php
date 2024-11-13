@@ -17,11 +17,7 @@ use Alight\Admin;
 use Alight\Request;
 use Alight\Response;
 use Alight\Utility;
-use ErrorException;
 use Exception;
-use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use InvalidArgumentException as GlobalInvalidArgumentException;
-use PDOException;
 
 class Form
 {
@@ -94,7 +90,6 @@ class Form
      * 
      * @param string $key 
      * @return FormField 
-     * @throws Exception 
      */
     public static function field(string $key): FormField
     {
@@ -112,7 +107,6 @@ class Form
      * 
      * @param string $subKey 
      * @return FormField 
-     * @throws Exception 
      */
     public static function subField(string $subKey): FormField
     {
@@ -132,12 +126,6 @@ class Form
      * 
      * @param string $table 
      * @param null|callable $callback function(string $event, array &$data){} 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
-     * @throws GlobalInvalidArgumentException 
-     * @throws PDOException 
      */
     public static function render(string $table, ?callable $callback = null)
     {
@@ -225,7 +213,6 @@ class Form
      * @param array $field 
      * @param array $data 
      * @return array 
-     * @throws Exception 
      */
     private static function dataFilter(array $field, array $data): array
     {

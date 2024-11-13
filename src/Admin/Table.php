@@ -17,11 +17,6 @@ use Alight\Admin;
 use Alight\Request;
 use Alight\Response;
 use ArrayObject;
-use Exception;
-use ErrorException;
-use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use InvalidArgumentException as GlobalInvalidArgumentException;
-use PDOException;
 
 class Table
 {
@@ -161,12 +156,6 @@ class Table
      * 
      * @param string $table 
      * @param null|callable $callback function(string $event, array &$data){} 
-     * @throws Exception 
-     * @throws ErrorException 
-     * @throws InvalidArgumentException 
-     * @throws InvalidArgumentException 
-     * @throws GlobalInvalidArgumentException 
-     * @throws PDOException 
      */
     public static function render(string $table, ?callable $callback = null)
     {

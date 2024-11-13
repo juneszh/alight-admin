@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { Modal } from 'antd';
-import { localeValue } from './Util';
+import { localeValue } from './Util.js';
 
 
 let modalCallback = {};

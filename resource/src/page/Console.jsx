@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Avatar, Card, Col, List, Modal, Row, Typography } from 'antd';
 import { InfoCircleOutlined, EditOutlined, ExclamationCircleOutlined, UnlockOutlined, PoweroffOutlined } from '@ant-design/icons';
 import { Area, Bar, Base, BidirectionalBar, Box, Bullet, CirclePacking, Column, DualAxes, Funnel, Gauge, Heatmap, Histogram, Line, Liquid, Mix, Pie, Radar, RadialBar, Rose, Sankey, Scatter, Stock, Sunburst, Tiny, Treemap, Venn, Violin, Waterfall, WordCloud } from '@ant-design/plots';
-import global, { ajax, localeInit, localeValue, notEmpty, redirect } from '../lib/Util';
-import ModelKit from '../lib/ModelKit';
+import global, { ajax, localeInit, localeValue, notEmpty, redirect } from '../lib/Util.js';
+import ModelKit from '../lib/ModelKit.jsx';
 import dayjs from 'dayjs';
 
 const { Text } = Typography;

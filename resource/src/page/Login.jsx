@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button, Checkbox, Col, Form, Input, Row } from 'antd';
 import { LockOutlined, SafetyOutlined, UserOutlined } from '@ant-design/icons';
-import global, { ajax, localeInit, localeValue } from '../lib/Util';
+import global, { ajax, localeInit, localeValue } from '../lib/Util.js';
 
 const Login = props => {
     localeInit(props.locale);

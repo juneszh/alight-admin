@@ -3,7 +3,7 @@ import { message } from 'antd';
 import { BetaSchemaForm, ProFormUploadDragger } from '@ant-design/pro-components';
 import { useResizeDetector } from 'react-resize-detector';
 import { Editor } from '@tinymce/tinymce-react';
-import global, { ajax, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util';
+import global, { ajax, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util.js';
 import { isString } from 'antd/es/button';
 
 const Form = props => {

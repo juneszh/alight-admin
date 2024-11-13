@@ -92,7 +92,7 @@ const ifResult = (ifKeyValue, values) => {
 const inIframe = () => {
     try {
         return window.self !== window.top;
-    } catch (e) {
+    } catch {
         return false;
     }
 };

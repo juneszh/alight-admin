@@ -179,6 +179,18 @@ class TableButton
     }
 
     /**
+     * Set url
+     * 
+     * @param string $value 
+     * @return $this 
+     */
+    public function url(string $value)
+    {
+        Table::$config['button'][$this->index][__FUNCTION__] = Admin::url($value);
+        return $this;
+    }
+
+    /**
      * Set variant
      *
      * @param string $value Table::VARIANT_*
@@ -189,18 +201,6 @@ class TableButton
     public function variant(string $value)
     {
         Table::$config['button'][$this->index][__FUNCTION__] = $value;
-        return $this;
-    }
-
-    /**
-     * Set url
-     * 
-     * @param string $value 
-     * @return $this 
-     */
-    public function url(string $value)
-    {
-        Table::$config['button'][$this->index][__FUNCTION__] = Admin::url($value);
         return $this;
     }
 }

@@ -96,7 +96,7 @@ class Form
         if (!self::$form) {
             throw new Exception('Missing form definition.');
         }
-        
+
         self::$key = $key;
 
         return new FormField(self::$form, self::$key, '');
@@ -113,7 +113,7 @@ class Form
         if (!self::$form) {
             throw new Exception('Missing form definition.');
         }
-        
+
         if (!self::$key) {
             throw new Exception('Missing key definition.');
         }
@@ -155,6 +155,10 @@ class Form
                 $value = Model::formGet($table, $_id);
             }
             foreach ($field as $k => $v) {
+                if (isset($field[$k]['value']) && $field[$k]['value'] === false) {
+                    unset($field[$k]['value']);
+                    continue;
+                }
                 if ($value && isset($value[$k]) && $field[$k]['type'] !== self::TYPE_PASSWORD) {
                     $field[$k]['value'] = $value[$k];
                 }

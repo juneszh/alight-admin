@@ -124,7 +124,7 @@ class FormField
     /**
      * Set default
      *
-     * @param mixed $value
+     * @param mixed $value clears the value when set to false
      * @return $this
      */
     public function default($value)

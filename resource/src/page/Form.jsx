@@ -193,9 +193,7 @@ const Form = props => {
                         column.renderFormItem = (schema, config, form) => richTextRender(schema, form);
                     } else if (fieldValue.type === 'color') {
                         column.fieldProps.showText = true;
-                        column.fieldProps.defaultFormat = 'rgb';
                         column.fieldProps.style = { display: 'inline-flex' };
-                        column.fieldProps.presets = false;
                     }
 
                     if (fieldValue.placeholder) {
@@ -206,12 +204,8 @@ const Form = props => {
                         column.fieldProps.disabled = fieldValue.disabled;
                     }
 
-                    if (['money', 'textarea', 'date', 'dateTime', 'dateWeek', 'dateMonth', 'dateQuarter', 'dateYear', 'dateRange', 'dateTimeRange', 'time', 'timeRange', 'progress', 'percent', 'digit', 'digitRange', 'code', 'fromNow', 'jsonCode'].indexOf(fieldValue.type) !== -1) {
-                        column.fieldProps.style = { width: '100%' };
-                    }
-
                     if (fieldValue.typeProps) {
-                        column.fieldProps = fieldValue.typeProps;
+                        column.fieldProps = { ...column.fieldProps, ...fieldValue.typeProps };
                     }
 
                     if (fieldValue.confirm) {
@@ -299,7 +293,7 @@ const Form = props => {
                                     }
                                 } else if (global.config.field[key].type === 'color') {
                                     if (typeof value !== 'string') {
-                                        values[key] = value.toRgbString();
+                                        values[key] = value.toCssString();
                                     }
                                 }
                             }

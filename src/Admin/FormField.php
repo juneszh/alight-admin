@@ -58,7 +58,6 @@ class FormField
                     'title' => $this->subKey,
                     'database' => $database,
                     'type' => Form::TYPE_TEXT,
-                    'typeProps' => [],
                 ];
             }
         } else {
@@ -67,7 +66,6 @@ class FormField
                     'title' => $this->key,
                     'database' => true,
                     'type' => Form::TYPE_TEXT,
-                    'typeProps' => [],
                 ];
             }
         }
@@ -325,14 +323,14 @@ class FormField
      * Set field (ProComponents) valueType
      *
      * @param string $value Form::TYPE_*
-     * @param array $props Props for Ant Design components. e.g. multiple select:['mode' => 'multiple'] or upload:['action' => 'api url', 'multiple' => true, 'data' => ['path' => 'test'], 'accept' => 'image/*,.pdf', 'basicUrl' => 'https://alight.cc']
+     * @param null|array $props Props for Ant Design components. e.g. multiple select:['mode' => 'multiple'] or upload:['action' => 'api url', 'multiple' => true, 'data' => ['path' => 'test'], 'accept' => 'image/*,.pdf', 'basicUrl' => 'https://alight.cc']
      * @return $this
      * 
      * @see https://procomponents.ant.design/en-US/components/schema#valuetype-lists
      * @see https://ant.design/components/overview/
      * @see https://ant.design/components/upload/#API
      */
-    public function type(string $valueType, array $props = [])
+    public function type(string $valueType, ?array $props = null)
     {
         $this->config(__FUNCTION__, $valueType);
 

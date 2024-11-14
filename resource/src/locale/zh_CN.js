@@ -1,6 +1,6 @@
 const i18n = {
     // Tinymce locale file name
-    ':tinymce': 'zh-Hans',
+    ':tinymce': 'zh_CN',
     // Error
     ':status_400': '错误的请求',
     ':status_401': '缺少登录授权',

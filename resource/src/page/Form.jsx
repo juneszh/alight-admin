@@ -53,33 +53,35 @@ const Form = props => {
 
     // https://www.tiny.cloud/docs/tinymce/6
     const richTextRender = (schema, form) => (
-        <Editor
-            disabled={(schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined}
-            init={{
-                branding: false,
-                contextmenu: 'image charmap emoticons visualblocks code fullscreen',
-                contextmenu_never_use_native: true,
-                convert_urls: false,
-                fullscreen_native: true,
-                images_upload_url: global.path + '/upload?' + new URLSearchParams(schema.fieldProps.data).toString(),
-                language: localeValue(':tinymce') ? localeValue(':tinymce') : undefined,
-                max_height: 600,
-                menubar: schema.proFieldProps.readonly ? false : 'edit view insert format table',
-                plugins: [
-                    'advlist', 'anchor', 'autolink', 'autoresize', 'charmap', 'code',
-                    'emoticons', 'fullscreen', 'image', 'insertdatetime', 'link', 'lists',
-                    'quickbars', 'searchreplace', 'table', 'visualblocks',
-                ],
-                promotion: false,
-                quickbars_insert_toolbar: false,
-                quickbars_selection_toolbar: true,
-                toolbar: false,
-                ...schema.fieldProps
-            }}
-            initialValue={schema.initialValue}
-            onEditorChange={(newValue) => form ? form.setFieldsValue({ [schema.key]: newValue }) : false}
-            tinymceScriptSrc='/alight-admin/tinymce/tinymce.min.js'
-        />
+        <>
+            <Editor
+                disabled={(schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined}
+                init={{
+                    branding: false,
+                    contextmenu: 'image charmap emoticons visualblocks code fullscreen',
+                    contextmenu_never_use_native: true,
+                    convert_urls: false,
+                    fullscreen_native: true,
+                    images_upload_url: global.path + '/upload?' + new URLSearchParams(schema.fieldProps.data).toString(),
+                    language: localeValue(':tinymce') ? localeValue(':tinymce') : undefined,
+                    max_height: 600,
+                    menubar: schema.proFieldProps.readonly ? false : 'edit view insert format table',
+                    plugins: [
+                        'advlist', 'anchor', 'autolink', 'autoresize', 'charmap', 'code',
+                        'emoticons', 'fullscreen', 'image', 'insertdatetime', 'link', 'lists',
+                        'quickbars', 'searchreplace', 'table', 'visualblocks',
+                    ],
+                    promotion: false,
+                    quickbars_insert_toolbar: false,
+                    quickbars_selection_toolbar: true,
+                    toolbar: false,
+                    ...schema.fieldProps
+                }}
+                initialValue={schema.initialValue}
+                onEditorChange={(newValue) => form ? form.setFieldsValue({ [schema.key]: newValue }) : false}
+                tinymceScriptSrc='/alight-admin/tinymce/tinymce.min.js'
+            />
+        </>
     );
 
     let layout = 'horizontal';

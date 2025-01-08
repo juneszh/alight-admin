@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button, Card, Col, ConfigProvider, message, Modal, Popover, QRCode, Row, Space, Statistic } from 'antd';
+import { Button, Card, Col, message, Modal, Popover, QRCode, Row, Space, Statistic } from 'antd';
 import { ExclamationCircleOutlined, ScanOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import { useResizeDetector } from 'react-resize-detector';
@@ -25,8 +25,6 @@ const Table = props => {
     });
 
     let tableSearch = false;
-
-    const buttonColor = ['default', 'primary', 'danger'];
 
     const columnsBuilder = (columnObj, expand) => {
         const columns = [];
@@ -150,16 +148,15 @@ const Table = props => {
                             for (const [buttonKey, buttonValue] of Object.entries(columnValue.button)) {
                                 if (ifResult(buttonValue.if, record)) {
                                     buttons.push(
-                                        <ConfigProvider key={buttonKey} theme={buttonValue.color && !buttonColor.includes(buttonValue.color) ? { token: { colorPrimary: buttonValue.color } } : undefined}>
-                                            <Button
-                                                autoInsertSpace={false}
-                                                color={buttonValue.color ? (buttonColor.includes(buttonValue.color) ? buttonValue.color : 'primary') : 'default'}
-                                                href={buttonHref(buttonValue, record)}
-                                                onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, record); }}
-                                                size='small'
-                                                variant={buttonValue.variant ?? (buttonValue.color ? 'solid' : undefined)}
-                                            >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
-                                        </ConfigProvider>
+                                        <Button
+                                            autoInsertSpace={false}
+                                            color={buttonValue.color ?? 'default'}
+                                            href={buttonHref(buttonValue, record)}
+                                            key={buttonKey}
+                                            onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, record); }}
+                                            size='small'
+                                            variant={buttonValue.variant ?? (buttonValue.color ? 'solid' : undefined)}
+                                        >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
                                     );
                                 }
                             }
@@ -266,15 +263,13 @@ const Table = props => {
     if (notEmpty(global.config.toolbar.button)) {
         for (const [buttonKey, buttonValue] of Object.entries(global.config.toolbar.button)) {
             toolbarActions.push(
-                <ConfigProvider key={buttonKey} theme={buttonValue.color && !buttonColor.includes(buttonValue.color) ? { token: { colorPrimary: buttonValue.color } } : undefined}>
-                    <Button
-                        danger={buttonValue.danger ?? undefined}
-                        color={buttonValue.color && buttonColor.includes(buttonValue.color) ? buttonValue.color : 'primary'}
-                        href={buttonHref(buttonValue)}
-                        onClick={(e) => { e.preventDefault(); buttonAction(buttonValue); }}
-                        variant={buttonValue.variant ?? 'solid'}
-                    >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
-                </ConfigProvider>
+                <Button
+                    color={buttonValue.color ?? 'primary'}
+                    href={buttonHref(buttonValue)}
+                    key={buttonKey}
+                    onClick={(e) => { e.preventDefault(); buttonAction(buttonValue); }}
+                    variant={buttonValue.variant ?? 'solid'}
+                >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
             );
         }
     }
@@ -412,14 +407,13 @@ const Table = props => {
                     if (notEmpty(global.config.batch.button)) {
                         for (const [buttonKey, buttonValue] of Object.entries(global.config.batch.button)) {
                             buttons.push(
-                                <ConfigProvider key={buttonKey} theme={buttonValue.color && !buttonColor.includes(buttonValue.color) ? { token: { colorPrimary: buttonValue.color } } : undefined}>
-                                    <Button
-                                        color={buttonValue.color && buttonColor.includes(buttonValue.color) ? buttonValue.color : 'primary'}
-                                        href={buttonHref(buttonValue, selectedRowKeys)}
-                                        onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, selectedRowKeys); }}
-                                        variant={buttonValue.variant ?? 'solid'}
-                                    >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
-                                </ConfigProvider>
+                                <Button
+                                    color={buttonValue.color ?? 'primary'}
+                                    href={buttonHref(buttonValue, selectedRowKeys)}
+                                    key={buttonKey}
+                                    onClick={(e) => { e.preventDefault(); buttonAction(buttonValue, selectedRowKeys); }}
+                                    variant={buttonValue.variant ?? 'solid'}
+                                >{buttonValue.locale ? localeValue(buttonValue.title) : buttonValue.title}</Button>
                             );
                         }
                     }

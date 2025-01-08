@@ -73,7 +73,7 @@ class TableButton
     /**
      * Set color
      *
-     * @param string $color Table::COLOR_* or css format color
+     * @param string $color Table::COLOR_*
      * @return $this 
      */
     public function color(string $color)

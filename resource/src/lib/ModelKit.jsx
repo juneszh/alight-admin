@@ -1,5 +1,6 @@
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { Modal } from 'antd';
+import Draggable from 'react-draggable';
 import { localeValue } from './Util.js';
 
 
@@ -8,11 +9,19 @@ let modalCallback = {};
 const ModelKit = forwardRef((props, ref) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalHeight, setModalHeight] = useState(400);
-    const [modalWidth, setModalWidth] = useState(800);
+    const [modalWidth, setModalWidth] = useState(816);
     const [modalConfig, setModalConfig] = useState({ title: '', url: '' });
     const [modalFooter, setModalFooter] = useState(null);
     const iframeRef = useRef();
     const [lastModal, setLastModal] = useState('form');
+    const [draggleDisabled, setDraggleDisabled] = useState(true);
+    const [draggleBounds, setDraggleBounds] = useState({
+        left: 0,
+        top: 0,
+        bottom: 0,
+        right: 0,
+    });
+    const draggleRef = useRef(null);
 
     useImperativeHandle(ref, () => ({
         modalShow,
@@ -29,7 +38,7 @@ const ModelKit = forwardRef((props, ref) => {
         if (lastModal !== button.action) {
             if (button.action === 'form') {
                 setModalHeight(400);
-                setModalWidth(800);
+                setModalWidth(816);
             } else {
                 setModalHeight('100vh');
                 setModalWidth('100vw');
@@ -88,11 +97,47 @@ const ModelKit = forwardRef((props, ref) => {
         iframeRef.current?.contentWindow.postMessage({ submit: true });
     }
 
+
+    const draggleStart = (_event, uiData) => {
+        const { clientWidth, clientHeight } = window.document.documentElement;
+        const targetRect = draggleRef.current?.getBoundingClientRect();
+        if (!targetRect) {
+            return;
+        }
+        setDraggleBounds({
+            left: -targetRect.left + uiData.x,
+            right: clientWidth - (targetRect.right - uiData.x),
+            top: -targetRect.top + uiData.y,
+            bottom: clientHeight - (targetRect.bottom - uiData.y),
+        });
+    };
+
     return (
-        <Modal title={modalConfig.title}
+        <Modal
+            title={<div
+                style={{ width: '100%', cursor: 'move' }}
+                onMouseOver={() => {
+                    if (draggleDisabled) {
+                        setDraggleDisabled(false);
+                    }
+                }}
+                onMouseOut={() => {
+                    setDraggleDisabled(true);
+                }}
+                onFocus={() => { }}
+                onBlur={() => { }}
+            >{modalConfig.title}</div>}
             centered
             destroyOnClose={true}
             footer={modalFooter}
+            modalRender={(modal) => (
+                <Draggable
+                    disabled={draggleDisabled}
+                    bounds={draggleBounds}
+                    nodeRef={draggleRef}
+                    onStart={(event, uiData) => draggleStart(event, uiData)}
+                ><div ref={draggleRef}>{modal}</div></Draggable>
+            )}
             onCancel={modalHide}
             onOk={modalSubmit}
             open={modalOpen}

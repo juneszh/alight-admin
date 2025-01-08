@@ -271,7 +271,7 @@ const Form = props => {
 
     useEffect(() => {
         if (inIframe() && rootSize.height) {
-            postMessage({ size: { height: rootSize.height, width: 800 } });
+            postMessage({ size: { height: rootSize.height, width: 816 } });
         }
     }, [rootSize.height]);
 

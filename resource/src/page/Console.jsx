@@ -217,7 +217,7 @@ const Console = props => {
     }, []);
 
     return (
-        <div style={{ backgroundColor: '#f0f2f5', height: 'auto', minHeight: '100vh', padding: 24 }}>
+        <div style={{ backgroundColor: '#f0f2f5', height: 'auto', minHeight: '100vh', padding: 24, boxSizing: 'border-box' }}>
             <Row gutter={[16, 16]}>
                 <Col xs={24} sm={24} md={8} lg={6} xxl={4}>
                     <Card

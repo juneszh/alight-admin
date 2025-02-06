@@ -8,4 +8,7 @@ export default defineConfig({
         manifest: true,
     },
     plugins: [react()],
+    server: {
+        cors: true,
+    },
 })

@@ -369,6 +369,7 @@ class Controller
 
         $fileName = '';
         $now = time();
+        $path = str_replace('..', '', $path);
         $filePath = 'upload/' . ($path ?: 'file') . '/' . date('Y', $now) . '/' . date('md', $now);
         $localPath = App::root('public' . '/' . $filePath);
         if (!is_dir($localPath)) {

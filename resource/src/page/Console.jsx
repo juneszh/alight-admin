@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, useEffect, useRef, useState } from 'react';
 import { Avatar, Card, Col, List, Modal, Row, Typography } from 'antd';
 import { InfoCircleOutlined, EditOutlined, ExclamationCircleOutlined, UnlockOutlined, PoweroffOutlined } from '@ant-design/icons';
-import * as plots from '@ant-design/plots/es/components';
-import global, { ajax, localeInit, localeValue, notEmpty, redirect } from '../lib/Util.js';
-import ModelKit from '../lib/ModelKit.jsx';
+import global, { ajax, localeInit, localeValue, notEmpty, redirect } from '../lib/Util';
+import ModelKit from '../lib/ModelKit';
 import dayjs from 'dayjs';
 
 const { Text } = Typography;
+
+const plots = lazy(() => import('../lib/Plots'));
 
 const Console = props => {
     localeInit(props.locale);
@@ -114,8 +115,8 @@ const Console = props => {
             subComponent = component.substring(4);
             component = 'Tiny';
         }
-        const PlotsTag = subComponent ? plots[component][subComponent] : plots[component];
-        return <PlotsTag {...config} />;
+        const Plots = subComponent ? plots[component][subComponent] : plots[component];
+        return <Plots {...config} />;
     };
 
     const ChartList = () => {

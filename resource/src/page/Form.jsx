@@ -3,8 +3,7 @@ import { message } from 'antd';
 import { BetaSchemaForm, ProFormUploadDragger } from '@ant-design/pro-components';
 import { useResizeDetector } from 'react-resize-detector';
 import { Editor } from '@tinymce/tinymce-react';
-import global, { ajax, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util.js';
-import { isString } from 'antd/es/button';
+import global, { ajax, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util';
 
 const Form = props => {
     localeInit(props.locale);
@@ -119,7 +118,7 @@ const Form = props => {
 
                 if (fieldValue.value !== undefined && fieldValue.value !== '') {
                     if (fieldValue.type === 'upload') {
-                        if (isString(fieldValue.value)) {
+                        if (typeof fieldValue.value === 'string') {
                             fieldValue.value = [fieldValue.value];
                         }
                         column.initialValue = [];

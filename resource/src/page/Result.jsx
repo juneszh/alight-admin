@@ -1,6 +1,6 @@
 import { createRef, useEffect, useState } from 'react';
 import { Button, Col, Result, Row } from 'antd';
-import global, { inIframe, localeInit, localeValue, postMessage, redirect } from '../lib/Util.js';
+import global, { inIframe, localeInit, localeValue, postMessage, redirect } from '../lib/Util';
 
 const Error = props => {
     localeInit(props.locale);

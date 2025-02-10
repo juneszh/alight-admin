@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { Modal } from 'antd';
 import Draggable from 'react-draggable';
-import { localeValue } from './Util.js';
+import { localeValue } from './Util';
 
 
 let modalCallback = {};

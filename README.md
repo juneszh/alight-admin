@@ -151,7 +151,7 @@ Finally, the database table **user_admin** has completed **CRUD** creation. See 
 File: app/config/admin/console.php
 ```php
 // Here using Line charts, we support 30+ charts with AntDesign Charts
-// More details please refer to : https://charts.ant.design/en/docs/api
+// More details please refer to : https://ant-design-charts.antgroup.com/en/examples
 Console::chart('Line')->config([
     'xField' => 'date',
     'yField' => 'value',

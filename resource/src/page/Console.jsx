@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Avatar, Card, Col, List, Modal, Row, Typography } from 'antd';
 import { InfoCircleOutlined, EditOutlined, ExclamationCircleOutlined, UnlockOutlined, PoweroffOutlined } from '@ant-design/icons';
-import { Area, Bar, Base, BidirectionalBar, Box, Bullet, CirclePacking, Column, DualAxes, Funnel, Gauge, Heatmap, Histogram, Line, Liquid, Mix, Pie, Radar, RadialBar, Rose, Sankey, Scatter, Stock, Sunburst, Tiny, Treemap, Venn, Violin, Waterfall, WordCloud } from '@ant-design/plots';
+import * as plots from '@ant-design/plots/es/components';
 import global, { ajax, localeInit, localeValue, notEmpty, redirect } from '../lib/Util.js';
 import ModelKit from '../lib/ModelKit.jsx';
 import dayjs from 'dayjs';
@@ -109,78 +109,13 @@ const Console = props => {
 
     const chartComponent = (key, component, config) => {
         config.data = chartData[key];
-        switch (component) {
-            case 'Area':
-                return <Area {...config} />;
-            case 'Bar':
-                return <Bar {...config} />;
-            case 'Base':
-                return <Base {...config} />;
-            case 'BidirectionalBar':
-                return <BidirectionalBar {...config} />;
-            case 'Box':
-                return <Box {...config} />;
-            case 'Bullet':
-                return <Bullet {...config} />;
-            case 'CirclePacking':
-                return <CirclePacking {...config} />;
-            case 'Column':
-                return <Column {...config} />;
-            case 'DualAxes':
-                return <DualAxes {...config} />;
-            case 'Funnel':
-                return <Funnel {...config} />;
-            case 'Gauge':
-                return <Gauge {...config} />;
-            case 'Heatmap':
-                return <Heatmap {...config} />;
-            case 'Histogram':
-                return <Histogram {...config} />;
-            case 'Line':
-                return <Line {...config} />;
-            case 'Liquid':
-                return <Liquid {...config} />;
-            case 'Mix':
-                return <Mix {...config} />;
-            case 'Pie':
-                return <Pie {...config} />;
-            case 'Radar':
-                return <Radar {...config} />;
-            case 'RadialBar':
-                return <RadialBar {...config} />;
-            case 'Rose':
-                return <Rose {...config} />;
-            case 'Sankey':
-                return <Sankey {...config} />;
-            case 'Scatter':
-                return <Scatter {...config} />;
-            case 'Stock':
-                return <Stock {...config} />;
-            case 'Sunburst':
-                return <Sunburst {...config} />;
-            case 'TinyArea':
-                return <Tiny.Area {...config} />;
-            case 'TinyColumn':
-                return <Tiny.Column {...config} />;
-            case 'TinyLine':
-                return <Tiny.Line {...config} />;
-            case 'TinyProgress':
-                return <Tiny.Progress {...config} />;
-            case 'TinyRing':
-                return <Tiny.Ring {...config} />;
-            case 'Treemap':
-                return <Treemap {...config} />;
-            case 'Venn':
-                return <Venn {...config} />;
-            case 'Violin':
-                return <Violin {...config} />;
-            case 'Waterfall':
-                return <Waterfall {...config} />;
-            case 'WordCloud':
-                return <WordCloud {...config} />;
-            default:
-                return null;
+        let subComponent;
+        if (component.substring(0, 4) === 'Tiny'){
+            subComponent = component.substring(4);
+            component = 'Tiny';
         }
+        const PlotsTag = subComponent ? plots[component][subComponent] : plots[component];
+        return <PlotsTag {...config} />;
     };
 
     const ChartList = () => {

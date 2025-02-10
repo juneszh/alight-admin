@@ -21,7 +21,7 @@ class Config
     public static array $config = [
         'title' => 'Alight Admin', // Admin panel title
         'path' => 'admin', // Admin panel access path
-        'locale' => false, // Whether to enable locale language (built-in zh_CN)
+        'locale' => '', // Whether to enable locale language (default: en_US)
         'menu' => '', // Menu configuration file
         'console' => '', // Console configuration file
         'remember' => 86400, // Login renewal cycle

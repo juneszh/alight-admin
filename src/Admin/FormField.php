@@ -323,12 +323,13 @@ class FormField
      * Set field (ProComponents) valueType
      *
      * @param string $value Form::TYPE_*
-     * @param null|array $props Props for Ant Design components. e.g. multiple select:['mode' => 'multiple'] or upload:['action' => 'api url', 'multiple' => true, 'data' => ['path' => 'test'], 'accept' => 'image/*,.pdf', 'basicUrl' => 'https://alight.cc']
+     * @param null|array $props Props for Ant Design components. e.g. multiple select:['mode' => 'multiple'] or upload:['action' => 'api url', 'multiple' => true, 'data' => ['path' => 'test'], 'accept' => 'image/*,.pdf', 'basicUrl' => 'https://alight.cc', 'imgCrop' => ['aspect' => 2/1]]
      * @return $this
      * 
      * @see https://procomponents.ant.design/en-US/components/schema#valuetype-lists
      * @see https://ant.design/components/overview/
      * @see https://ant.design/components/upload/#API
+     * @see https://github.com/nanxiaobei/antd-img-crop
      */
     public function type(string $valueType, ?array $props = null)
     {

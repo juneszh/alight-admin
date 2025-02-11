@@ -45,6 +45,7 @@ const i18n = {
     ':sum': 'Sum',
     ':avg': 'Avg',
     ':upload_failed': 'Upload failed',
+    ':edit_image': 'Edit image',
 };
 
 export default i18n;

@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { lazy, useCallback, useEffect, useRef } from 'react';
 import { message } from 'antd';
 import { BetaSchemaForm, ProFormUploadDragger } from '@ant-design/pro-components';
 import { useResizeDetector } from 'react-resize-detector';
-import { Editor } from '@tinymce/tinymce-react';
 import global, { ajax, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util';
+
+const Editor = lazy(() => import('../lib/Editor'));
+const ImgCrop = lazy(() => import('antd-img-crop'));
 
 const Form = props => {
     localeInit(props.locale);
@@ -16,39 +18,51 @@ const Form = props => {
 
     const formRef = useRef();
 
-    const uploadRender = (schema) => (
-        <>
-            <ProFormUploadDragger
-                disabled={(schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined}
-                fieldProps={{
-                    action: global.path + '/upload',
-                    listType: 'picture',
-                    maxCount: schema.fieldProps.multiple ? 0 : 1,
-                    name: 'file',
-                    onChange: ({ file, fileList }) => {
-                        if (file.status === 'error') {
-                            for (const [key, value] of Object.entries(fileList)) {
-                                if (value.uid === file.uid) {
-                                    fileList.splice(key, 1);
-                                    if (file.response?.message) {
-                                        message.error(localeValue(file.response.message));
-                                    } else {
-                                        message.error(localeValue(':upload_failed'));
-                                    }
+    const uploadRender = (schema) => {
+        const ProFormUploadDraggerWrapper = (({ fieldProps, beforeUpload, ...props }) => {
+            return <ProFormUploadDragger {...props} fieldProps={{ beforeUpload, ...fieldProps }} />;
+        });
+        const uploadProps = {
+            disabled: (schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined,
+            fieldProps: {
+                action: global.path + '/upload',
+                listType: 'picture',
+                maxCount: schema.fieldProps.multiple ? 0 : 1,
+                name: 'file',
+                onChange: ({ file, fileList }) => {
+                    if (file.status === 'error') {
+                        for (const [key, value] of Object.entries(fileList)) {
+                            if (value.uid === file.uid) {
+                                fileList.splice(key, 1);
+                                if (file.response?.message) {
+                                    message.error(localeValue(file.response.message));
+                                } else {
+                                    message.error(localeValue(':upload_failed'));
                                 }
                             }
                         }
-                    },
-                    ...schema.fieldProps
-                }}
-                formItemProps={{
-                    style: { margin: 0 }
-                }}
-                max={schema.proFieldProps.readonly ? 0 : undefined}
-                name={schema.dataIndex}
-            />
-        </>
-    );
+                    }
+                },
+                ...schema.fieldProps
+            },
+            formItemProps: {
+                style: { margin: 0 }
+            },
+            max: schema.proFieldProps.readonly ? 0 : undefined,
+            name: schema.dataIndex
+        };
+        return schema.fieldProps.imgCrop !== undefined ? (
+            <>
+                <ImgCrop quality={0.9} modalTitle={localeValue(':edit_image')} {...schema.fieldProps.imgCrop}>
+                    <ProFormUploadDraggerWrapper {...uploadProps} />
+                </ImgCrop>
+            </>
+        ) : (
+            <>
+                <ProFormUploadDragger {...uploadProps} />
+            </>
+        );
+    };
 
     // https://www.tiny.cloud/docs/tinymce/6
     const richTextRender = (schema, form) => (

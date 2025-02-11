@@ -45,6 +45,7 @@ const i18n = {
     ':sum': '合计',
     ':avg': '平均',
     ':upload_failed': '上传失败',
+    ':edit_image': '编辑图片',
 };
 
 export default i18n;

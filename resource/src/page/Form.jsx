@@ -18,10 +18,11 @@ const Form = props => {
 
     const formRef = useRef();
 
+    const ProFormUploadDraggerWrapper = (({ fieldProps, beforeUpload, ...props }) => {
+        return <ProFormUploadDragger {...props} fieldProps={{ beforeUpload, ...fieldProps }} />;
+    });
+
     const uploadRender = (schema) => {
-        const ProFormUploadDraggerWrapper = (({ fieldProps, beforeUpload, ...props }) => {
-            return <ProFormUploadDragger {...props} fieldProps={{ beforeUpload, ...fieldProps }} />;
-        });
         const uploadProps = {
             disabled: (schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined,
             fieldProps: {

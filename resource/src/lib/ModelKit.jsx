@@ -107,6 +107,8 @@ const ModelKit = forwardRef((props, ref) => {
                     clearInterval(iFrameTimer);
                 } else if (iFrameHeight > 400) {
                     setModalHeight(Math.ceil(iFrameHeight / 100) * 100);
+                } else {
+                    setModalHeight(400);
                 }
                 iFrameHeightLast = iFrameHeight;
             }

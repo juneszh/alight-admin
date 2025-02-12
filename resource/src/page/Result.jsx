@@ -1,11 +1,9 @@
-import { createRef, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button, Col, Result, Row } from 'antd';
-import global, { inIframe, localeInit, localeValue, postMessage, redirect } from '../lib/Util';
+import global, { localeInit, localeValue, redirect } from '../lib/Util';
 
 const Error = props => {
     localeInit(props.locale);
-
-    const rootRef = createRef();
 
     const [countDown, setCountDown] = useState(5);
 
@@ -35,19 +33,13 @@ const Error = props => {
         );
     };
 
-    useEffect(() => {
-        if (inIframe()) {
-            postMessage({ size: { height: rootRef?.current.clientHeight, width: 800 } });
-        }
-    }, [rootRef]);
-
     return (
         <Row
             align='middle'
             justify='center'
             style={{ height: 'auto', minHeight: '100vh' }}
         >
-            <Col ref={rootRef}>
+            <Col>
                 <Result
                     extra={global.config.status === 200 ? closeButton() : (global.config.status === 401 ? loginButton() : undefined)}
                     status={global.config.status === 200 ? 'success' : (global.config.status === 401 ? 403 : global.config.status)}

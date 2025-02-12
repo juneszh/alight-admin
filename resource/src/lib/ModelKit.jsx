@@ -65,19 +65,6 @@ const ModelKit = forwardRef((props, ref) => {
                 if (modalCallback?.always !== undefined) {
                     modalCallback.always(event.data);
                 }
-            } else if (event.data.size) {
-                if (event.data.size.height) {
-                    if (event.data.size.height > 400) {
-                        setModalHeight(Math.ceil(event.data.size.height / 100) * 100);
-                    } else {
-                        setModalHeight(400);
-                    }
-                }
-                if (event.data.size.width) {
-                    setModalWidth((lastWidth) => {
-                        return lastWidth === '100vw' ? lastWidth : event.data.size.width;
-                    });
-                }
             } else if (event.data.button) {
                 setModalFooter(undefined);
             }
@@ -97,7 +84,6 @@ const ModelKit = forwardRef((props, ref) => {
         iframeRef.current?.contentWindow.postMessage({ submit: true });
     }
 
-
     const draggleStart = (_event, uiData) => {
         const { clientWidth, clientHeight } = window.document.documentElement;
         const targetRect = draggleRef.current?.getBoundingClientRect();
@@ -110,6 +96,21 @@ const ModelKit = forwardRef((props, ref) => {
             top: -targetRect.top + uiData.y,
             bottom: clientHeight - (targetRect.bottom - uiData.y),
         });
+    };
+
+    const ifrmeLoad = () => {
+        let iFrameHeightLast = 0;
+        const iFrameTimer = setInterval(() => {
+            const iFrameHeight = iframeRef.current?.contentWindow.document.body.scrollHeight;
+            if (iFrameHeight > 0) {
+                if (iFrameHeight === iFrameHeightLast) {
+                    clearInterval(iFrameTimer);
+                } else if (iFrameHeight > 400) {
+                    setModalHeight(Math.ceil(iFrameHeight / 100) * 100);
+                }
+                iFrameHeightLast = iFrameHeight;
+            }
+        }, 200);
     };
 
     return (
@@ -150,6 +151,7 @@ const ModelKit = forwardRef((props, ref) => {
                 src={modalConfig.url}
                 style={{ border: 'none', borderRadius: 8, flex: '1 1 auto', overflow: 'auto' }}
                 title='modalFrame'
+                onLoad={ifrmeLoad}
             />
         </Modal>
     );

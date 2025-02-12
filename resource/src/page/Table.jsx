@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button, Card, Col, message, Modal, Popover, QRCode, Row, Space, Statistic } from 'antd';
 import { ExclamationCircleOutlined, ScanOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
-import { useResizeDetector } from 'react-resize-detector';
 import dayjs from 'dayjs';
 import global, { ajax, ifResult, localeInit, localeValue, notEmpty } from '../lib/Util.js';
 import ModelKit from '../lib/ModelKit.jsx';
@@ -16,13 +15,6 @@ const Table = props => {
     const modelRef = useRef();
 
     const [requestStatistic, setRequestStatistic] = useState({});
-    const [statisticJustify, setStatisticJustify] = useState('space-evenly');
-
-    const statSize = useResizeDetector({
-        handleWidth: false,
-        refreshMode: 'debounce',
-        refreshRate: 100
-    });
 
     let tableSearch = false;
 
@@ -274,16 +266,6 @@ const Table = props => {
         }
     }
 
-    useEffect(() => {
-        if (statSize.height) {
-            if (statSize.height > 100) {
-                setStatisticJustify('start');
-            } else {
-                setStatisticJustify('space-evenly');
-            }
-        }
-    }, [statSize.height]);
-
     return (
         <div style={{ backgroundColor: '#f0f2f5', height: 'auto', minHeight: '100vh' }}>
             <ProTable
@@ -438,7 +420,7 @@ const Table = props => {
                     }
                     return (
                         <Card>
-                            <Row gutter={[16, 16]} justify={statisticJustify} ref={statSize.ref}>{statistic}</Row>
+                            <Row gutter={[16, 16]} justify='space-evenly'>{statistic}</Row>
                         </Card>
                     );
                 } : undefined}

@@ -1,7 +1,6 @@
 import { lazy, useCallback, useEffect, useRef } from 'react';
 import { message } from 'antd';
 import { BetaSchemaForm, ProFormUploadDragger } from '@ant-design/pro-components';
-import { useResizeDetector } from 'react-resize-detector';
 import global, { ajax, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util';
 
 const Editor = lazy(() => import('../lib/Editor'));
@@ -9,12 +8,6 @@ const ImgCrop = lazy(() => import('antd-img-crop'));
 
 const Form = props => {
     localeInit(props.locale);
-
-    const rootSize = useResizeDetector({
-        handleWidth: false,
-        refreshMode: 'debounce',
-        refreshRate: 200
-    });
 
     const formRef = useRef();
 
@@ -65,7 +58,6 @@ const Form = props => {
         );
     };
 
-    // https://www.tiny.cloud/docs/tinymce/6
     const richTextRender = (schema, form) => (
         <>
             <Editor
@@ -283,14 +275,8 @@ const Form = props => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    useEffect(() => {
-        if (inIframe() && rootSize.height) {
-            postMessage({ size: { height: rootSize.height, width: 816 } });
-        }
-    }, [rootSize.height]);
-
     return (
-        <div ref={rootSize.ref}>
+        <>
             <BetaSchemaForm
                 columns={mainColumns}
                 formRef={formRef}
@@ -343,7 +329,7 @@ const Form = props => {
                     }
                 }}
             />
-        </div>
+        </>
     );
 };
 

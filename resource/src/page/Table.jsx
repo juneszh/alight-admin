@@ -286,7 +286,7 @@ const Table = props => {
                     setting: false
                 }}
                 pagination={{
-                    showSizeChanger: true,
+                    showQuickJumper: true,
                 }}
                 request={async (params = {}, sort) => {
                     if (notEmpty(sort)) {

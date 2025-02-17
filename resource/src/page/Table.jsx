@@ -15,6 +15,7 @@ const Table = props => {
     const modelRef = useRef();
 
     const [requestStatistic, setRequestStatistic] = useState({});
+    const [mainSetting, setMainSetting] = useState({});
 
     let tableSearch = false;
 
@@ -282,8 +283,10 @@ const Table = props => {
                         search={false}
                     />
                 } : undefined}
-                options={{
-                    setting: false
+                columnsState={{
+                    onChange: (value) => {
+                        setMainSetting(value);
+                    }
                 }}
                 pagination={{
                     showQuickJumper: true,
@@ -323,16 +326,45 @@ const Table = props => {
                     const avgCells = [];
 
                     if (notEmpty(mainColumns) && notEmpty(pageData)) {
-                        let titleIndex = '0';
+                        let titleIndex = 0;
                         const summaryColumns = [];
 
                         if (notEmpty(global.config.batch.button)) {
-                            titleIndex = '1';
+                            titleIndex = 1;
                             summaryColumns.push('_batch');
                         }
-                        for (const column of Object.values(mainColumns)) {
-                            if (!column.hideInTable) {
-                                summaryColumns.push(column.dataIndex);
+                        if (notEmpty(mainSetting)) {
+                            const summaryColumnsLeft = [];
+                            const summaryColumnsCenter = [];
+                            const summaryColumnsRight = [];
+                            for (const [key, value] of Object.entries(mainSetting)) {
+                                if (value.show) {
+                                    if (value.order !== undefined) {
+                                        if (value.fixed === 'left') {
+                                            summaryColumnsLeft[value.order] = key;
+                                        } else if (value.fixed === 'right') {
+                                            summaryColumnsRight[value.order] = key;
+                                        } else {
+                                            summaryColumnsCenter[value.order] = key;
+                                        }
+
+                                    } else {
+                                        if (value.fixed === 'left') {
+                                            summaryColumnsLeft.push(key);
+                                        } else if (value.fixed === 'right') {
+                                            summaryColumnsRight.push(key);
+                                        } else {
+                                            summaryColumnsCenter.push(key);
+                                        }
+                                    }
+                                }
+                            }
+                            summaryColumns.push(...summaryColumnsLeft.filter(n => n), ...summaryColumnsCenter.filter(n => n), ...summaryColumnsRight.filter(n => n));
+                        } else {
+                            for (const column of Object.values(mainColumns)) {
+                                if (!column.hideInTable) {
+                                    summaryColumns.push(column.dataIndex);
+                                }
                             }
                         }
 
@@ -344,7 +376,7 @@ const Table = props => {
                                 sumVisible = true;
                                 sumCells.push(
                                     <ProTable.Summary.Cell className='ant-table-column-sort' index={index} key={key}>
-                                        {index === titleIndex ? <><span style={{ float: 'left' }}>{localeValue(':sum')}</span>{result}</> : result}
+                                        {index == titleIndex ? <><span style={{ float: 'left' }}>{localeValue(':sum')}</span>{result}</> : result}
                                     </ProTable.Summary.Cell>
                                 );
                                 if (global.config.summary[key].avg !== undefined) {
@@ -352,25 +384,25 @@ const Table = props => {
                                     result = (sum / pageData.length).toFixed(precision);
                                     avgCells.push(
                                         <ProTable.Summary.Cell className='ant-table-column-sort' index={index} key={key}>
-                                            {index === titleIndex ? <><span style={{ float: 'left' }}>{localeValue(':avg')}</span>{result}</> : result}
+                                            {index == titleIndex ? <><span style={{ float: 'left' }}>{localeValue(':avg')}</span>{result}</> : result}
                                         </ProTable.Summary.Cell>
                                     );
                                 } else {
                                     avgCells.push(
                                         <ProTable.Summary.Cell className='ant-table-column-sort' index={index} key={key}>
-                                            {index === titleIndex ? <span style={{ float: 'left' }}>{localeValue(':avg')}</span> : undefined}
+                                            {index == titleIndex ? <span style={{ float: 'left' }}>{localeValue(':avg')}</span> : undefined}
                                         </ProTable.Summary.Cell>
                                     );
                                 }
                             } else {
                                 sumCells.push(
                                     <ProTable.Summary.Cell className='ant-table-column-sort' index={index} key={key}>
-                                        {index === titleIndex ? <span style={{ float: 'left' }}>{localeValue(':sum')}</span> : undefined}
+                                        {index == titleIndex ? <span style={{ float: 'left' }}>{localeValue(':sum')}</span> : undefined}
                                     </ProTable.Summary.Cell>
                                 );
                                 avgCells.push(
                                     <ProTable.Summary.Cell className='ant-table-column-sort' index={index} key={key}>
-                                        {index === titleIndex ? <span style={{ float: 'left' }}>{localeValue(':avg')}</span> : undefined}
+                                        {index == titleIndex ? <span style={{ float: 'left' }}>{localeValue(':avg')}</span> : undefined}
                                     </ProTable.Summary.Cell>
                                 );
                             }

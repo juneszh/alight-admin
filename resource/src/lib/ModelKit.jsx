@@ -11,7 +11,7 @@ const ModelKit = forwardRef((props, ref) => {
     const [modalHeight, setModalHeight] = useState(400);
     const [modalWidth, setModalWidth] = useState(816);
     const [modalConfig, setModalConfig] = useState({ title: '', url: '' });
-    const [modalFooter, setModalFooter] = useState(null);
+    const [modalOk, setModalOk] = useState(undefined);
     const iframeRef = useRef();
     const [lastModal, setLastModal] = useState('form');
     const [draggleDisabled, setDraggleDisabled] = useState(true);
@@ -45,7 +45,7 @@ const ModelKit = forwardRef((props, ref) => {
             }
         }
         setLastModal(button.action);
-        setModalFooter(null);
+        setModalOk({ disabled: true });
         setModalOpen(true);
     };
 
@@ -66,7 +66,7 @@ const ModelKit = forwardRef((props, ref) => {
                     modalCallback.always(event.data);
                 }
             } else if (event.data.button) {
-                setModalFooter(undefined);
+                setModalOk({ disabled: false });
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -132,7 +132,7 @@ const ModelKit = forwardRef((props, ref) => {
             >{modalConfig.title}</div>}
             centered
             destroyOnClose={true}
-            footer={modalFooter}
+            maskClosable={false}
             modalRender={(modal) => (
                 <Draggable
                     disabled={draggleDisabled}
@@ -141,6 +141,7 @@ const ModelKit = forwardRef((props, ref) => {
                     onStart={(event, uiData) => draggleStart(event, uiData)}
                 ><div ref={draggleRef}>{modal}</div></Draggable>
             )}
+            okButtonProps={modalOk}
             onCancel={modalHide}
             onOk={modalSubmit}
             open={modalOpen}

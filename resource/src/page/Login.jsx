@@ -17,7 +17,7 @@ const Login = props => {
     const onFinish = (values) => {
         ajax(global.path + '/login', values).then(result => {
             if (result.error === 0) {
-                window.location.replace(global.path);
+                window.location.replace(global.path + '/');
             } else {
                 buildCaptcha();
                 form.setFieldsValue({

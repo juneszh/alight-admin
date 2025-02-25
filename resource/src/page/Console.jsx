@@ -1,6 +1,6 @@
 import { lazy, useEffect, useRef, useState } from 'react';
 import { Avatar, Card, Col, List, Modal, Row, Typography } from 'antd';
-import { InfoCircleOutlined, EditOutlined, ExclamationCircleOutlined, UnlockOutlined, PoweroffOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, EditOutlined, ExclamationCircleOutlined, LockOutlined, PoweroffOutlined } from '@ant-design/icons';
 import global, { ajax, localeInit, localeValue, notEmpty, redirect } from '../lib/Util';
 import ModelKit from '../lib/ModelKit';
 import dayjs from 'dayjs';
@@ -159,7 +159,7 @@ const Console = props => {
                     <Card
                         actions={[
                             <EditOutlined key={1} title={localeValue(':edit_profile')} onClick={editProfile} />,
-                            <UnlockOutlined key={2} title={localeValue(':change_password')} onClick={changePassword} />,
+                            <LockOutlined key={2} title={localeValue(':change_password')} onClick={changePassword} />,
                             <PoweroffOutlined key={3} title={localeValue(':logout')} onClick={logout} />,
                         ]}
                         title={localeValue(':user_profile')}

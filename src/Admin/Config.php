@@ -29,7 +29,7 @@ class Config
         'cravatar' => false, // Whether to use Cravatar instead of Libravatar (Gravatar) to display avatar
         'errorPageHandler' => [Controller::class, 'result'], // Override error page handler
         'noticeCallback' => null, // Callback operation after successful notification
-        'dev' => false, // Use the js from 'npm run dev' when set true
+        'dev' => false, // For 'npm run dev' set to true, or set a url instead of 'http://localhost:5173'
     ];
 
     /**

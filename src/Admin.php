@@ -68,8 +68,9 @@ class Admin
         if (substr($url, 0, 4) === 'http') {
             return $url;
         } else {
+            $path = AdminConfig::get('path');
             $url = trim($url, '/');
-            return '/' . AdminConfig::get('path') . ($url ? '/' . $url : '');
+            return ($path ? '/' . $path : '') . ($url ? '/' . $url : '');
         }
     }
 
@@ -100,9 +101,10 @@ class Admin
         $indent = '    ';
 
         if ($admin['dev']) {
-            $return .= $indent . '<script type="module">import RefreshRuntime from "http://localhost:5173/alight-admin/@react-refresh";RefreshRuntime.injectIntoGlobalHook(window);window.$RefreshReg$ = () => {};window.$RefreshSig$ = () => (type) => type;window.__vite_plugin_react_preamble_installed__ = true;</script>' . PHP_EOL;
-            $return .= $indent . '<script type="module" src="http://localhost:5173/alight-admin/@vite/client"></script>' . PHP_EOL;
-            $return .= $indent . '<script type="module" src="http://localhost:5173/alight-admin/src/main.jsx"></script>' . PHP_EOL;
+            $devSrc = is_string($admin['dev']) ? $admin['dev'] : 'http://localhost:5173';
+            $return .= $indent . '<script type="module">import RefreshRuntime from "' . $devSrc . '/alight-admin/@react-refresh";RefreshRuntime.injectIntoGlobalHook(window);window.$RefreshReg$ = () => {};window.$RefreshSig$ = () => (type) => type;window.__vite_plugin_react_preamble_installed__ = true;</script>' . PHP_EOL;
+            $return .= $indent . '<script type="module" src="' . $devSrc . '/alight-admin/@vite/client"></script>' . PHP_EOL;
+            $return .= $indent . '<script type="module" src="' . $devSrc . '/alight-admin/src/main.jsx"></script>' . PHP_EOL;
         } else {
             $manifest = App::root(self::PUBLIC . '/.vite/manifest.json');
             if (file_exists($manifest)) {

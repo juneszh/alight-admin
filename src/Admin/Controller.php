@@ -373,7 +373,7 @@ class Controller
         $filePath = 'upload/' . ($path ?: 'file') . '/' . date('Y', $now) . '/' . date('md', $now);
         $localPath = App::root('public' . '/' . $filePath);
         if (!is_dir($localPath)) {
-            mkdir($localPath, 0775, true);
+            @mkdir($localPath, 0777, true);
         }
 
         if ($file) {

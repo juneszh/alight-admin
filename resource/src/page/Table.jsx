@@ -19,6 +19,8 @@ const Table = props => {
 
     let tableSearch = false;
 
+    const urlSearch = new URLSearchParams(window.location.search);
+
     const columnsBuilder = (columnObj, expand) => {
         const columns = [];
         if (notEmpty(columnObj)) {
@@ -43,19 +45,34 @@ const Table = props => {
                             title: columnValue.locale ? localeValue(columnValue.title) : columnValue.title,
                             search: true,
                             hideInTable: true,
-                            valueType: columnValue.searchType
+                            valueType: columnValue.searchType,
+                            fieldProps: {}
                         };
+
                         if (columnValue.searchType === 'dateTimeRange') {
                             columnSearch.fieldProps = { showTime: { defaultValue: [dayjs('00:00:00', 'HH:mm:ss'), dayjs('23:59:59', 'HH:mm:ss')] } };
                         }
+                        
+                        if (columnValue.searchProps) {
+                            columnSearch.fieldProps = { ...columnSearch.fieldProps, ...columnValue.searchProps };
+                        }
+
+                        if (urlSearch.has(columnKey)) {
+                            columnSearch.initialValue = urlSearch.get(columnKey);
+                        }
+
                         columns.push(columnSearch);
                     } else {
                         column.valueType = columnValue.searchType;
                         column.search = true;
-                    }
 
-                    if (columnValue.searchProps) {
-                        column.fieldProps = columnValue.searchProps;
+                        if (columnValue.searchProps) {
+                            column.fieldProps = columnValue.searchProps;
+                        }
+
+                        if (urlSearch.has(columnKey)) {
+                            column.initialValue = urlSearch.get(columnKey);
+                        }
                     }
                 }
 

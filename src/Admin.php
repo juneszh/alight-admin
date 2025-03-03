@@ -423,10 +423,8 @@ class Admin
             $dir = App::root($storagePath . '/download/');
             $file = $dir . '/alight-admin.tar.gz';
 
-            if (!is_dir($dir)) {
-                if (!mkdir($dir, 0777, true)) {
-                    throw new Exception('Failed to create download directory.');
-                }
+            if (!is_dir($dir) && !@mkdir($dir, 0777, true)) {
+                throw new Exception('Failed to create download directory.');
             } else {
                 exec('rm -rf ' . $dir . '/*');
             }

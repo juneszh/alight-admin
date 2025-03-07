@@ -176,7 +176,7 @@ class Form
                 $callback(self::EVENT_RENDER, $renderData);
             }
 
-            Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => $_title, 'script' => Admin::globalScript('Form', $renderData)]);
+            Response::render(Admin::path() . '/src/Admin/View.php', ['title' => $_title, 'script' => Admin::globalScript('Form', $renderData)]);
         } else {
             $sqlData = self::dataFilter($field, Request::request());
 

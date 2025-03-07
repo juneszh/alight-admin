@@ -34,7 +34,7 @@ class Controller
         $roleId = Auth::checkRole([]);
         $menu = Menu::build($roleId);
 
-        Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => Config::get('title'), 'script' => Admin::globalScript('Home', ['menu' => $menu])]);
+        Response::render(Admin::path() . '/src/Admin/View.php', ['title' => Config::get('title'), 'script' => Admin::globalScript('Home', ['menu' => $menu])]);
     }
 
     /**
@@ -48,7 +48,7 @@ class Controller
         $status = in_array($status, [200, 401, 403, 404, 500]) ? (int) $status : $status;
         $message = $message ? urldecode($message) : null;
 
-        Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => Config::get('title'), 'script' => Admin::globalScript('Result', ['status' => $status, 'message' => $message])]);
+        Response::render(Admin::path() . '/src/Admin/View.php', ['title' => Config::get('title'), 'script' => Admin::globalScript('Result', ['status' => $status, 'message' => $message])]);
     }
 
     /**
@@ -144,7 +144,7 @@ class Controller
                 Response::redirect(Admin::url());
             }
 
-            Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => Config::get('title'), 'script' => Admin::globalScript('Login')]);
+            Response::render(Admin::path() . '/src/Admin/View.php', ['title' => Config::get('title'), 'script' => Admin::globalScript('Login')]);
         }
     }
 
@@ -175,7 +175,7 @@ class Controller
             }
         }
 
-        Response::render(Admin::path() . '/src/Admin/View.phtml', ['title' => Config::get('title'), 'script' => Admin::globalScript('Console', ['chart' => $chart])]);
+        Response::render(Admin::path() . '/src/Admin/View.php', ['title' => Config::get('title'), 'script' => Admin::globalScript('Console', ['chart' => $chart])]);
     }
 
     /**

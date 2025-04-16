@@ -148,8 +148,8 @@ const Table = props => {
                 }
 
                 if (columnValue.html) {
-                    column.render = (text) => {
-                        return <div dangerouslySetInnerHTML={{ __html: text }} />;
+                    column.render = (_, entity) => {
+                        return <div dangerouslySetInnerHTML={{ __html: entity[columnKey] }} />;
                     }
                 } else if (columnValue.button) {
                     column.render = (text, record) => {

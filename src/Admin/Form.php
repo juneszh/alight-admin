@@ -232,7 +232,7 @@ class Form
                     } elseif ($v['type'] === self::TYPE_PASSWORD) {
                         $return[$k] = password_hash($data[$k], PASSWORD_DEFAULT);
                     } elseif (is_array($data[$k])) {
-                        $return[$k] = json_encode($data[$k], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                        $return[$k] = $data[$k] ? json_encode($data[$k], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '';
                     } else {
                         $return[$k] = isset($v['raw']) ? $data[$k] : trim((string) $data[$k]);
                     }

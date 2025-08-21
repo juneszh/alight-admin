@@ -247,7 +247,7 @@ const Table = props => {
                             }
                         })
                     },
-                    title: localeValue(':confirm_modify'),
+                    title: localeValue(':confirm'),
                 });
                 break;
             case 'submit':

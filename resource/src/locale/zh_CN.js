@@ -38,7 +38,7 @@ const i18n = {
     ':status': '状态',
     ':create_time': '创建时间',
     ':action': '操作',
-    ':confirm_modify': '确定要修改？',
+    ':confirm': '确定要操作？',
     ':success': '操作成功',
     ':confirm_password': '确认密码',
     ':confirm_field': '与{{field}}不一致',

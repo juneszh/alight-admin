@@ -189,7 +189,7 @@ File: app/controller/admin/Test.php
             ['date' => '2019-08-31', 'value' => 9]
         ];
 
-        // Respond using the built-in json format api
+        // Response using the built-in json format api
         Alight\Response::api(0, null, ['data' => $data]);
     }
 ```

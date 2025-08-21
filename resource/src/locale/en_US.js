@@ -38,7 +38,7 @@ const i18n = {
     ':status': 'Status',
     ':create_time': 'Create time',
     ':action': 'Action',
-    ':confirm_modify': 'Are you sure to modify?',
+    ':confirm': 'Are you sure?',
     ':success': 'Success',
     ':confirm_password': 'Confirm password',
     ':confirm_field': 'Different from {{field}}',

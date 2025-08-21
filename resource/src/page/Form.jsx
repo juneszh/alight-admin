@@ -291,7 +291,7 @@ const Form = props => {
                                 if (global.config.field[key].type === 'upload') {
                                     values[key] = value.map(e => (e.response?.data?.name ?? e.name));
                                     if (!global.config.field[key]?.typeProps?.multiple) {
-                                        values[key] = values[key][0];
+                                        values[key] = values[key][0] ?? '';
                                     }
                                 } else if (global.config.field[key].type === 'color') {
                                     if (typeof value !== 'string') {

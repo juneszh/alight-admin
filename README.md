@@ -302,7 +302,7 @@ Finally, we will get the console page as:
     * [React](https://react.dev/)
     * [Vite](https://vitejs.dev/)
     * [Ant Design](https://ant.design/)
-    * [TinyMCE](https://www.tiny.cloud/tinymce/)
+    * [TinyMCE 6](https://www.tiny.cloud/docs/tinymce/6/)
 
 ## License
 * [MIT license](./LICENSE)

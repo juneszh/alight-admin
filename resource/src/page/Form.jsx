@@ -14,6 +14,8 @@ const Form = props => {
 
     const formRef = useRef();
 
+    const isLight = localStorage.getItem('alight-dark') ? false : true;
+
     const ProFormUploadDraggerWrapper = (({ fieldProps, beforeUpload, ...props }) => {
         return <ProFormUploadDragger {...props} fieldProps={{ beforeUpload, ...fieldProps }} />;
     });
@@ -83,6 +85,8 @@ const Form = props => {
                     promotion: false,
                     quickbars_insert_toolbar: false,
                     quickbars_selection_toolbar: true,
+                    skin: isLight ? 'oxide' : 'oxide-dark',
+                    content_css: isLight ? 'default' : 'tinymce-5-dark',
                     toolbar: false,
                     ...schema.fieldProps
                 }}
@@ -322,6 +326,8 @@ const Form = props => {
                 style={{
                     backgroundColor: token.colorBgElevated,
                     padding: 24,
+                    height: 'auto', 
+                    minHeight: '100vh',
                     width: '100%'
                 }}
                 submitter={inIframe() || !showButton ? false : {

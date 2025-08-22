@@ -131,7 +131,7 @@ const ModelKit = forwardRef((props, ref) => {
                 onBlur={() => { }}
             >{modalConfig.title}</div>}
             centered
-            destroyOnClose={true}
+            destroyOnHidden={true}
             maskClosable={false}
             modalRender={(modal) => (
                 <Draggable

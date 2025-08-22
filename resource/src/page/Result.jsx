@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { Button, Col, Result, Row } from 'antd';
+import { Button, Col, Result, Row, theme } from 'antd';
 import global, { localeInit, localeValue, redirect } from '../lib/Util';
+
+const { useToken } = theme;
 
 const Error = props => {
     localeInit(props.locale);
+    const { token } = useToken();
 
     const [countDown, setCountDown] = useState(5);
 
@@ -37,7 +40,11 @@ const Error = props => {
         <Row
             align='middle'
             justify='center'
-            style={{ height: 'auto', minHeight: '100vh' }}
+            style={{
+                backgroundColor: token.colorBgLayout,
+                height: 'auto',
+                minHeight: '100vh'
+            }}
         >
             <Col>
                 <Result

@@ -1,16 +1,19 @@
 import { lazy, useEffect, useRef, useState } from 'react';
-import { Avatar, Card, Col, List, Modal, Row, Typography } from 'antd';
-import { InfoCircleOutlined, EditOutlined, ExclamationCircleOutlined, LockOutlined, PoweroffOutlined } from '@ant-design/icons';
+import { App, Avatar, Card, Col, List, Row, Switch, Typography, theme } from 'antd';
+import { InfoCircleOutlined, EditOutlined, ExclamationCircleOutlined, LockOutlined, PoweroffOutlined, SunOutlined, MoonOutlined } from '@ant-design/icons';
 import global, { ajax, localeInit, localeValue, notEmpty, redirect } from '../lib/Util';
 import ModelKit from '../lib/ModelKit';
 import dayjs from 'dayjs';
 
 const { Text } = Typography;
+const { useToken } = theme;
 
 const plots = lazy(() => import('../lib/Plots'));
 
 const Console = props => {
     localeInit(props.locale);
+    const { token } = useToken();
+    const { message, modal } = App.useApp();
 
     const modelRef = useRef();
 
@@ -18,6 +21,7 @@ const Console = props => {
     const [noticeCount, setNoticeCount] = useState(0);
     const [noticeList, setNoticeList] = useState([]);
     const [noticeLoad, setNoticeLoad] = useState(false);
+    const [isLight] = useState(localStorage.getItem('alight-dark') ? false : true);
 
     const chartDataInit = {};
     if (notEmpty(global.config.chart)) {
@@ -28,7 +32,7 @@ const Console = props => {
     const [chartData, setChartData] = useState(chartDataInit);
 
     const getProfile = () => {
-        ajax(global.path + '/console/user').then(result => {
+        ajax(message, global.path + '/console/user').then(result => {
             if (notEmpty(result.data)) {
                 setUserData(result.data);
             }
@@ -37,7 +41,7 @@ const Console = props => {
 
     const getNotice = (page = 1) => {
         setNoticeLoad(true);
-        ajax(global.path + '/console/notice/list?page=' + page).then(result => {
+        ajax(message, global.path + '/console/notice/list?page=' + page).then(result => {
             if (notEmpty(result.data)) {
                 setNoticeCount(result.data.count);
                 setNoticeList(result.data.list);
@@ -56,7 +60,7 @@ const Console = props => {
                 return v;
             });
             setNoticeList(newList);
-            ajax(global.path + '/console/notice/read', { id: item.id });
+            ajax(message, global.path + '/console/notice/read', { id: item.id });
         }
         if (item.has_content) {
             modelRef.current?.modalShow({
@@ -99,7 +103,7 @@ const Console = props => {
     };
 
     const logout = () => {
-        Modal.confirm({
+        modal.confirm({
             icon: <ExclamationCircleOutlined />,
             onOk: () => {
                 redirect(global.path + '/logout');
@@ -111,7 +115,7 @@ const Console = props => {
     const chartComponent = (key, component, config) => {
         config.data = chartData[key];
         let subComponent;
-        if (component.substring(0, 4) === 'Tiny'){
+        if (component.substring(0, 4) === 'Tiny') {
             subComponent = component.substring(4);
             component = 'Tiny';
         }
@@ -133,13 +137,22 @@ const Console = props => {
         return charts;
     };
 
+    const changeMode = checked => {
+        if (checked){
+            localStorage.removeItem('alight-dark');
+        } else {
+            localStorage.setItem('alight-dark', '1');
+        }
+        window.location.reload();
+    }
+
     useEffect(() => {
         getProfile();
         getNotice();
         if (notEmpty(global.config.chart)) {
             for (const [chartKey, chartValue] of Object.entries(global.config.chart)) {
                 if (chartValue.api) {
-                    ajax(chartValue.api).then(result => {
+                    ajax(message, chartValue.api).then(result => {
                         if (notEmpty(result.data)) {
                             setChartData(prevState => ({
                                 ...prevState,
@@ -153,7 +166,7 @@ const Console = props => {
     }, []);
 
     return (
-        <div style={{ backgroundColor: '#f0f2f5', height: 'auto', minHeight: '100vh', padding: 24, boxSizing: 'border-box' }}>
+        <div style={{ backgroundColor: token.colorBgLayout, height: 'auto', minHeight: '100vh', padding: 24, boxSizing: 'border-box' }}>
             <Row gutter={[16, 16]}>
                 <Col xs={24} sm={24} md={8} lg={6} xxl={4}>
                     <Card
@@ -163,6 +176,7 @@ const Console = props => {
                             <PoweroffOutlined key={3} title={localeValue(':logout')} onClick={logout} />,
                         ]}
                         title={localeValue(':user_profile')}
+                        extra={<Switch checkedChildren={<SunOutlined />} unCheckedChildren={<MoonOutlined />} onChange={changeMode} defaultChecked={isLight} />}
                     >
                         <Card.Meta
                             avatar={<Avatar src={userData.avatar} size={94} />}
@@ -211,4 +225,10 @@ const Console = props => {
     );
 };
 
-export default Console;
+const MyApp = props => (
+    <App>
+        <Console locale={props.locale} />
+    </App>
+);
+
+export default MyApp;

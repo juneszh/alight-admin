@@ -1,10 +1,8 @@
-import { message } from 'antd';
-
 const $global = window.$global ?? {};
 
 let i18n = {};
 
-const ajax = async (url, data) => {
+const ajax = async (message, url, data) => {
     const options = data ? {
         headers: {
             'X-Requested-With': 'XMLHttpRequest',

@@ -1,10 +1,14 @@
 import { useState } from 'react';
-import { Button, Checkbox, Col, Form, Input, Row } from 'antd';
+import { App, Button, Checkbox, Col, Form, Input, Row, theme } from 'antd';
 import { LockOutlined, SafetyOutlined, UserOutlined } from '@ant-design/icons';
 import global, { ajax, localeInit, localeValue } from '../lib/Util';
 
+const { useToken } = theme;
+
 const Login = props => {
     localeInit(props.locale);
+    const { token } = useToken();
+    const { message } = App.useApp();
 
     const [form] = Form.useForm();
 
@@ -15,7 +19,7 @@ const Login = props => {
     };
 
     const onFinish = (values) => {
-        ajax(global.path + '/login', values).then(result => {
+        ajax(message, global.path + '/login', values).then(result => {
             if (result.error === 0) {
                 window.location.replace(global.path + '/');
             } else {
@@ -36,10 +40,10 @@ const Login = props => {
         <Row
             align='middle'
             justify='center'
-            style={{ backgroundColor: '#f0f2f5', height: 'auto', minHeight: '100vh' }}
+            style={{ backgroundColor: token.colorBgLayout, height: 'auto', minHeight: '100vh' }}
         >
             <Col style={{ width: '320px' }}>
-                <h1 style={{ fontWeight: 'bold', marginBottom: '40px', textAlign: 'center' }} >{global.title}</h1>
+                <h1 style={{ color: token.colorTextBase, fontWeight: 'bold', marginBottom: '40px', textAlign: 'center' }} >{global.title}</h1>
                 <Form
                     autoComplete='off'
                     form={form}
@@ -125,4 +129,10 @@ const Login = props => {
     );
 };
 
-export default Login;
+const MyApp = props => (
+    <App>
+        <Login locale={props.locale} />
+    </App>
+);
+
+export default MyApp;

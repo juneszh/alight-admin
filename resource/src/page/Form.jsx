@@ -1,13 +1,16 @@
 import { lazy, useCallback, useEffect, useRef } from 'react';
-import { message } from 'antd';
+import { App, theme } from 'antd';
 import { BetaSchemaForm, ProFormUploadDragger } from '@ant-design/pro-components';
 import global, { ajax, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util';
 
+const { useToken } = theme;
 const Editor = lazy(() => import('../lib/Editor'));
 const ImgCrop = lazy(() => import('antd-img-crop'));
 
 const Form = props => {
     localeInit(props.locale);
+    const { token } = useToken();
+    const { message } = App.useApp();
 
     const formRef = useRef();
 
@@ -301,7 +304,7 @@ const Form = props => {
                             }
                         }
                     }
-                    return ajax(window.location.href, values).then(result => {
+                    return ajax(message, window.location.href, values).then(result => {
                         if (result && result.error === 0) {
                             if (inIframe()) {
                                 postMessage(result);
@@ -317,6 +320,7 @@ const Form = props => {
                 }}
                 shouldUpdate={false}
                 style={{
+                    backgroundColor: token.colorBgElevated,
                     padding: 24,
                     width: '100%'
                 }}
@@ -324,7 +328,9 @@ const Form = props => {
                     resetButtonProps: false,
                     submitButtonProps: {
                         style: {
-                            float: 'right'
+                            position: 'fixed',
+                            right: 24,
+                            bottom: 24,
                         }
                     }
                 }}
@@ -333,4 +339,10 @@ const Form = props => {
     );
 };
 
-export default Form;
+const MyApp = props => (
+    <App>
+        <Form locale={props.locale} />
+    </App>
+);
+
+export default MyApp;

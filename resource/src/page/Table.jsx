@@ -1,13 +1,17 @@
 import { useRef, useState } from 'react';
-import { Button, Card, Col, message, Modal, Popover, QRCode, Row, Space, Statistic } from 'antd';
+import { App, Button, Card, Col, Popover, QRCode, Row, Space, Statistic, theme } from 'antd';
 import { ExclamationCircleOutlined, ScanOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import dayjs from 'dayjs';
 import global, { ajax, ifResult, localeInit, localeValue, notEmpty } from '../lib/Util.js';
 import ModelKit from '../lib/ModelKit.jsx';
 
+const { useToken } = theme;
+
 const Table = props => {
     localeInit(props.locale);
+    const { token } = useToken();
+    const { message, modal } = App.useApp();
 
     const isMobile = /Mobi/.test(window.navigator.userAgent);
 
@@ -237,10 +241,10 @@ const Table = props => {
                 });
                 break;
             case 'confirm':
-                Modal.confirm({
+                modal.confirm({
                     icon: <ExclamationCircleOutlined />,
                     onOk: () => {
-                        ajax(button.url, params).then(result => {
+                        ajax(message, button.url, params).then(result => {
                             if (result && result.error === 0) {
                                 message.success(localeValue(':success'));
                                 actionRef.current?.reload();
@@ -251,7 +255,7 @@ const Table = props => {
                 });
                 break;
             case 'submit':
-                ajax(button.url, params).then(result => {
+                ajax(message, button.url, params).then(result => {
                     if (result && result.error === 0) {
                         message.success(localeValue(':success'));
                         actionRef.current?.reload();
@@ -285,7 +289,7 @@ const Table = props => {
     }
 
     return (
-        <div style={{ backgroundColor: '#f0f2f5', height: 'auto', minHeight: '100vh' }}>
+        <div style={{ backgroundColor: token.colorBgLayout, height: 'auto', minHeight: '100vh' }}>
             <ProTable
                 actionRef={actionRef}
                 cardBordered
@@ -313,7 +317,7 @@ const Table = props => {
                         params._order = Object.keys(sort)[0];
                         params._sort = sort[params._order];
                     }
-                    const result = await ajax(window.location.pathname + '?' + new URLSearchParams({...Object.fromEntries(urlSearch), ...params}).toString());
+                    const result = await ajax(message, window.location.pathname + '?' + new URLSearchParams({...Object.fromEntries(urlSearch), ...params}).toString());
                     if (result && result.error === 0) {
                         setRequestStatistic(result.data.statistic ?? {});
                         return {
@@ -482,4 +486,10 @@ const Table = props => {
     );
 };
 
-export default Table;
+const MyApp = props => (
+    <App>
+        <Table locale={props.locale} />
+    </App>
+);
+
+export default MyApp;

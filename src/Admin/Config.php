@@ -24,7 +24,7 @@ class Config
         'locale' => '', // Whether to enable locale language (default: en_US)
         'menu' => '', // Menu configuration file
         'console' => '', // Console configuration file
-        'remember' => 86400, // Login renewal cycle
+        'remember' => 129600, // Login renewal cycle (seconds)
         'sso' => true, // Single sign-on
         'cravatar' => false, // Whether to use Cravatar instead of Libravatar (Gravatar) to display avatar
         'errorPageHandler' => [Controller::class, 'result'], // Override error page handler

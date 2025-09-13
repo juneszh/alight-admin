@@ -30,6 +30,10 @@ class Config
         'errorPageHandler' => [Controller::class, 'result'], // Override error page handler
         'noticeCallback' => null, // Callback operation after successful notification
         'dev' => false, // For 'npm run dev' set to true, or set a url instead of 'http://localhost:5173'
+        'turnstile' => [
+            'sitekey' => '',
+            'secret' => '',
+        ],
     ];
 
     /**

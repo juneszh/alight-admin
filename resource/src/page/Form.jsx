@@ -71,6 +71,7 @@ const Form = props => {
                     branding: false,
                     contextmenu: 'image charmap emoticons visualblocks code fullscreen',
                     contextmenu_never_use_native: true,
+                    convert_unsafe_embeds: true,
                     convert_urls: false,
                     fullscreen_native: true,
                     images_upload_url: global.path + '/upload?' + new URLSearchParams(schema.fieldProps.data).toString(),

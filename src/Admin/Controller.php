@@ -87,27 +87,61 @@ class Controller
             $account = Request::post('account', '');
             $password = Request::post('password', '');
             $captchaCode = Request::post('captcha', '');
+            $token = Request::post('token', '');
 
-            if (!$account || !$password || !$captchaCode) {
+            if (!$account || !$password) {
                 Response::api(1001, ':missing_param');
                 exit;
             }
 
-            $captchaHash = $_COOKIE['admin_captcha'] ?? '';
             $cache = Cache::init();
-            $cacheKey = 'alight.admin_captcha.' . $captchaHash;
-            $captchaCodeCache = $cache->get($cacheKey);
-            $cache->delete($cacheKey);
-            setcookie('admin_captcha', '', [
-                'expires' => 0,
-                'path' => '/' . Config::get('path'),
-                'domain' => '.' . Request::host(),
-                'httponly' => true,
-                'samesite' => 'Strict',
-            ]);
+            if ($captchaCode) {
+                $captchaHash = $_COOKIE['admin_captcha'] ?? '';
+                $cacheKey = 'alight.admin_captcha.' . $captchaHash;
+                $captchaCodeCache = $cache->get($cacheKey);
+                $cache->delete($cacheKey);
+                setcookie('admin_captcha', '', [
+                    'expires' => 0,
+                    'path' => '/' . Config::get('path'),
+                    'domain' => '.' . Request::host(),
+                    'httponly' => true,
+                    'samesite' => 'Strict',
+                ]);
 
-            if (!$captchaCodeCache || $captchaCode != $captchaCodeCache) {
-                Response::api(1002, ':invalid_captcha');
+                if (!$captchaCodeCache || $captchaCode != $captchaCodeCache) {
+                    Response::api(1002, ':invalid_captcha');
+                    exit;
+                }
+            } elseif ($token) {
+                $secret = Config::get('turnstile')['secret'] ?? '';
+                $url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+                $data = [
+                    'secret' => $secret,
+                    'response' => $token,
+                    'remoteip' => Request::ip(),
+                ];
+                $options = [
+                    'http' => [
+                        'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                        'method' => 'POST',
+                        'content' => http_build_query($data)
+                    ]
+                ];
+
+                $context = stream_context_create($options);
+                $response = file_get_contents($url, false, $context);
+                if ($response === FALSE) {
+                    $validation = ['success' => false, 'error-codes' => ['internal-error']];
+                } else {
+                    $validation =  json_decode($response, true);
+                }
+
+                if (!$validation['success']) {
+                    Response::api(1002, ':invalid_captcha');
+                    exit;
+                }
+            } else {
+                Response::api(1001, ':missing_param');
                 exit;
             }
 
@@ -144,7 +178,7 @@ class Controller
                 Response::redirect(Admin::url());
             }
 
-            Response::render(Admin::path() . '/src/Admin/View.php', ['title' => Config::get('title'), 'script' => Admin::globalScript('Login')]);
+            Response::render(Admin::path() . '/src/Admin/View.php', ['title' => Config::get('title'), 'script' => Admin::globalScript('Login', ['sitekey' => Config::get('turnstile')['sitekey'] ?? ''])]);
         }
     }
 

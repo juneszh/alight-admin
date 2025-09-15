@@ -44,6 +44,7 @@ const Login = props => {
         setCaptcha(captchaPath + (new Date()).getTime());
     };
 
+    const isLight = localStorage.getItem('alight-dark') ? false : true;
     const ref = useRef()
     const [turnstile, setTurnstile] = useState(global.config.sitekey ? true : false);
     const setToken = (value) => {
@@ -149,7 +150,7 @@ const Login = props => {
                                 onError={() => setTurnstile(false)}
                                 onExpire={() => setToken('')}
                                 onSuccess={setToken}
-                                options={{ size: 'flexible' }}
+                                options={{ size: 'flexible', theme: isLight ? 'light' : 'dark' }}
                             />
                         </Form.Item>
                         :

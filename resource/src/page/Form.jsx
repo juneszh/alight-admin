@@ -12,7 +12,7 @@ const Form = props => {
     const { token } = useToken();
     const { message } = App.useApp();
 
-    const formRef = useRef();
+    const formRef = useRef(undefined);
 
     const isLight = localStorage.getItem('alight-dark') ? false : true;
 

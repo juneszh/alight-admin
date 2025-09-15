@@ -15,8 +15,8 @@ const Table = props => {
 
     const isMobile = /Mobi/.test(window.navigator.userAgent);
 
-    const actionRef = useRef();
-    const modelRef = useRef();
+    const actionRef = useRef(undefined);
+    const modelRef = useRef(undefined);
 
     const [requestStatistic, setRequestStatistic] = useState({});
     const [mainSetting, setMainSetting] = useState({});

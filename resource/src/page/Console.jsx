@@ -15,7 +15,7 @@ const Console = props => {
     const { token } = useToken();
     const { message, modal } = App.useApp();
 
-    const modelRef = useRef();
+    const modelRef = useRef(undefined);
 
     const [userData, setUserData] = useState({});
     const [noticeCount, setNoticeCount] = useState(0);

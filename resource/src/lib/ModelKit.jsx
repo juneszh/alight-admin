@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
+import { useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { Modal } from 'antd';
 import Draggable from 'react-draggable';
 import { localeValue } from './Util';
@@ -6,13 +6,13 @@ import { localeValue } from './Util';
 
 let modalCallback = {};
 
-const ModelKit = forwardRef((props, ref) => {
+const ModelKit = ({ ref }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalHeight, setModalHeight] = useState(400);
     const [modalWidth, setModalWidth] = useState(816);
     const [modalConfig, setModalConfig] = useState({ title: '', url: '' });
     const [modalOk, setModalOk] = useState(undefined);
-    const iframeRef = useRef();
+    const iframeRef = useRef(undefined);
     const [lastModal, setLastModal] = useState('form');
     const [draggleDisabled, setDraggleDisabled] = useState(true);
     const [draggleBounds, setDraggleBounds] = useState({
@@ -21,7 +21,7 @@ const ModelKit = forwardRef((props, ref) => {
         bottom: 0,
         right: 0,
     });
-    const draggleRef = useRef(null);
+    const draggleRef = useRef(undefined);
 
     useImperativeHandle(ref, () => ({
         modalShow,
@@ -158,7 +158,7 @@ const ModelKit = forwardRef((props, ref) => {
             />
         </Modal>
     );
-});
+};
 ModelKit.displayName = 'ModelKit';
 
 export default ModelKit;

@@ -45,7 +45,7 @@ const Login = props => {
     };
 
     const isLight = localStorage.getItem('alight-dark') ? false : true;
-    const ref = useRef()
+    const ref = useRef(undefined)
     const [turnstile, setTurnstile] = useState(global.config.sitekey ? true : false);
     const setToken = (value) => {
         form.setFieldsValue({

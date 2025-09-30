@@ -51,7 +51,7 @@ const Form = props => {
             formItemProps: {
                 style: { margin: 0 }
             },
-            max: schema.proFieldProps.readonly ? 0 : (schema.fieldProps.maxCount ?? undefined),
+            max: schema.proFieldProps.readonly ? 0 : (schema.fieldProps.multiple ? undefined : (schema.fieldProps.maxCount ?? 1)),
             name: schema.dataIndex
         };
         return schema.fieldProps.imgCrop !== undefined ? (

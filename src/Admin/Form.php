@@ -69,6 +69,7 @@ class Form
         TYPE_FORM_SET = 'formSet',
         //extension
         TYPE_UPLOAD = 'upload',
+        TYPE_UPLOAD_DRAGGER = 'uploadDragger',
         TYPE_RICH_TEXT = 'richText';
 
     /**

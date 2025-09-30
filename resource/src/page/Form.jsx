@@ -1,6 +1,6 @@
 import { lazy, useCallback, useEffect, useRef } from 'react';
 import { App, theme } from 'antd';
-import { BetaSchemaForm, ProFormUploadDragger } from '@ant-design/pro-components';
+import { BetaSchemaForm, ProFormUploadButton, ProFormUploadDragger } from '@ant-design/pro-components';
 import global, { ajax, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util';
 
 const { useToken } = theme;
@@ -16,11 +16,15 @@ const Form = props => {
 
     const isLight = localStorage.getItem('alight-dark') ? false : true;
 
+    const ProFormUploadButtonWrapper = (({ fieldProps, beforeUpload, ...props }) => {
+        return <ProFormUploadButton {...props} fieldProps={{ beforeUpload, ...fieldProps }} />;
+    });
+
     const ProFormUploadDraggerWrapper = (({ fieldProps, beforeUpload, ...props }) => {
         return <ProFormUploadDragger {...props} fieldProps={{ beforeUpload, ...fieldProps }} />;
     });
 
-    const uploadRender = (schema) => {
+    const uploadRender = (schema, dragger) => {
         const uploadProps = {
             disabled: (schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined,
             fieldProps: {
@@ -47,18 +51,18 @@ const Form = props => {
             formItemProps: {
                 style: { margin: 0 }
             },
-            max: schema.proFieldProps.readonly ? 0 : undefined,
+            max: schema.proFieldProps.readonly ? 0 : (schema.fieldProps.maxCount ?? undefined),
             name: schema.dataIndex
         };
         return schema.fieldProps.imgCrop !== undefined ? (
             <>
                 <ImgCrop quality={0.9} modalTitle={localeValue(':edit_image')} {...schema.fieldProps.imgCrop}>
-                    <ProFormUploadDraggerWrapper {...uploadProps} />
+                    {dragger ? <ProFormUploadDraggerWrapper {...uploadProps} /> : <ProFormUploadButtonWrapper {...uploadProps} />}
                 </ImgCrop>
             </>
         ) : (
             <>
-                <ProFormUploadDragger {...uploadProps} />
+                {dragger ? <ProFormUploadDragger {...uploadProps} /> : <ProFormUploadButton {...uploadProps} />}
             </>
         );
     };
@@ -132,7 +136,7 @@ const Form = props => {
                 }
 
                 if (fieldValue.value !== undefined && fieldValue.value !== '') {
-                    if (fieldValue.type === 'upload') {
+                    if (fieldValue.type === 'upload' || fieldValue.type === 'uploadDragger') {
                         if (typeof fieldValue.value === 'string') {
                             fieldValue.value = [fieldValue.value];
                         }
@@ -202,8 +206,11 @@ const Form = props => {
                     }
 
                     if (fieldValue.type === 'upload') {
-                        column.render = (dom, entity, index, action, schema) => uploadRender(schema);
-                        column.renderFormItem = (schema) => uploadRender(schema);
+                        column.render = (dom, entity, index, action, schema) => uploadRender(schema, false);
+                        column.renderFormItem = (schema) => uploadRender(schema, false);
+                    } else if (fieldValue.type === 'uploadDragger') {
+                        column.render = (dom, entity, index, action, schema) => uploadRender(schema, true);
+                        column.renderFormItem = (schema) => uploadRender(schema, true);
                     } else if (fieldValue.type === 'richText') {
                         column.render = (dom, entity, index, action, schema) => richTextRender(schema);
                         column.renderFormItem = (schema, config, form) => richTextRender(schema, form);
@@ -296,7 +303,7 @@ const Form = props => {
                     if (notEmpty(global.config.field)) {
                         for (const [key, value] of Object.entries(values)) {
                             if (global.config.field[key]) {
-                                if (global.config.field[key].type === 'upload') {
+                                if (global.config.field[key].type === 'upload' || global.config.field[key].type === 'uploadDragger') {
                                     values[key] = value.map(e => (e.response?.data?.name ?? e.name));
                                     if (!global.config.field[key]?.typeProps?.multiple) {
                                         values[key] = values[key][0] ?? '';
@@ -327,7 +334,7 @@ const Form = props => {
                 style={{
                     backgroundColor: token.colorBgElevated,
                     padding: 24,
-                    height: 'auto', 
+                    height: 'auto',
                     minHeight: '100vh',
                     width: '100%'
                 }}

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Alight\Admin;
 
+use Alight\Admin;
+
 class FormField
 {
     private string $form;
@@ -240,6 +242,20 @@ class FormField
     public function readonly(bool $bool = true)
     {
         $this->config(__FUNCTION__, $bool ?: null);
+        return $this;
+    }
+
+    /**
+     * Set request url
+     *
+     * @param string $url 
+     * @param array $params 
+     * @return $this
+     */
+    public function request(string $url, array $params = [])
+    {
+        $this->config(__FUNCTION__, $url ? Admin::url($url) : null);
+        $this->config(__FUNCTION__ . 'Params', $params ?: null);
         return $this;
     }
 

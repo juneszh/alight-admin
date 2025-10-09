@@ -227,6 +227,14 @@ const Form = props => {
                         column.fieldProps.disabled = fieldValue.disabled;
                     }
 
+                    if (fieldValue.request) {
+                        column.dependencies = fieldValue.requestParams;
+                        column.request = async (params, props) => {
+                            const result = await ajax(message, fieldValue.request, params);
+                            return result?.data?.list ?? [];
+                        };
+                    }
+
                     if (fieldValue.typeProps) {
                         column.fieldProps = { ...column.fieldProps, ...fieldValue.typeProps };
                     }

@@ -39,6 +39,21 @@ const ajax = async (message, url, data) => {
         });
 };
 
+const ifKeys = (ifKeyValue) => {
+    let result = [];
+    if (notEmpty(ifKeyValue)) {
+        for (const ifKey of Object.keys(ifKeyValue)) {
+            let indexSign = ifKey.indexOf('[');
+            if (indexSign !== -1) {
+                result.push(ifKey.slice(0, indexSign));
+            } else {
+                result.push(ifKey);
+            }
+        }
+    }
+    return result;
+}
+
 const ifResult = (ifKeyValue, values) => {
     let result = true;
     if (notEmpty(ifKeyValue)) {
@@ -131,4 +146,4 @@ const redirect = url => {
 };
 
 export default $global;
-export { ajax, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect };
+export { ajax, ifKeys, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect };

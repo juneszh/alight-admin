@@ -1,7 +1,7 @@
 import { lazy, useCallback, useEffect, useRef } from 'react';
 import { App, theme } from 'antd';
 import { BetaSchemaForm, ProFormUploadButton, ProFormUploadDragger } from '@ant-design/pro-components';
-import global, { ajax, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util';
+import global, { ajax, ifKeys, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util';
 
 const { useToken } = theme;
 const Editor = lazy(() => import('../lib/Editor'));
@@ -258,7 +258,7 @@ const Form = props => {
                 if (notEmpty(fieldValue.if)) {
                     columns.push({
                         valueType: 'dependency',
-                        name: Object.keys(fieldValue.if),
+                        name: ifKeys(fieldValue.if),
                         columns: (record) => {
                             return ifResult(fieldValue.if, record) ? [column] : [];
                         },
@@ -291,65 +291,63 @@ const Form = props => {
     }, []);
 
     return (
-        <>
-            <BetaSchemaForm
-                columns={mainColumns}
-                formRef={formRef}
-                grid={true}
-                labelWrap={true}
-                layout={layout}
-                layoutType='Form'
-                onFinish={async (values) => {
-                    if (notEmpty(global.config.field)) {
-                        for (const [key, value] of Object.entries(values)) {
-                            if (global.config.field[key]) {
-                                if (global.config.field[key].type === 'upload' || global.config.field[key].type === 'uploadDragger') {
-                                    values[key] = value.map(e => (e.response?.data?.name ?? e.name));
-                                    if (!global.config.field[key]?.typeProps?.multiple) {
-                                        values[key] = values[key][0] ?? '';
-                                    }
-                                } else if (global.config.field[key].type === 'color') {
-                                    if (typeof value !== 'string') {
-                                        values[key] = value.toCssString();
-                                    }
+        <BetaSchemaForm
+            columns={mainColumns}
+            formRef={formRef}
+            grid={true}
+            labelWrap={true}
+            layout={layout}
+            layoutType='Form'
+            onFinish={async (values) => {
+                if (notEmpty(global.config.field)) {
+                    for (const [key, value] of Object.entries(values)) {
+                        if (global.config.field[key]) {
+                            if (global.config.field[key].type === 'upload' || global.config.field[key].type === 'uploadDragger') {
+                                values[key] = value.map(e => (e.response?.data?.name ?? e.name));
+                                if (!global.config.field[key]?.typeProps?.multiple) {
+                                    values[key] = values[key][0] ?? '';
+                                }
+                            } else if (global.config.field[key].type === 'color') {
+                                if (typeof value !== 'string') {
+                                    values[key] = value.toCssString();
                                 }
                             }
                         }
                     }
-                    return ajax(message, window.location.href, values).then(result => {
-                        if (result && result.error === 0) {
-                            if (inIframe()) {
-                                postMessage(result);
-                            } else {
-                                redirect(global.path + '/result/200');
-                            }
-                        }
-                    })
-                }}
-                rowProps={{
-                    gutter: 24,
-                    justify: 'start'
-                }}
-                shouldUpdate={false}
-                style={{
-                    backgroundColor: token.colorBgElevated,
-                    padding: 24,
-                    height: 'auto',
-                    minHeight: '100vh',
-                    width: '100%'
-                }}
-                submitter={inIframe() || !showButton ? false : {
-                    resetButtonProps: false,
-                    submitButtonProps: {
-                        style: {
-                            position: 'fixed',
-                            right: 24,
-                            bottom: 24,
+                }
+                return ajax(message, window.location.href, values).then(result => {
+                    if (result && result.error === 0) {
+                        if (inIframe()) {
+                            postMessage(result);
+                        } else {
+                            redirect(global.path + '/result/200');
                         }
                     }
-                }}
-            />
-        </>
+                })
+            }}
+            rowProps={{
+                gutter: 24,
+                justify: 'start'
+            }}
+            shouldUpdate={false}
+            style={{
+                backgroundColor: token.colorBgElevated,
+                padding: 24,
+                height: 'auto',
+                minHeight: '100vh',
+                width: '100%'
+            }}
+            submitter={inIframe() || !showButton ? false : {
+                resetButtonProps: false,
+                submitButtonProps: {
+                    style: {
+                        position: 'fixed',
+                        right: 24,
+                        bottom: 24,
+                    }
+                }
+            }}
+        />
     );
 };
 

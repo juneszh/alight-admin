@@ -86,12 +86,12 @@ const ifResult = (ifKeyValue, values) => {
                         continue;
                     }
                 } else if (ifSign === '[!]') {
-                    if (numberToString(values[ifKey.slice(0, -3)]) === numberToString(ifValue)) {
+                    if (numberToString(values[ifKey.slice(0, -3)]) == numberToString(ifValue)) {
                         result = false;
                         continue;
                     }
                 } else {
-                    if (numberToString(values[ifKey]) !== numberToString(ifValue)) {
+                    if (numberToString(values[ifKey]) != numberToString(ifValue)) {
                         result = false;
                         continue;
                     }

@@ -55,51 +55,45 @@ const Form = props => {
             name: schema.dataIndex
         };
         return schema.fieldProps.imgCrop !== undefined ? (
-            <>
-                <ImgCrop quality={0.9} modalTitle={localeValue(':edit_image')} {...schema.fieldProps.imgCrop}>
-                    {dragger ? <ProFormUploadDraggerWrapper {...uploadProps} /> : <ProFormUploadButtonWrapper {...uploadProps} />}
-                </ImgCrop>
-            </>
+            <ImgCrop quality={0.9} modalTitle={localeValue(':edit_image')} {...schema.fieldProps.imgCrop}>
+                {dragger ? <ProFormUploadDraggerWrapper {...uploadProps} /> : <ProFormUploadButtonWrapper {...uploadProps} />}
+            </ImgCrop>
         ) : (
-            <>
-                {dragger ? <ProFormUploadDragger {...uploadProps} /> : <ProFormUploadButton {...uploadProps} />}
-            </>
+            dragger ? <ProFormUploadDragger {...uploadProps} /> : <ProFormUploadButton {...uploadProps} />
         );
     };
 
     const richTextRender = (schema, form) => (
-        <>
-            <Editor
-                disabled={(schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined}
-                init={{
-                    branding: false,
-                    contextmenu: 'image charmap emoticons visualblocks code fullscreen',
-                    contextmenu_never_use_native: true,
-                    convert_unsafe_embeds: true,
-                    convert_urls: false,
-                    fullscreen_native: true,
-                    images_upload_url: global.path + '/upload?' + new URLSearchParams(schema.fieldProps.data).toString(),
-                    language: localeValue(':tinymce') ? localeValue(':tinymce') : undefined,
-                    max_height: 600,
-                    menubar: schema.proFieldProps.readonly ? false : 'edit insert view format table',
-                    plugins: [
-                        'advlist', 'anchor', 'autolink', 'autoresize', 'charmap', 'code', 'codesample',
-                        'emoticons', 'fullscreen', 'image', 'insertdatetime', 'link', 'lists', 'media', 'pagebreak',
-                        'quickbars', 'searchreplace', 'table', 'visualblocks', 'visualchars', 'wordcount',
-                    ],
-                    promotion: false,
-                    quickbars_insert_toolbar: false,
-                    quickbars_selection_toolbar: true,
-                    skin: isLight ? 'oxide' : 'oxide-dark',
-                    content_css: isLight ? 'default' : 'tinymce-5-dark',
-                    toolbar: false,
-                    ...schema.fieldProps
-                }}
-                initialValue={schema.initialValue}
-                onEditorChange={(newValue) => form ? form.setFieldsValue({ [schema.key]: newValue }) : false}
-                tinymceScriptSrc='/alight-admin/tinymce/tinymce.min.js'
-            />
-        </>
+        <Editor
+            disabled={(schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined}
+            init={{
+                branding: false,
+                contextmenu: 'image charmap emoticons visualblocks code fullscreen',
+                contextmenu_never_use_native: true,
+                convert_unsafe_embeds: true,
+                convert_urls: false,
+                fullscreen_native: true,
+                images_upload_url: global.path + '/upload?' + new URLSearchParams(schema.fieldProps.data).toString(),
+                language: localeValue(':tinymce') ? localeValue(':tinymce') : undefined,
+                max_height: 600,
+                menubar: schema.proFieldProps.readonly ? false : 'edit insert view format table',
+                plugins: [
+                    'advlist', 'anchor', 'autolink', 'autoresize', 'charmap', 'code', 'codesample',
+                    'emoticons', 'fullscreen', 'image', 'insertdatetime', 'link', 'lists', 'media', 'pagebreak',
+                    'quickbars', 'searchreplace', 'table', 'visualblocks', 'visualchars', 'wordcount',
+                ],
+                promotion: false,
+                quickbars_insert_toolbar: false,
+                quickbars_selection_toolbar: true,
+                skin: isLight ? 'oxide' : 'oxide-dark',
+                content_css: isLight ? 'default' : 'tinymce-5-dark',
+                toolbar: false,
+                ...schema.fieldProps
+            }}
+            initialValue={schema.initialValue}
+            onEditorChange={(newValue) => form ? form.setFieldsValue({ [schema.key]: newValue }) : false}
+            tinymceScriptSrc='/alight-admin/tinymce/tinymce.min.js'
+        />
     );
 
     let layout = 'horizontal';

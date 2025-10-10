@@ -229,7 +229,7 @@ const Form = props => {
 
                     if (fieldValue.request) {
                         column.dependencies = fieldValue.requestParams;
-                        column.request = async (params, props) => {
+                        column.request = async (params) => {
                             const result = await ajax(message, fieldValue.request, params);
                             return result?.data?.list ?? [];
                         };

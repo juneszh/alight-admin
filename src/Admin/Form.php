@@ -67,6 +67,7 @@ class Form
         TYPE_GROUP = 'group',
         TYPE_FORM_LIST = 'formList',
         TYPE_FORM_SET = 'formSet',
+        TYPE_DIVIDER = 'divider',
         //extension
         TYPE_UPLOAD = 'upload',
         TYPE_UPLOAD_DRAGGER = 'uploadDragger',

@@ -231,12 +231,14 @@ class Form
                             Response::api(400, ':status_400');
                             exit;
                         }
+                    } elseif (isset($v['raw'])) {
+                        $return[$k] = $data[$k];
                     } elseif ($v['type'] === self::TYPE_PASSWORD) {
                         $return[$k] = password_hash($data[$k], PASSWORD_DEFAULT);
                     } elseif (is_array($data[$k])) {
                         $return[$k] = $data[$k] ? json_encode($data[$k], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '';
                     } else {
-                        $return[$k] = isset($v['raw']) ? $data[$k] : trim((string) $data[$k]);
+                        $return[$k] = trim((string) $data[$k]);
                     }
                 }
             } elseif ($v['type'] === self::TYPE_GROUP && isset($v['sub'])) {

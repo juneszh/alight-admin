@@ -222,7 +222,7 @@ class FormField
     }
 
     /**
-     * Keep the raw data when submit (trim default)
+     * Keep the raw data when submit, default: password_hash(password)/trim(string)/json_encode(array)
      *
      * @param bool $bool 
      * @return $this

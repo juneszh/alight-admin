@@ -76,9 +76,9 @@ const Form = props => {
                 images_upload_url: global.path + '/upload?' + new URLSearchParams(schema.fieldProps.data).toString(),
                 language: localeValue(':tinymce') ? localeValue(':tinymce') : undefined,
                 max_height: 600,
-                menubar: schema.proFieldProps.readonly ? false : 'edit insert view format table',
+                menubar: schema.proFieldProps.readonly ? false : undefined,
                 plugins: [
-                    'advlist', 'anchor', 'autolink', 'autoresize', 'charmap', 'code', 'codesample',
+                    'advlist', 'anchor', 'autolink', 'autoresize', 'autosave', 'charmap', 'code', 'codesample',
                     'emoticons', 'fullscreen', 'image', 'insertdatetime', 'link', 'lists', 'media', 'pagebreak',
                     'quickbars', 'searchreplace', 'table', 'visualblocks', 'visualchars', 'wordcount',
                 ],

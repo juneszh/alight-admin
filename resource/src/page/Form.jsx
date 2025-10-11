@@ -16,15 +16,15 @@ const Form = props => {
 
     const isLight = localStorage.getItem('alight-dark') ? false : true;
 
-    const ProFormUploadButtonWrapper = (({ fieldProps, beforeUpload, ...props }) => {
+    const ProFormUploadButtonWrapper = ({ fieldProps, beforeUpload, ...props }) => {
         return <ProFormUploadButton {...props} fieldProps={{ beforeUpload, ...fieldProps }} />;
-    });
+    };
 
-    const ProFormUploadDraggerWrapper = (({ fieldProps, beforeUpload, ...props }) => {
+    const ProFormUploadDraggerWrapper = ({ fieldProps, beforeUpload, ...props }) => {
         return <ProFormUploadDragger {...props} fieldProps={{ beforeUpload, ...fieldProps }} />;
-    });
+    };
 
-    const uploadRender = (schema, dragger) => {
+    const UploadWrapper = ({ schema, dragger }) => {
         const uploadProps = {
             disabled: (schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined,
             fieldProps: {
@@ -63,7 +63,7 @@ const Form = props => {
         );
     };
 
-    const richTextRender = (schema, form) => (
+    const EditorWrapper = ({ schema, form }) => (
         <Editor
             disabled={(schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined}
             init={{
@@ -200,14 +200,14 @@ const Form = props => {
                     }
 
                     if (fieldValue.type === 'upload') {
-                        column.render = (dom, entity, index, action, schema) => uploadRender(schema, false);
-                        column.renderFormItem = (schema) => uploadRender(schema, false);
+                        column.render = (dom, entity, index, action, schema) => (<UploadWrapper schema={schema} />);
+                        column.renderFormItem = (schema) => (<UploadWrapper schema={schema} />);
                     } else if (fieldValue.type === 'uploadDragger') {
-                        column.render = (dom, entity, index, action, schema) => uploadRender(schema, true);
-                        column.renderFormItem = (schema) => uploadRender(schema, true);
+                        column.render = (dom, entity, index, action, schema) => (<UploadWrapper schema={schema} dragger={true} />);
+                        column.renderFormItem = (schema) => (<UploadWrapper schema={schema} dragger={true} />);
                     } else if (fieldValue.type === 'richText') {
-                        column.render = (dom, entity, index, action, schema) => richTextRender(schema);
-                        column.renderFormItem = (schema, config, form) => richTextRender(schema, form);
+                        column.render = (dom, entity, index, action, schema) => (<EditorWrapper schema={schema} />);
+                        column.renderFormItem = (schema, config, form) => (<EditorWrapper schema={schema} form={form} />);
                     } else if (fieldValue.type === 'color') {
                         column.fieldProps.showText = true;
                         column.fieldProps.style = { display: 'inline-flex' };

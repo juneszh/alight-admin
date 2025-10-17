@@ -1,4 +1,4 @@
-import { lazy, useCallback, useEffect, useRef } from 'react';
+import { lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { App, Button, Space, theme } from 'antd';
 import { BetaSchemaForm, ProFormUploadButton, ProFormUploadDragger } from '@ant-design/pro-components';
 import global, { ajax, ifKeys, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util';
@@ -13,6 +13,7 @@ const Form = props => {
     const { message } = App.useApp();
 
     const formRef = useRef(undefined);
+    const [submitLoading, setSubmitLoading] = useState(false);
 
     const isLight = localStorage.getItem('alight-dark') ? false : true;
 
@@ -324,6 +325,7 @@ const Form = props => {
             layout={layout}
             layoutType='Form'
             onFinish={async (values) => {
+                setSubmitLoading(true);
                 if (notEmpty(global.config.field)) {
                     for (const [key, value] of Object.entries(values)) {
                         if (global.config.field[key]) {
@@ -342,6 +344,7 @@ const Form = props => {
                 }
                 return ajax(message, window.location.href, values).then(result => {
                     if (result && result.error === 0) {
+                        setSubmitLoading(false);
                         if (inIframe()) {
                             postMessage(result);
                         } else {
@@ -365,6 +368,7 @@ const Form = props => {
             submitter={inIframe() || !showButton ? false : {
                 resetButtonProps: false,
                 submitButtonProps: {
+                    loading: submitLoading,
                     style: {
                         position: 'fixed',
                         right: 24,

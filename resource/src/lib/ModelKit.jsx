@@ -11,7 +11,8 @@ const ModelKit = ({ ref }) => {
     const [modalHeight, setModalHeight] = useState(400);
     const [modalWidth, setModalWidth] = useState(816);
     const [modalConfig, setModalConfig] = useState({ title: '', url: '' });
-    const [modalOk, setModalOk] = useState(undefined);
+    const [okDisabled, setOkDisabled] = useState(true);
+    const [okLoading, setOkLoading] = useState(false);
     const iframeRef = useRef(undefined);
     const [lastModal, setLastModal] = useState('form');
     const [draggleDisabled, setDraggleDisabled] = useState(true);
@@ -45,7 +46,7 @@ const ModelKit = ({ ref }) => {
             }
         }
         setLastModal(button.action);
-        setModalOk({ disabled: true });
+        setOkDisabled(true);
         setModalOpen(true);
     };
 
@@ -65,8 +66,9 @@ const ModelKit = ({ ref }) => {
                 if (modalCallback?.always !== undefined) {
                     modalCallback.always(event.data);
                 }
+                setOkLoading(false);
             } else if (event.data.button) {
-                setModalOk({ disabled: false });
+                setOkDisabled(false);
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -81,6 +83,7 @@ const ModelKit = ({ ref }) => {
     };
 
     const modalSubmit = () => {
+        setOkLoading(true);
         iframeRef.current?.contentWindow.postMessage({ submit: true });
     }
 
@@ -141,7 +144,7 @@ const ModelKit = ({ ref }) => {
                     onStart={(event, uiData) => draggleStart(event, uiData)}
                 ><div ref={draggleRef}>{modal}</div></Draggable>
             )}
-            okButtonProps={modalOk}
+            okButtonProps={{disabled: okDisabled, loading: okLoading}}
             onCancel={modalHide}
             onOk={modalSubmit}
             open={modalOpen}

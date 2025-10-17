@@ -74,6 +74,22 @@ class FormField
     }
 
     /**
+     * Set request
+     *
+     * @param string $title 
+     * @param string $url 
+     * @param array $params 
+     * @return $this
+     */
+    public function button(string $title, string $url, array $params = [])
+    {
+        $this->config(__FUNCTION__, $title);
+        $this->config(__FUNCTION__ . 'Url', $url ? Admin::url($url) : null);
+        $this->config(__FUNCTION__ . 'Params', $params ?: null);
+        return $this;
+    }
+
+    /**
      * Common setting config values
      *
      * @param string $key
@@ -246,7 +262,7 @@ class FormField
     }
 
     /**
-     * Set request url
+     * Set request
      *
      * @param string $url 
      * @param array $params 

@@ -1,5 +1,5 @@
 import { lazy, useCallback, useEffect, useRef } from 'react';
-import { App, theme } from 'antd';
+import { App, Button, Space, theme } from 'antd';
 import { BetaSchemaForm, ProFormUploadButton, ProFormUploadDragger } from '@ant-design/pro-components';
 import global, { ajax, ifKeys, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util';
 
@@ -129,6 +129,29 @@ const Form = props => {
                     column.formItemProps.wrapperCol = fieldValue.grid ?? { sm: 14 };
                 }
 
+                if (fieldValue.button) {
+                    column.title = <Space>
+                        {column.title}
+                        <Button
+                            autoInsertSpace={false}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                const params = {};
+                                for (const param of Object.values(fieldValue.buttonParams)) {
+                                    params[param] = formRef?.current?.getFieldValue(param);
+                                }
+                                ajax(message, fieldValue.buttonUrl, params).then(result => {
+                                    if (result && result.error === 0) {
+                                        message.success(localeValue(':success'));
+                                        formRef?.current?.setFieldsValue(result.data);
+                                    }
+                                });
+                            }}
+                            size='small'
+                        >{fieldValue.button}</Button>
+                    </Space>;
+                }
+
                 if (fieldValue.value !== undefined && fieldValue.value !== '') {
                     if (fieldValue.type === 'upload' || fieldValue.type === 'uploadDragger') {
                         if (typeof fieldValue.value === 'string') {
@@ -200,14 +223,14 @@ const Form = props => {
                     }
 
                     if (fieldValue.type === 'upload') {
-                        column.render = (dom, entity, index, action, schema) => (<UploadWrapper schema={schema} />);
-                        column.renderFormItem = (schema) => (<UploadWrapper schema={schema} />);
+                        column.render = (dom, entity, index, action, schema) => <UploadWrapper schema={schema} />;
+                        column.renderFormItem = (schema) => <UploadWrapper schema={schema} />;
                     } else if (fieldValue.type === 'uploadDragger') {
-                        column.render = (dom, entity, index, action, schema) => (<UploadWrapper schema={schema} dragger={true} />);
-                        column.renderFormItem = (schema) => (<UploadWrapper schema={schema} dragger={true} />);
+                        column.render = (dom, entity, index, action, schema) => <UploadWrapper schema={schema} dragger={true} />;
+                        column.renderFormItem = (schema) => <UploadWrapper schema={schema} dragger={true} />;
                     } else if (fieldValue.type === 'richText') {
-                        column.render = (dom, entity, index, action, schema) => (<EditorWrapper schema={schema} />);
-                        column.renderFormItem = (schema, config, form) => (<EditorWrapper schema={schema} form={form} />);
+                        column.render = (dom, entity, index, action, schema) => <EditorWrapper schema={schema} />;
+                        column.renderFormItem = (schema, config, form) => <EditorWrapper schema={schema} form={form} />;
                     } else if (fieldValue.type === 'color') {
                         column.fieldProps.showText = true;
                         column.fieldProps.style = { display: 'inline-flex' };

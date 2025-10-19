@@ -47,6 +47,7 @@ const ModelKit = ({ ref }) => {
         }
         setLastModal(button.action);
         setOkDisabled(true);
+        setOkLoading(false);
         setModalOpen(true);
     };
 
@@ -66,9 +67,9 @@ const ModelKit = ({ ref }) => {
                 if (modalCallback?.always !== undefined) {
                     modalCallback.always(event.data);
                 }
-                setOkLoading(false);
             } else if (event.data.button) {
                 setOkDisabled(false);
+                setOkLoading(false);
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps

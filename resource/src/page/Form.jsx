@@ -344,14 +344,29 @@ const Form = props => {
                 }
                 return ajax(message, window.location.href, values).then(result => {
                     if (result && result.error === 0) {
-                        setSubmitLoading(false);
                         if (inIframe()) {
                             postMessage(result);
                         } else {
                             redirect(global.path + '/result/200');
                         }
                     }
+                    if (showButton) {
+                        if (inIframe()) {
+                            postMessage({ button: showButton });
+                        } else {
+                            setSubmitLoading(false);
+                        }
+                    }
                 })
+            }}
+            onFinishFailed={() => {
+                if (showButton) {
+                    if (inIframe()) {
+                        postMessage({ button: showButton });
+                    } else {
+                        setSubmitLoading(false);
+                    }
+                }
             }}
             rowProps={{
                 gutter: 24,

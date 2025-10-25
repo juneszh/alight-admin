@@ -17,7 +17,7 @@ const Home = props => {
     const [openKeys, setOpenKeys] = useState([]);
     const [selectedKeys, setSelectedKeys] = useState([]);
 
-    const menuAction = (e, item, itemKey, subKey) => {
+    const menuAction = (e, item) => {
         e.preventDefault();
         switch (item.action) {
             case 'popup':
@@ -27,30 +27,25 @@ const Home = props => {
                 window.location.assign(item.url);
                 break;
             default:
-                if (subKey) {
-                    window.history.pushState(null, '', '#' + itemKey + '-' + subKey);
-                    changeIFrame(itemKey + '-' + subKey);
-                } else {
-                    window.history.pushState(null, '', '#' + itemKey);
-                    changeIFrame(itemKey);
-                }
+                window.history.pushState(null, '', '#' + item.url);
+                changeIFrame(item.url);
                 break;
         }
     };
 
-    const changeIFrame = hashKey => {
-        if (!hashKey || !iFrameMap[hashKey]) {
-            hashKey = window.location.hash ? window.location.hash.substring(1) : '1-1';
+    const changeIFrame = url => {
+        if (!url || !iFrameMap[url]) {
+            url = window.location.hash ? window.location.hash.substring(1) : '/console';
         }
-        if (!iFrameMap[hashKey]) {
-            hashKey = '1-1';
+        if (!iFrameMap[url]) {
+            url = '/console';
         }
         if (openKeys.length === 0) {
-            setOpenKeys([hashKey.split('-')[0]]);
+            setOpenKeys([iFrameMap[url].parent]);
         }
-        setSelectedKeys([hashKey]);
-        setIframeSrc(iFrameMap[hashKey].url);
-        window.document.title = iFrameMap[hashKey].title;
+        setSelectedKeys([url]);
+        setIframeSrc(url);
+        window.document.title = iFrameMap[url].title;
     }
 
     const items = [];
@@ -67,24 +62,24 @@ const Home = props => {
             }
             if (notEmpty(itemValue.sub)) {
                 item.children = [];
-                for (const [subKey, subValue] of Object.entries(itemValue.sub)) {
+                for (const subValue of Object.values(itemValue.sub)) {
                     if (itemKey === '1') {
                         subValue.title = localeValue(subValue.title);
                     }
                     let children = {
-                        key: itemKey + '-' + subKey,
+                        key: subValue.url,
                         label: subValue.title,
                         icon: subValue.icon && Icons[subValue.icon] ? Icons[subValue.icon] : undefined,
                     };
                     if (subValue.url) {
                         if ((subValue.action ?? 'iframe') === 'iframe') {
-                            iFrameMap[itemKey + '-' + subKey] = { url: subValue.url, title: preTitle + subValue.title };
+                            iFrameMap[subValue.url] = { parent: itemKey, title: preTitle + subValue.title };
                         }
                         children.label = (
                             <a
                                 href={subValue.url + (subValue.url.indexOf('?') !== -1 ? '&' : '?') + '_title=' + subValue.title}
                                 rel='noopener noreferrer'
-                                onClick={e => menuAction(e, subValue, itemKey, subKey)}
+                                onClick={e => menuAction(e, subValue)}
                             >{subValue.title}</a>
                         );
                     }
@@ -93,13 +88,13 @@ const Home = props => {
             } else {
                 if (itemValue.url) {
                     if ((itemValue.action ?? 'iframe') === 'iframe') {
-                        iFrameMap[itemKey] = { url: itemValue.url, title: preTitle + itemValue.title };
+                        iFrameMap[itemValue.url] = { parent: itemKey, title: preTitle + itemValue.title };
                     }
                     item.label = (
                         <a
                             href={itemValue.url + (itemValue.url.indexOf('?') !== -1 ? '&' : '?') + '_title=' + itemValue.title}
                             rel='noopener noreferrer'
-                            onClick={e => menuAction(e, itemValue, itemKey)}
+                            onClick={e => menuAction(e, itemValue)}
                         >{itemValue.title}</a>
                     );
                 }

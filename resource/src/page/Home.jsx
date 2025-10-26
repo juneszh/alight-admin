@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Layout, Menu } from 'antd';
+import { Badge, Layout, Menu } from 'antd';
 import { DashboardOutlined, SafetyCertificateOutlined, TeamOutlined } from '@ant-design/icons';
 import global, { localeInit, localeValue, notEmpty } from '../lib/Util';
 
@@ -16,6 +16,9 @@ const Home = props => {
     const [iframeSrc, setIframeSrc] = useState();
     const [openKeys, setOpenKeys] = useState([]);
     const [selectedKeys, setSelectedKeys] = useState([]);
+    const [noticeL1, setNoticeL1] = useState({});
+    const [noticeL2, setNoticeL2] = useState({});
+
 
     const menuAction = (e, item) => {
         e.preventDefault();
@@ -27,25 +30,26 @@ const Home = props => {
                 window.location.assign(item.url);
                 break;
             default:
-                window.history.pushState(null, '', '#' + item.url);
-                changeIFrame(item.url);
+                window.history.pushState(null, '', '#' + (item.key ?? item.url));
+                changeIFrame((item.key ?? item.url));
                 break;
         }
     };
 
-    const changeIFrame = url => {
-        if (!url || !iFrameMap[url]) {
-            url = window.location.hash ? window.location.hash.substring(1) : '/console';
+    const changeIFrame = key => {
+        if (!key || !iFrameMap[key]) {
+            key = window.location.hash ? window.location.hash.substring(1) : Object.keys(iFrameMap)[0];
         }
-        if (!iFrameMap[url]) {
-            url = '/console';
+        if (!iFrameMap[key]) {
+            key = Object.keys(iFrameMap)[0];
         }
         if (openKeys.length === 0) {
-            setOpenKeys([iFrameMap[url].parent]);
+            console.log(iFrameMap, key);
+            setOpenKeys([iFrameMap[key].parent]);
         }
-        setSelectedKeys([url]);
-        setIframeSrc(url);
-        window.document.title = iFrameMap[url].title;
+        setSelectedKeys([key]);
+        setIframeSrc(iFrameMap[key].url);
+        window.document.title = iFrameMap[key].title;
     }
 
     const items = [];
@@ -53,9 +57,9 @@ const Home = props => {
     let preTitle = '';
     if (notEmpty(global.config.menu)) {
         for (const [itemKey, itemValue] of Object.entries(global.config.menu)) {
-            let item = {
+            const item = {
                 key: itemKey,
-                label: itemValue.title
+                label: <>{itemValue.title} {noticeL1[itemKey] !== undefined ? <Badge status="error" /> : undefined}</>
             };
             if (itemKey == 1) {
                 preTitle = itemValue.title + ' - ';
@@ -66,29 +70,29 @@ const Home = props => {
                     if (itemKey === '1') {
                         subValue.title = localeValue(subValue.title);
                     }
-                    let children = {
-                        key: subValue.url,
-                        label: subValue.title,
-                        icon: subValue.icon && Icons[subValue.icon] ? Icons[subValue.icon] : undefined,
-                    };
                     if (subValue.url) {
+                        const children = {
+                            key: subValue.key ?? subValue.url,
+                            label: subValue.title,
+                            icon: subValue.icon && Icons[subValue.icon] ? Icons[subValue.icon] : undefined,
+                        };
                         if ((subValue.action ?? 'iframe') === 'iframe') {
-                            iFrameMap[subValue.url] = { parent: itemKey, title: preTitle + subValue.title };
+                            iFrameMap[subValue.key ?? subValue.url] = { parent: itemKey, title: preTitle + subValue.title, url: subValue.url };
                         }
                         children.label = (
                             <a
                                 href={subValue.url + (subValue.url.indexOf('?') !== -1 ? '&' : '?') + '_title=' + subValue.title}
                                 rel='noopener noreferrer'
                                 onClick={e => menuAction(e, subValue)}
-                            >{subValue.title}</a>
+                            >{subValue.title} {noticeL2[children.key] !== undefined ? <Badge status="error" /> : undefined}</a>
                         );
+                        item.children.push(children);
                     }
-                    item.children.push(children);
                 }
             } else {
                 if (itemValue.url) {
                     if ((itemValue.action ?? 'iframe') === 'iframe') {
-                        iFrameMap[itemValue.url] = { parent: itemKey, title: preTitle + itemValue.title };
+                        iFrameMap[itemValue.key ?? itemValue.url] = { parent: itemKey, title: preTitle + itemValue.title, url: itemValue.url };
                     }
                     item.label = (
                         <a

@@ -91,6 +91,19 @@ class MenuItem
     }
 
     /**
+     * Custom unique key, default is url
+     *
+     * @param string $value
+     * @return $this 
+     * 
+     */
+    public function key(string $value)
+    {
+        $this->config(__FUNCTION__, $value);
+        return $this;
+    }
+
+    /**
      * Which role has permission to view
      *
      * @param array $roleValues

@@ -44,7 +44,6 @@ const Home = props => {
             key = Object.keys(iFrameMap)[0];
         }
         if (openKeys.length === 0) {
-            console.log(iFrameMap, key);
             setOpenKeys([iFrameMap[key].parent]);
         }
         setSelectedKeys([key]);

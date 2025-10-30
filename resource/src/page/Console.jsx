@@ -2,7 +2,7 @@ import { lazy, useEffect, useRef, useState } from 'react';
 import { App, Avatar, Card, Col, List, Row, Switch, Typography, theme } from 'antd';
 import { InfoCircleOutlined, EditOutlined, ExclamationCircleOutlined, LockOutlined, PoweroffOutlined, SunOutlined, MoonOutlined } from '@ant-design/icons';
 import global, { ajax, localeInit, localeValue, notEmpty, redirect } from '../lib/Util';
-import ModelKit from '../lib/ModelKit';
+import ModelKit from '../lib/ModalKit';
 import dayjs from 'dayjs';
 
 const { Text } = Typography;

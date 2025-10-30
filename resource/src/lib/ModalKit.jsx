@@ -67,9 +67,13 @@ const ModelKit = ({ ref }) => {
                 if (modalCallback?.always !== undefined) {
                     modalCallback.always(event.data);
                 }
-            } else if (event.data.button) {
-                setOkDisabled(false);
-                setOkLoading(false);
+            } else if (event.data.button !== undefined) {
+                if (event.data.button) {
+                    setOkDisabled(false);
+                    setOkLoading(false);
+                } else {
+                    setOkDisabled(true);
+                }
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -145,7 +149,7 @@ const ModelKit = ({ ref }) => {
                     onStart={(event, uiData) => draggleStart(event, uiData)}
                 ><div ref={draggleRef}>{modal}</div></Draggable>
             )}
-            okButtonProps={{disabled: okDisabled, loading: okLoading}}
+            okButtonProps={{ disabled: okDisabled, loading: okLoading }}
             onCancel={modalHide}
             onOk={modalSubmit}
             open={modalOpen}

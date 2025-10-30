@@ -3,8 +3,8 @@ import { App, Button, Card, Col, Popover, QRCode, Row, Space, Statistic, theme }
 import { ExclamationCircleOutlined, ScanOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import dayjs from 'dayjs';
-import global, { ajax, ifResult, localeInit, localeValue, notEmpty } from '../lib/Util.js';
-import ModelKit from '../lib/ModelKit.jsx';
+import global, { ajax, ifResult, localeInit, localeValue, notEmpty } from '../lib/Util';
+import ModelKit from '../lib/ModalKit';
 
 const { useToken } = theme;
 

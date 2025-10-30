@@ -34,7 +34,18 @@ const Form = props => {
                 maxCount: schema.fieldProps.multiple ? 0 : 1,
                 name: 'file',
                 onChange: ({ file, fileList }) => {
-                    if (file.status === 'error') {
+                    if (file.status === 'uploading') {
+                        if (showButton) {
+                            postMessage({ button: false });
+                        }
+                    } else if (file.status === 'done') {
+                        if (showButton) {
+                            postMessage({ button: true });
+                        }
+                    } else if (file.status === 'error') {
+                        if (showButton) {
+                            postMessage({ button: true });
+                        }
                         for (const [key, value] of Object.entries(fileList)) {
                             if (value.uid === file.uid) {
                                 fileList.splice(key, 1);
@@ -330,7 +341,7 @@ const Form = props => {
                     for (const [key, value] of Object.entries(values)) {
                         if (global.config.field[key]) {
                             if (global.config.field[key].type === 'upload' || global.config.field[key].type === 'uploadDragger') {
-                                values[key] = value.map(e => (e.response?.data?.name ?? e.name));
+                                values[key] = value.map(e => (e.response?.data?.name));
                                 if (!global.config.field[key]?.typeProps?.multiple) {
                                     values[key] = values[key][0] ?? '';
                                 }
@@ -372,6 +383,7 @@ const Form = props => {
                 gutter: 24,
                 justify: 'start'
             }}
+            scrollToFirstError={true}
             shouldUpdate={false}
             style={{
                 backgroundColor: token.colorBgElevated,

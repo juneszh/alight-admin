@@ -186,6 +186,8 @@ const Form = props => {
                                 }
                             }
                         }
+                    } else if (fieldValue.type === 'switch') {
+                        column.initialValue = !!parseInt(fieldValue.value);
                     } else {
                         column.initialValue = numberToString(fieldValue.value);
                     }

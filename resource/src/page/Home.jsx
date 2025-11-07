@@ -30,8 +30,12 @@ const Home = props => {
                 window.location.assign(item.url);
                 break;
             default:
-                window.history.pushState(null, '', '#' + (item.key ?? item.url));
-                changeIFrame((item.key ?? item.url));
+                let key = item.key ?? item.url;
+                if (key === Object.keys(iFrameMap)[0]) {
+                    key = '';
+                }
+                window.history.pushState(null, '', '#' + key);
+                changeIFrame(key);
                 break;
         }
     };

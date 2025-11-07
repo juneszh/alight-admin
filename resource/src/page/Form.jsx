@@ -341,7 +341,7 @@ const Form = props => {
                     for (const [key, value] of Object.entries(values)) {
                         if (global.config.field[key]) {
                             if (global.config.field[key].type === 'upload' || global.config.field[key].type === 'uploadDragger') {
-                                values[key] = value.map(e => (e.response?.data?.name));
+                                values[key] = value.map(e => (e.response?.data?.name ?? e.name));
                                 if (!global.config.field[key]?.typeProps?.multiple) {
                                     values[key] = values[key][0] ?? '';
                                 }

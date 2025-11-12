@@ -226,6 +226,21 @@ class FormField
     }
 
     /**
+     * Set options (likes enum but supports children)
+     *
+     * @param array $values
+     * @return $this
+     * 
+     * @example Basic [['label'=>'N', 'value'=>0], ['label'=>'Y', 'value'=>1]]
+     * @example Children [['label'=>'city', 'value'=>100, 'children'=>[['label'=>'area1', 'value'=>101], ['label'=>'area2', 'value'=>102]]]]
+     */
+    public function options(array $values)
+    {
+        $this->config(__FUNCTION__, $values ?: null);
+        return $this;
+    }
+
+    /**
      * Set placeholder
      *
      * @param string $value

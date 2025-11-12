@@ -232,6 +232,10 @@ const Form = props => {
                         }
                     }
 
+                    if (fieldValue.options) {
+                        column.options = fieldValue.options;
+                    }
+
                     if (fieldValue.tooltip) {
                         column.tooltip = fieldValue.tooltip;
                     }

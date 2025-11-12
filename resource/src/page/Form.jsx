@@ -233,7 +233,7 @@ const Form = props => {
                     }
 
                     if (fieldValue.options) {
-                        column.options = fieldValue.options;
+                        column.fieldProps.options = fieldValue.options;
                     }
 
                     if (fieldValue.tooltip) {

@@ -353,7 +353,13 @@ const Form = props => {
                                 }
                             } else if (global.config.field[key].type === 'color') {
                                 if (typeof value !== 'string') {
-                                    values[key] = value.toCssString();
+                                    if (global.config.field[key]?.typeProps?.format === 'rgb') {
+                                        values[key] = value.toRgbString();
+                                    } else if (global.config.field[key]?.typeProps?.format === 'hsb') {
+                                        values[key] = value.toHsbString();
+                                    } else {
+                                        values[key] = value.toHexString();
+                                    }
                                 }
                             }
                         }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Badge, Layout, Menu } from 'antd';
+import { ConfigProvider, Layout, Menu } from 'antd';
 import { DashboardOutlined, SafetyCertificateOutlined, TeamOutlined } from '@ant-design/icons';
 import global, { localeInit, localeValue, notEmpty } from '../lib/Util';
 
@@ -12,12 +12,10 @@ const Home = props => {
         TeamOutlined: <TeamOutlined />
     };
 
-    const [collapsedWidth, setCollapsedWidth] = useState(48);
+    const [collapsedWidth, setCollapsedWidth] = useState(60);
     const [iframeSrc, setIframeSrc] = useState();
     const [openKeys, setOpenKeys] = useState([]);
     const [selectedKeys, setSelectedKeys] = useState([]);
-    const [noticeL1, setNoticeL1] = useState({});
-    const [noticeL2, setNoticeL2] = useState({});
 
 
     const menuAction = (e, item) => {
@@ -62,7 +60,7 @@ const Home = props => {
         for (const [itemKey, itemValue] of Object.entries(global.config.menu)) {
             const item = {
                 key: itemKey,
-                label: <>{itemValue.title} {noticeL1[itemKey] !== undefined ? <Badge status="error" /> : undefined}</>
+                label: itemValue.title
             };
             if (itemKey == 1) {
                 preTitle = itemValue.title + ' - ';
@@ -87,7 +85,7 @@ const Home = props => {
                                 href={subValue.url + (subValue.url.indexOf('?') !== -1 ? '&' : '?') + '_title=' + subValue.title}
                                 rel='noopener noreferrer'
                                 onClick={e => menuAction(e, subValue)}
-                            >{subValue.title} {noticeL2[children.key] !== undefined ? <Badge status="error" /> : undefined}</a>
+                            >{subValue.title}</a>
                         );
                         item.children.push(children);
                     }
@@ -120,39 +118,49 @@ const Home = props => {
     }, []);
 
     return (
-        <Layout style={{ height: 'auto', minHeight: '100vh' }}>
-            <Layout.Sider
-                breakpoint='lg'
-                collapsedWidth={collapsedWidth}
-                collapsible
-                onBreakpoint={broken => {
-                    setCollapsedWidth(broken ? 0 : 48);
-                }}
-            >
-                <Menu
-                    forceSubMenuRender={true}
-                    inlineIndent={16}
-                    items={items}
-                    mode='inline'
-                    onOpenChange={openKeys => {
-                        setOpenKeys(openKeys);
+        <ConfigProvider
+            theme={{
+                components: {
+                    Layout: {
+                        headerHeight: 0
+                    },
+                },
+            }}
+        >
+            <Layout style={{ height: 'auto', minHeight: '100vh' }}>
+                <Layout.Sider
+                    breakpoint='lg'
+                    collapsedWidth={collapsedWidth}
+                    collapsible
+                    onBreakpoint={broken => {
+                        setCollapsedWidth(broken ? 0 : 60);
                     }}
-                    openKeys={openKeys}
-                    selectedKeys={selectedKeys}
-                    theme='dark'
-                />
-            </Layout.Sider>
-            <Layout className='site-layout'>
-                <Layout.Content style={{ display: 'flex' }}>
-                    <iframe
-                        key={iframeSrc}
-                        src={iframeSrc}
-                        style={{ border: 'none', flex: '1 1 auto', overflow: 'auto' }}
-                        title='homeFrame'
+                >
+                    <Menu
+                        forceSubMenuRender={true}
+                        inlineIndent={16}
+                        items={items}
+                        mode='inline'
+                        onOpenChange={openKeys => {
+                            setOpenKeys(openKeys);
+                        }}
+                        openKeys={openKeys}
+                        selectedKeys={selectedKeys}
+                        theme='dark'
                     />
-                </Layout.Content>
+                </Layout.Sider>
+                <Layout className='site-layout'>
+                    <Layout.Content style={{ display: 'flex' }}>
+                        <iframe
+                            key={iframeSrc}
+                            src={iframeSrc}
+                            style={{ border: 'none', flex: '1 1 auto', overflow: 'auto' }}
+                            title='homeFrame'
+                        />
+                    </Layout.Content>
+                </Layout>
             </Layout>
-        </Layout>
+        </ConfigProvider>
     );
 };
 

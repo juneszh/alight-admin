@@ -242,13 +242,13 @@ const Form = props => {
 
                     if (fieldValue.type === 'upload') {
                         column.render = (dom, entity, index, action, schema) => <UploadWrapper schema={schema} />;
-                        column.renderFormItem = (schema) => <UploadWrapper schema={schema} />;
+                        column.formItemRender = (schema) => <UploadWrapper schema={schema} />;
                     } else if (fieldValue.type === 'uploadDragger') {
                         column.render = (dom, entity, index, action, schema) => <UploadWrapper schema={schema} dragger={true} />;
-                        column.renderFormItem = (schema) => <UploadWrapper schema={schema} dragger={true} />;
+                        column.formItemRender = (schema) => <UploadWrapper schema={schema} dragger={true} />;
                     } else if (fieldValue.type === 'richText') {
                         column.render = (dom, entity, index, action, schema) => <EditorWrapper schema={schema} />;
-                        column.renderFormItem = (schema, config, form) => <EditorWrapper schema={schema} form={form} />;
+                        column.formItemRender = (schema, config, form) => <EditorWrapper schema={schema} form={form} />;
                     } else if (fieldValue.type === 'color') {
                         column.fieldProps.showText = true;
                         column.fieldProps.style = { display: 'inline-flex' };

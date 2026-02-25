@@ -33,7 +33,7 @@ class Controller
 
         $roleId = Auth::checkRole([]);
         if (!$roleId) {
-            return false;
+            return true;
         }
 
         $menu = Menu::build($roleId);
@@ -95,7 +95,7 @@ class Controller
 
             if (!$account || !$password) {
                 Response::api(1001, ':missing_param');
-                return false;
+                return true;
             }
 
             $cache = Cache::init();
@@ -114,7 +114,7 @@ class Controller
 
                 if (!$captchaCodeCache || $captchaCode != $captchaCodeCache) {
                     Response::api(1002, ':invalid_captcha');
-                    return false;
+                    return true;
                 }
             } elseif ($token) {
                 $secret = Config::get('turnstile')['secret'] ?? '';
@@ -142,36 +142,36 @@ class Controller
 
                 if (!$validation['success']) {
                     Response::api(1002, ':invalid_captcha');
-                    return false;
+                    return true;
                 }
             } else {
                 Response::api(1001, ':missing_param');
-                return false;
+                return true;
             }
 
             $userId = Model::getUserIdByAccount($account);
             if (!$userId) {
                 Response::api(1003, ':invalid_account');
-                return false;
+                return true;
             }
 
             $waitMinute = 15;
             $failTimes = (int) $cache->get('alight.admin_login_fail.' . $userId);
             if ($failTimes >= 5) {
                 Response::api(1004, ':try_again_later');
-                return false;
+                return true;
             }
 
             $userInfo = Model::getUserInfo($userId);
             if (!password_verify($password, $userInfo['password'])) {
                 $cache->set('alight.admin_login_fail.' . $userId, $failTimes + 1, $waitMinute * 60);
                 Response::api(1003, ':invalid_account');
-                return false;
+                return true;
             }
 
             if ($userInfo['status'] != 1) {
                 Response::api(1005, ':invalid_account');
-                return false;
+                return true;
             }
 
             Auth::store($userId);
@@ -298,9 +298,8 @@ class Controller
      */
     public static function roleTable()
     {
-        $roleId = Auth::checkRole([1]);
-        if (!$roleId) {
-            return false;
+        if (!Auth::checkRole([1])) {
+            return true;
         }
 
         Table::column('id')->title('ID')->sort(Table::SORT_ASCEND);
@@ -318,9 +317,8 @@ class Controller
      */
     public static function roleForm()
     {
-        $roleId = Auth::checkRole([1]);
-        if (!$roleId) {
-            return false;
+        if (!Auth::checkRole([1])) {
+            return true;
         }
 
         Form::create('add');
@@ -336,9 +334,8 @@ class Controller
      */
     public static function userTable()
     {
-        $roleId = Auth::checkRole([1]);
-        if (!$roleId) {
-            return false;
+        if (!Auth::checkRole([1])) {
+            return true;
         }
 
         $roleEnum = Utility::arrayFilter(Model::getRoleList(), [], 'id', 'name');
@@ -371,9 +368,8 @@ class Controller
             $role = [];
         }
 
-        $roleId = Auth::checkRole($role);
-        if (!$roleId) {
-            return false;
+        if (!Auth::checkRole($role)) {
+            return true;
         }
 
         $roleEnum = Utility::arrayFilter(Model::getRoleList(), [], 'id', 'name');
@@ -444,7 +440,7 @@ class Controller
 
         if (!$fileName) {
             Response::api(400, ':status_400');
-            return false;
+            return true;
         }
 
         $resData = [

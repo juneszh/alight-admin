@@ -182,7 +182,7 @@ class Form
         } else {
             $sqlData = self::dataFilter($field, Request::request());
             if ($sqlData === null){
-                return false;
+                return true;
             }
 
             if (is_callable($callback)) {

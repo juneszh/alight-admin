@@ -181,6 +181,9 @@ class Form
             Response::render(Admin::path() . '/src/Admin/View.php', ['title' => $_title, 'script' => Admin::globalScript('Form', $renderData)]);
         } else {
             $sqlData = self::dataFilter($field, Request::request());
+            if ($sqlData === null){
+                return false;
+            }
 
             if (is_callable($callback)) {
                 $callback(self::EVENT_REQUEST, $sqlData);
@@ -218,9 +221,9 @@ class Form
      * 
      * @param array $field 
      * @param array $data 
-     * @return array 
+     * @return null|array 
      */
-    private static function dataFilter(array $field, array $data): array
+    private static function dataFilter(array $field, array $data): ?array
     {
         $return = [];
         foreach ($field as $k => $v) {
@@ -229,7 +232,7 @@ class Form
                     if (isset($v['confirm'])) {
                         if ($data[$v['confirm']] != $data[$k]) {
                             Response::api(400, ':status_400');
-                            exit;
+                            return null;
                         }
                     } elseif (isset($v['raw'])) {
                         $return[$k] = $data[$k];
@@ -245,6 +248,8 @@ class Form
                 $_return = self::dataFilter($v['sub'], $data);
                 if ($_return) {
                     $return = array_merge($return, $_return);
+                } elseif ($_return === null){
+                    return null;
                 }
             }
         }

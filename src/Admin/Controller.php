@@ -32,6 +32,10 @@ class Controller
         Auth::store($userId, true);
 
         $roleId = Auth::checkRole([]);
+        if (!$roleId) {
+            return false;
+        }
+
         $menu = Menu::build($roleId);
 
         Response::render(Admin::path() . '/src/Admin/View.php', ['title' => Config::get('title'), 'script' => Admin::globalScript('Home', ['menu' => $menu])]);
@@ -91,7 +95,7 @@ class Controller
 
             if (!$account || !$password) {
                 Response::api(1001, ':missing_param');
-                exit;
+                return false;
             }
 
             $cache = Cache::init();
@@ -110,7 +114,7 @@ class Controller
 
                 if (!$captchaCodeCache || $captchaCode != $captchaCodeCache) {
                     Response::api(1002, ':invalid_captcha');
-                    exit;
+                    return false;
                 }
             } elseif ($token) {
                 $secret = Config::get('turnstile')['secret'] ?? '';
@@ -138,36 +142,36 @@ class Controller
 
                 if (!$validation['success']) {
                     Response::api(1002, ':invalid_captcha');
-                    exit;
+                    return false;
                 }
             } else {
                 Response::api(1001, ':missing_param');
-                exit;
+                return false;
             }
 
             $userId = Model::getUserIdByAccount($account);
             if (!$userId) {
                 Response::api(1003, ':invalid_account');
-                exit;
+                return false;
             }
 
             $waitMinute = 15;
             $failTimes = (int) $cache->get('alight.admin_login_fail.' . $userId);
             if ($failTimes >= 5) {
                 Response::api(1004, ':try_again_later');
-                exit;
+                return false;
             }
 
             $userInfo = Model::getUserInfo($userId);
             if (!password_verify($password, $userInfo['password'])) {
                 $cache->set('alight.admin_login_fail.' . $userId, $failTimes + 1, $waitMinute * 60);
                 Response::api(1003, ':invalid_account');
-                exit;
+                return false;
             }
 
             if ($userInfo['status'] != 1) {
                 Response::api(1005, ':invalid_account');
-                exit;
+                return false;
             }
 
             Auth::store($userId);
@@ -294,7 +298,10 @@ class Controller
      */
     public static function roleTable()
     {
-        Auth::checkRole([1]);
+        $roleId = Auth::checkRole([1]);
+        if (!$roleId) {
+            return false;
+        }
 
         Table::column('id')->title('ID')->sort(Table::SORT_ASCEND);
         Table::column('name')->title(':role');
@@ -311,7 +318,10 @@ class Controller
      */
     public static function roleForm()
     {
-        Auth::checkRole([1]);
+        $roleId = Auth::checkRole([1]);
+        if (!$roleId) {
+            return false;
+        }
 
         Form::create('add');
         Form::field('name')->title(':name')->required();
@@ -326,7 +336,10 @@ class Controller
      */
     public static function userTable()
     {
-        Auth::checkRole([1]);
+        $roleId = Auth::checkRole([1]);
+        if (!$roleId) {
+            return false;
+        }
 
         $roleEnum = Utility::arrayFilter(Model::getRoleList(), [], 'id', 'name');
         $statusEnum = [1 => ['text' => ':enable', 'status' => 'success'], 2 => ['text' => ':disable', 'status' => 'error']];
@@ -358,7 +371,10 @@ class Controller
             $role = [];
         }
 
-        Auth::checkRole($role);
+        $roleId = Auth::checkRole($role);
+        if (!$roleId) {
+            return false;
+        }
 
         $roleEnum = Utility::arrayFilter(Model::getRoleList(), [], 'id', 'name');
         $statusEnum = [1 => ':enable', 2 => ':disable'];
@@ -428,7 +444,7 @@ class Controller
 
         if (!$fileName) {
             Response::api(400, ':status_400');
-            exit;
+            return false;
         }
 
         $resData = [

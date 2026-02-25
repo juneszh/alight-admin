@@ -16,6 +16,7 @@ namespace Alight\Admin;
 use Alight\Cache;
 use Alight\Request;
 use Alight\Response;
+use Alight\RouteMiddleware;
 use Alight\Router;
 use Alight\Utility;
 
@@ -38,11 +39,10 @@ class Auth
 
         if (Request::isAjax()) {
             Response::api(401, ':status_401');
-            exit;
         } else {
             Controller::result(401);
-            exit;
         }
+        return 0;
     }
 
     /**
@@ -91,7 +91,7 @@ class Auth
      */
     public static function getUserId(): int
     {
-        $authId = Router::getAuthId();
+        $authId = RouteMiddleware::getAuthId();
         if ($authId) {
             return (int) $authId;
         }
@@ -183,7 +183,7 @@ class Auth
      * @param array $roleIds 
      * @return int 
      */
-    public static function checkRole(array $roleIds)
+    public static function checkRole(array $roleIds): int
     {
         $userId = self::getUserId();
         if ($userId) {
@@ -202,10 +202,9 @@ class Auth
 
         if (Request::isAjax()) {
             Response::api(403, ':status_403');
-            exit;
         } else {
             Controller::result(403);
-            exit;
         }
+        return 0;
     }
 }

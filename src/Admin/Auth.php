@@ -91,7 +91,7 @@ class Auth
      */
     public static function getUserId(): int
     {
-        $authId = RouteMiddleware::getAuthId();
+        $authId = Router::getAuthId();
         if ($authId) {
             return (int) $authId;
         }

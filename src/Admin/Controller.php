@@ -18,6 +18,7 @@ use Alight\App;
 use Alight\Cache;
 use Alight\Request;
 use Alight\Response;
+use Alight\ResponseException;
 use Alight\Utility;
 
 class Controller
@@ -32,9 +33,6 @@ class Controller
         Auth::store($userId, true);
 
         $roleId = Auth::checkRole([]);
-        if (!$roleId) {
-            return true;
-        }
 
         $menu = Menu::build($roleId);
 
@@ -94,8 +92,7 @@ class Controller
             $token = Request::post('token', '');
 
             if (!$account || !$password) {
-                Response::api(1001, ':missing_param');
-                return true;
+                throw new ResponseException(1001, ':missing_param');
             }
 
             $cache = Cache::init();
@@ -113,8 +110,7 @@ class Controller
                 ]);
 
                 if (!$captchaCodeCache || $captchaCode != $captchaCodeCache) {
-                    Response::api(1002, ':invalid_captcha');
-                    return true;
+                    throw new ResponseException(1002, ':invalid_captcha');
                 }
             } elseif ($token) {
                 $secret = Config::get('turnstile')['secret'] ?? '';
@@ -141,37 +137,31 @@ class Controller
                 }
 
                 if (!$validation['success']) {
-                    Response::api(1002, ':invalid_captcha');
-                    return true;
+                    throw new ResponseException(1002, ':invalid_captcha');
                 }
             } else {
-                Response::api(1001, ':missing_param');
-                return true;
+                throw new ResponseException(1001, ':missing_param');
             }
 
             $userId = Model::getUserIdByAccount($account);
             if (!$userId) {
-                Response::api(1003, ':invalid_account');
-                return true;
+                throw new ResponseException(1003, ':invalid_account');
             }
 
             $waitMinute = 15;
             $failTimes = (int) $cache->get('alight.admin_login_fail.' . $userId);
             if ($failTimes >= 5) {
-                Response::api(1004, ':try_again_later');
-                return true;
+                throw new ResponseException(1004, ':try_again_later');
             }
 
             $userInfo = Model::getUserInfo($userId);
             if (!password_verify($password, $userInfo['password'])) {
                 $cache->set('alight.admin_login_fail.' . $userId, $failTimes + 1, $waitMinute * 60);
-                Response::api(1003, ':invalid_account');
-                return true;
+                throw new ResponseException(1003, ':invalid_account');
             }
 
             if ($userInfo['status'] != 1) {
-                Response::api(1005, ':invalid_account');
-                return true;
+                throw new ResponseException(1005, ':invalid_account');
             }
 
             Auth::store($userId);
@@ -298,9 +288,7 @@ class Controller
      */
     public static function roleTable()
     {
-        if (!Auth::checkRole([1])) {
-            return true;
-        }
+        Auth::checkRole([1]);
 
         Table::column('id')->title('ID')->sort(Table::SORT_ASCEND);
         Table::column('name')->title(':role');
@@ -317,9 +305,7 @@ class Controller
      */
     public static function roleForm()
     {
-        if (!Auth::checkRole([1])) {
-            return true;
-        }
+        Auth::checkRole([1]);
 
         Form::create('add');
         Form::field('name')->title(':name')->required();
@@ -334,9 +320,7 @@ class Controller
      */
     public static function userTable()
     {
-        if (!Auth::checkRole([1])) {
-            return true;
-        }
+        Auth::checkRole([1]);
 
         $roleEnum = Utility::arrayFilter(Model::getRoleList(), [], 'id', 'name');
         $statusEnum = [1 => ['text' => ':enable', 'status' => 'success'], 2 => ['text' => ':disable', 'status' => 'error']];
@@ -368,9 +352,7 @@ class Controller
             $role = [];
         }
 
-        if (!Auth::checkRole($role)) {
-            return true;
-        }
+        Auth::checkRole($role);
 
         $roleEnum = Utility::arrayFilter(Model::getRoleList(), [], 'id', 'name');
         $statusEnum = [1 => ':enable', 2 => ':disable'];
@@ -439,8 +421,7 @@ class Controller
         }
 
         if (!$fileName) {
-            Response::api(400, ':status_400');
-            return true;
+            throw new ResponseException(400, ':status_400');
         }
 
         $resData = [

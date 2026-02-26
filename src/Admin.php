@@ -18,8 +18,8 @@ use Alight\Admin\Config as AdminConfig;
 use Alight\Admin\Controller;
 use Alight\Admin\Model;
 use Composer\InstalledVersions;
-use Exception;
 use PharData;
+use RuntimeException;
 use Symfony\Component\VarExporter\VarExporter;
 
 class Admin
@@ -129,7 +129,7 @@ class Admin
     public static function install()
     {
         if (PHP_SAPI !== 'cli') {
-            throw new Exception('PHP-CLI required.');
+            throw new RuntimeException('PHP-CLI required.');
         }
 
         self::insertConfig();
@@ -410,7 +410,7 @@ class Admin
     public static function download()
     {
         if (PHP_SAPI !== 'cli') {
-            throw new Exception('PHP-CLI required.');
+            throw new RuntimeException('PHP-CLI required.');
         }
 
         $version = self::version();
@@ -424,7 +424,7 @@ class Admin
             $file = $dir . '/alight-admin.tar.gz';
 
             if (!is_dir($dir) && !@mkdir($dir, 0777, true)) {
-                throw new Exception('Failed to create download directory.');
+                throw new RuntimeException('Failed to create download directory.');
             } else {
                 exec('rm -rf ' . $dir . '/*');
             }

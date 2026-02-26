@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Alight\Admin;
 
 use Alight\Config as AlightConfig;
-use Exception;
+use LogicException;
 
 class Config
 {
@@ -45,7 +45,7 @@ class Config
     {
         $config = AlightConfig::get('admin');
         if (!$config || !is_array($config)) {
-            throw new Exception('Missing admin configuration.');
+            throw new LogicException('Missing admin configuration.');
         }
 
         if (isset($config['title']) && !is_array($config['title'])) {
@@ -53,12 +53,12 @@ class Config
         } else {
             if ($key) {
                 if (!isset($config[$key]) || !is_array($config[$key])) {
-                    throw new Exception('Missing admin configuration about \'' . $key . '\'.');
+                    throw new LogicException('Missing admin configuration about \'' . $key . '\'.');
                 }
             } else {
                 $key = key($config);
                 if (!is_array($config[$key])) {
-                    throw new Exception('Missing admin configuration.');
+                    throw new LogicException('Missing admin configuration.');
                 }
             }
             $configAdmin = $config[$key];

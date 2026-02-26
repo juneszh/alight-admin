@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Alight\Admin;
 
 use Alight\App;
-use Exception;
+use LogicException;
 
 class Menu
 {
@@ -50,7 +50,7 @@ class Menu
     public static function subItem(string $title): MenuItem
     {
         if (!self::$index) {
-            throw new Exception('Missing parent item definition.');
+            throw new LogicException('Missing parent item definition.');
         }
 
         ++self::$subIndex;

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Alight\Admin;
 
-use Exception;
+use LogicException;
 
 class FormOption
 {
@@ -46,7 +46,7 @@ class FormOption
     public function copy(string $form, array $fields = [])
     {
         if (!isset(Form::$config[$form])) {
-            throw new Exception('Missing copy form definition.');
+            throw new LogicException('Missing copy form definition.');
         }
 
         if ($fields) {

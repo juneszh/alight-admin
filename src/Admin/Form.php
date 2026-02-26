@@ -16,8 +16,9 @@ namespace Alight\Admin;
 use Alight\Admin;
 use Alight\Request;
 use Alight\Response;
+use Alight\ResponseException;
 use Alight\Utility;
-use Exception;
+use LogicException;
 
 class Form
 {
@@ -96,7 +97,7 @@ class Form
     public static function field(string $key): FormField
     {
         if (!self::$form) {
-            throw new Exception('Missing form definition.');
+            throw new LogicException('Missing form definition.');
         }
 
         self::$key = $key;
@@ -113,11 +114,11 @@ class Form
     public static function subField(string $subKey): FormField
     {
         if (!self::$form) {
-            throw new Exception('Missing form definition.');
+            throw new LogicException('Missing form definition.');
         }
 
         if (!self::$key) {
-            throw new Exception('Missing key definition.');
+            throw new LogicException('Missing key definition.');
         }
 
         return new FormField(self::$form, self::$key, $subKey);
@@ -181,9 +182,6 @@ class Form
             Response::render(Admin::path() . '/src/Admin/View.php', ['title' => $_title, 'script' => Admin::globalScript('Form', $renderData)]);
         } else {
             $sqlData = self::dataFilter($field, Request::request());
-            if ($sqlData === null){
-                return true;
-            }
 
             if (is_callable($callback)) {
                 $callback(self::EVENT_REQUEST, $sqlData);
@@ -221,9 +219,9 @@ class Form
      * 
      * @param array $field 
      * @param array $data 
-     * @return null|array 
+     * @return array 
      */
-    private static function dataFilter(array $field, array $data): ?array
+    private static function dataFilter(array $field, array $data): array
     {
         $return = [];
         foreach ($field as $k => $v) {
@@ -231,8 +229,7 @@ class Form
                 if (isset($data[$k])) {
                     if (isset($v['confirm'])) {
                         if ($data[$v['confirm']] != $data[$k]) {
-                            Response::api(400, ':status_400');
-                            return null;
+                            throw new ResponseException(400, ':status_400');
                         }
                     } elseif (isset($v['raw'])) {
                         $return[$k] = $data[$k];
@@ -248,8 +245,6 @@ class Form
                 $_return = self::dataFilter($v['sub'], $data);
                 if ($_return) {
                     $return = array_merge($return, $_return);
-                } elseif ($_return === null){
-                    return null;
                 }
             }
         }

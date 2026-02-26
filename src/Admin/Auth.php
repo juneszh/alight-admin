@@ -15,8 +15,7 @@ namespace Alight\Admin;
 
 use Alight\Cache;
 use Alight\Request;
-use Alight\Response;
-use Alight\RouteMiddleware;
+use Alight\ResponseException;
 use Alight\Router;
 use Alight\Utility;
 
@@ -33,16 +32,10 @@ class Auth
     public static function verify(): int
     {
         $userId = self::getUserId();
-        if ($userId) {
-            return $userId;
+        if (!$userId) {
+            throw new ResponseException(401, ':status_401');
         }
-
-        if (Request::isAjax()) {
-            Response::api(401, ':status_401');
-        } else {
-            Controller::result(401);
-        }
-        return 0;
+        return $userId;
     }
 
     /**
@@ -200,11 +193,6 @@ class Auth
             }
         }
 
-        if (Request::isAjax()) {
-            Response::api(403, ':status_403');
-        } else {
-            Controller::result(403);
-        }
-        return 0;
+        throw new ResponseException(403, ':status_403');
     }
 }

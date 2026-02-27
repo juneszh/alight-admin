@@ -14,7 +14,7 @@
     "@ant-design/happy-work-theme": "^2.0.0",
     "@ant-design/icons": "^6.1.0",
     "@ant-design/plots": "^2.6.8",
-    "@ant-design/pro-components": "3.1.4-0",
+    "@ant-design/pro-components": "3.1.6-0",
     "@marsidev/react-turnstile": "^1.4.2",
     "@tinymce/tinymce-react": "^6.3.0",
     "antd": "^6.3.1",

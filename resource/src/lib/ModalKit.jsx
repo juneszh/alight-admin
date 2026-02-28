@@ -140,7 +140,7 @@ const ModelKit = ({ ref }) => {
             >{modalConfig.title}</div>}
             centered
             destroyOnHidden={true}
-            maskClosable={false}
+            mask={{closable: false}}
             modalRender={(modal) => (
                 <Draggable
                     disabled={draggleDisabled}

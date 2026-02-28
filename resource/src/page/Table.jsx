@@ -21,12 +21,12 @@ const Table = props => {
     const [requestStatistic, setRequestStatistic] = useState({});
     const [mainSetting, setMainSetting] = useState({});
 
-    let tableSearch = false;
 
     const urlSearch = new URLSearchParams(window.location.search);
 
-    const columnsBuilder = (columnObj, expand) => {
+    const columnsBuilder = (columnObj, isExpand) => {
         const columns = [];
+        let tableSearch = false;
         if (notEmpty(columnObj)) {
             for (const [columnKey, columnValue] of Object.entries(columnObj)) {
                 const column = {
@@ -40,7 +40,9 @@ const Table = props => {
                 }
 
                 if (columnValue.searchType) {
-                    tableSearch = true;
+                    if (!isExpand) {
+                        tableSearch = true;
+                    }
                     const valueTypeString = columnValue?.type?.type ?? columnValue.type;
 
                     if (['dateRange', 'timeRange', 'dateTimeRange', 'digitRange'].indexOf(columnValue.searchType) !== -1 || (valueTypeString && columnValue.searchType !== valueTypeString)) {
@@ -56,7 +58,7 @@ const Table = props => {
                         if (columnValue.searchType === 'dateTimeRange') {
                             columnSearch.fieldProps = { showTime: { defaultValue: [dayjs('00:00:00', 'HH:mm:ss'), dayjs('23:59:59', 'HH:mm:ss')] } };
                         }
-                        
+
                         if (columnValue.searchProps) {
                             columnSearch.fieldProps = { ...columnSearch.fieldProps, ...columnValue.searchProps };
                         }
@@ -107,7 +109,7 @@ const Table = props => {
                 }
 
                 if (columnValue.sort) {
-                    if (expand) {
+                    if (isExpand) {
                         column.sorter = (a, b) => {
                             if (a[columnKey] > b[columnKey]) {
                                 return 1;
@@ -182,10 +184,10 @@ const Table = props => {
                 columns.push(column);
             }
         }
-        return columns;
+        return { columns, tableSearch };
     }
-    const mainColumns = columnsBuilder(global.config.column);
-    const expandColumns = columnsBuilder(global.config.expand, true);
+    const { columns: mainColumns, tableSearch } = columnsBuilder(global.config.column);
+    const { columns: expandColumns } = columnsBuilder(structuredClone(global.config.expand), true);
 
     const paramReplace = (data, record) => {
         data = Object.assign({}, data);
@@ -226,50 +228,64 @@ const Table = props => {
         const params = buttonParams(button, record);
         switch (button.action) {
             case 'form':
-                modelRef.current?.modalShow(button, params, {
-                    done: () => {
-                        message.success(localeValue(':success'));
-                        actionRef.current?.reload();
-                    }
-                });
-                break;
+                {
+                    modelRef.current?.modalShow(button, params, {
+                        done: () => {
+                            message.success(localeValue(':success'));
+                            actionRef.current?.reload();
+                        }
+                    });
+                    break;
+                }
             case 'page':
-                modelRef.current?.modalShow(button, params, {
-                    close: () => {
-                        actionRef.current?.reload();
-                    }
-                });
-                break;
+                {
+                    modelRef.current?.modalShow(button, params, {
+                        close: () => {
+                            actionRef.current?.reload();
+                        }
+                    });
+                    break;
+                }
             case 'confirm':
-                modal.confirm({
-                    icon: <ExclamationCircleOutlined />,
-                    onOk: () => {
-                        ajax(message, button.url, params).then(result => {
-                            if (result && result.error === 0) {
-                                message.success(localeValue(':success'));
-                                actionRef.current?.reload();
-                            }
-                        })
-                    },
-                    title: localeValue(':confirm'),
-                });
-                break;
+                {
+                    modal.confirm({
+                        icon: <ExclamationCircleOutlined />,
+                        onOk: () => {
+                            ajax(message, button.url, params).then(result => {
+                                if (result && result.error === 0) {
+                                    message.success(localeValue(':success'));
+                                    actionRef.current?.reload();
+                                }
+                            })
+                        },
+                        title: localeValue(':confirm'),
+                    });
+                    break;
+                }
             case 'submit':
-                ajax(message, button.url, params).then(result => {
-                    if (result && result.error === 0) {
-                        message.success(localeValue(':success'));
-                        actionRef.current?.reload();
-                    }
-                })
-                break;
+                {
+                    ajax(message, button.url, params).then(result => {
+                        if (result && result.error === 0) {
+                            message.success(localeValue(':success'));
+                            actionRef.current?.reload();
+                        }
+                    })
+                    break;
+                }
             case 'popup':
-                window.open(button.url);
-                break;
+                {
+                    window.open(button.url);
+                    break;
+                }
             case 'redirect':
-                window.location.assign(button.url);
-                break;
+                {
+                    window.location.assign(button.url);
+                    break;
+                }
             default:
-                break;
+                {
+                    break;
+                }
         }
     };
 
@@ -313,11 +329,17 @@ const Table = props => {
                     showQuickJumper: true,
                 }}
                 request={async (params = {}, sort) => {
+                    console.log(sort);
                     if (notEmpty(sort)) {
-                        params._order = Object.keys(sort)[0];
-                        params._sort = sort[params._order];
+                        for (const [_order, _sort] of Object.entries(sort)) {
+                            if (_sort) {
+                                params._order = _order;
+                                params._sort = _sort;
+                                break;
+                            }
+                        }
                     }
-                    const result = await ajax(message, window.location.pathname + '?' + new URLSearchParams({...Object.fromEntries(urlSearch), ...params}).toString());
+                    const result = await ajax(message, window.location.pathname + '?' + new URLSearchParams({ ...Object.fromEntries(urlSearch), ...params }).toString());
                     if (result && result.error === 0) {
                         setRequestStatistic(result.data.statistic ?? {});
                         return {

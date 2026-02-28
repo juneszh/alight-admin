@@ -21,13 +21,15 @@ const Home = props => {
     const menuAction = (e, item) => {
         e.preventDefault();
         switch (item.action) {
-            case 'popup':
+            case 'popup': {
                 window.open(item.url);
                 break;
-            case 'redirect':
+            }
+            case 'redirect': {
                 window.location.assign(item.url);
                 break;
-            default:
+            }
+            default: {
                 let key = item.key ?? item.url;
                 if (key === Object.keys(iFrameMap)[0]) {
                     key = '';
@@ -35,6 +37,7 @@ const Home = props => {
                 window.history.pushState(null, '', '#' + key);
                 changeIFrame(key);
                 break;
+            }
         }
     };
 

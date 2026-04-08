@@ -329,7 +329,6 @@ const Table = props => {
                     showQuickJumper: true,
                 }}
                 request={async (params = {}, sort) => {
-                    console.log(sort);
                     if (notEmpty(sort)) {
                         for (const [_order, _sort] of Object.entries(sort)) {
                             if (_sort) {

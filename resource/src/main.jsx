@@ -3,9 +3,9 @@ import { createRoot } from 'react-dom/client'
 import { ConfigProvider, theme } from 'antd';
 import { HappyProvider } from '@ant-design/happy-work-theme';
 import './index.css'
-import App from './App'
-import global from './lib/Util';
-import locale from './locale';
+import App from './App.jsx'
+import global from './lib/Util.js';
+import locale from './locale/index.js';
 
 const antdLocale = locale.antd[global.locale] ?? locale.antd['en_US'];
 const appLocale = locale.app[global.locale] ?? locale.app['en_US'];

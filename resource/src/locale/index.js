@@ -1,5 +1,5 @@
-import antd_en_US from 'antd/lib/locale/en_US';
-import antd_zh_CN from 'antd/lib/locale/zh_CN';
+import antd_en_US from 'antd/es/locale/en_US.js';
+import antd_zh_CN from 'antd/es/locale/zh_CN.js';
 import app_en_US from './en_US.js';
 import app_zh_CN from './zh_CN.js';
 

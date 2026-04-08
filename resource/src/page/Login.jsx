@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { App, Button, Checkbox, Col, Form, Input, Row, theme } from 'antd';
 import { LockOutlined, SafetyOutlined, UserOutlined } from '@ant-design/icons';
-import global, { ajax, localeInit, localeValue } from '../lib/Util';
+import global, { ajax, localeInit, localeValue } from '../lib/Util.js';
 import { Turnstile } from '@marsidev/react-turnstile'
 
 const { useToken } = theme;

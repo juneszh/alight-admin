@@ -1,14 +1,14 @@
 import { lazy, useEffect, useRef, useState } from 'react';
 import { App, Avatar, Card, Col, List, Row, Switch, Typography, theme } from 'antd';
 import { InfoCircleOutlined, EditOutlined, ExclamationCircleOutlined, LockOutlined, PoweroffOutlined, SunOutlined, MoonOutlined } from '@ant-design/icons';
-import global, { ajax, localeInit, localeValue, notEmpty, redirect } from '../lib/Util';
-import ModelKit from '../lib/ModalKit';
+import global, { ajax, localeInit, localeValue, notEmpty, redirect } from '../lib/Util.js';
+import ModelKit from '../lib/ModalKit.jsx';
 import dayjs from 'dayjs';
 
 const { Text } = Typography;
 const { useToken } = theme;
 
-const plots = lazy(() => import('../lib/Plots'));
+const plots = lazy(() => import('../lib/Plots.js'));
 
 const Console = props => {
     localeInit(props.locale);

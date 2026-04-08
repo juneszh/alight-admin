@@ -2,12 +2,12 @@ import { lazy, Suspense } from 'react'
 import { Spin } from 'antd';
 
 const lazyPages = {
-    Home: lazy(() => import('./page/Home')),
-    Login: lazy(() => import('./page/Login')),
-    Table: lazy(() => import('./page/Table')),
-    Form: lazy(() => import('./page/Form')),
-    Result: lazy(() => import('./page/Result')),
-    Console: lazy(() => import('./page/Console')),
+    Home: lazy(() => import('./page/Home.jsx')),
+    Login: lazy(() => import('./page/Login.jsx')),
+    Table: lazy(() => import('./page/Table.jsx')),
+    Form: lazy(() => import('./page/Form.jsx')),
+    Result: lazy(() => import('./page/Result.jsx')),
+    Console: lazy(() => import('./page/Console.jsx')),
 };
 
 const App = props => {

@@ -1,10 +1,10 @@
 import { lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { App, Button, Space, theme } from 'antd';
 import { BetaSchemaForm, ProFormUploadButton, ProFormUploadDragger } from '@ant-design/pro-components';
-import global, { ajax, ifKeys, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util';
+import global, { ajax, ifKeys, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util.js';
 
 const { useToken } = theme;
-const Editor = lazy(() => import('../lib/Editor'));
+const Editor = lazy(() => import('../lib/Editor.js'));
 const ImgCrop = lazy(() => import('antd-img-crop'));
 
 const Form = props => {

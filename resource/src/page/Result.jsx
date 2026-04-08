@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button, Col, Result, Row, theme } from 'antd';
-import global, { localeInit, localeValue, redirect } from '../lib/Util';
+import global, { localeInit, localeValue, redirect } from '../lib/Util.js';
 
 const { useToken } = theme;
 

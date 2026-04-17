@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { App, Button, Card, Col, Popover, QRCode, Row, Space, Statistic, theme } from 'antd';
 import { ExclamationCircleOutlined, ScanOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
@@ -311,49 +311,6 @@ const Table = props => {
         }
     }
 
-    const { titleIndex, summaryColumns } = useMemo(() => {
-        let titleIndex = 0;
-        const summaryColumns = [];
-        if (notEmpty(global.config.batch.button)) {
-            titleIndex = 1;
-            summaryColumns.push('_batch');
-        }
-        if (notEmpty(mainSetting)) {
-            const summaryColumnsLeft = [];
-            const summaryColumnsCenter = [];
-            const summaryColumnsRight = [];
-            for (const [key, value] of Object.entries(mainSetting)) {
-                if (value.show) {
-                    if (value.order !== undefined) {
-                        if (value.fixed === 'left') {
-                            summaryColumnsLeft[value.order] = key;
-                        } else if (value.fixed === 'right') {
-                            summaryColumnsRight[value.order] = key;
-                        } else {
-                            summaryColumnsCenter[value.order] = key;
-                        }
-                    } else {
-                        if (value.fixed === 'left') {
-                            summaryColumnsLeft.push(key);
-                        } else if (value.fixed === 'right') {
-                            summaryColumnsRight.push(key);
-                        } else {
-                            summaryColumnsCenter.push(key);
-                        }
-                    }
-                }
-            }
-            summaryColumns.push(...summaryColumnsLeft.filter(n => n), ...summaryColumnsCenter.filter(n => n), ...summaryColumnsRight.filter(n => n));
-        } else {
-            for (const column of Object.values(mainColumns)) {
-                if (!column.hideInTable) {
-                    summaryColumns.push(column.dataIndex);
-                }
-            }
-        }
-        return { titleIndex, summaryColumns };
-    }, [mainColumns, mainSetting, global.config.batch.button]);
-
     return (
         <div style={{ backgroundColor: token.colorBgLayout, height: 'auto', minHeight: '100vh' }}>
             <ProTable
@@ -416,8 +373,50 @@ const Table = props => {
                     let avgVisible = false;
                     const sumCells = [];
                     const avgCells = [];
+                    
+                    if (notEmpty(mainColumns) && notEmpty(pageData)) {
+                        let titleIndex = 0;
+                        const summaryColumns = [];
 
-                    if (notEmpty(summaryColumns) && notEmpty(pageData)) {
+                        if (notEmpty(global.config.batch.button)) {
+                            titleIndex = 1;
+                            summaryColumns.push('_batch');
+                        }
+                        if (notEmpty(mainSetting)) {
+                            const summaryColumnsLeft = [];
+                            const summaryColumnsCenter = [];
+                            const summaryColumnsRight = [];
+                            for (const [key, value] of Object.entries(mainSetting)) {
+                                if (value.show) {
+                                    if (value.order !== undefined) {
+                                        if (value.fixed === 'left') {
+                                            summaryColumnsLeft[value.order] = key;
+                                        } else if (value.fixed === 'right') {
+                                            summaryColumnsRight[value.order] = key;
+                                        } else {
+                                            summaryColumnsCenter[value.order] = key;
+                                        }
+
+                                    } else {
+                                        if (value.fixed === 'left') {
+                                            summaryColumnsLeft.push(key);
+                                        } else if (value.fixed === 'right') {
+                                            summaryColumnsRight.push(key);
+                                        } else {
+                                            summaryColumnsCenter.push(key);
+                                        }
+                                    }
+                                }
+                            }
+                            summaryColumns.push(...summaryColumnsLeft.filter(n => n), ...summaryColumnsCenter.filter(n => n), ...summaryColumnsRight.filter(n => n));
+                        } else {
+                            for (const column of Object.values(mainColumns)) {
+                                if (!column.hideInTable) {
+                                    summaryColumns.push(column.dataIndex);
+                                }
+                            }
+                        }
+
                         for (const [index, key] of Object.entries(summaryColumns)) {
                             if (global.config.summary[key]) {
                                 let precision = global.config.summary[key].precision ?? 2;

@@ -1,4 +1,4 @@
-import { lazy, useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { App, Button, Space, theme } from 'antd';
 import { BetaSchemaForm, ProFormUploadButton, ProFormUploadDragger } from '@ant-design/pro-components';
 import global, { ajax, ifKeys, ifResult, inIframe, localeInit, localeValue, notEmpty, numberToString, postMessage, redirect } from '../lib/Util.js';
@@ -8,14 +8,18 @@ const Editor = lazy(() => import('../lib/Editor.js'));
 const ImgCrop = lazy(() => import('antd-img-crop'));
 
 const Form = props => {
-    localeInit(props.locale);
+    const localeInitedRef = useRef(false);
+    if (!localeInitedRef.current) {
+        localeInit(props.locale);
+        localeInitedRef.current = true;
+    }
     const { token } = useToken();
     const { message } = App.useApp();
 
     const formRef = useRef(undefined);
     const [submitLoading, setSubmitLoading] = useState(false);
 
-    const isLight = localStorage.getItem('alight-dark') ? false : true;
+    const [isLight] = useState(() => !localStorage.getItem('alight-dark'));
 
     const ProFormUploadButtonWrapper = ({ fieldProps, beforeUpload, ...props }) => {
         return <ProFormUploadButton {...props} fieldProps={{ beforeUpload, ...fieldProps }} />;
@@ -25,7 +29,7 @@ const Form = props => {
         return <ProFormUploadDragger {...props} fieldProps={{ beforeUpload, ...fieldProps }} />;
     };
 
-    const UploadWrapper = ({ schema, dragger }) => {
+    const UploadWrapper = ({ schema, dragger, showButtonEnabled }) => {
         const uploadProps = {
             disabled: (schema.fieldProps.disabled || schema.proFieldProps.readonly) ?? undefined,
             fieldProps: {
@@ -35,25 +39,24 @@ const Form = props => {
                 name: 'file',
                 onChange: ({ file, fileList }) => {
                     if (file.status === 'uploading') {
-                        if (showButton) {
+                        if (showButtonEnabled) {
                             postMessage({ button: false });
                         }
                     } else if (file.status === 'done') {
-                        if (showButton) {
+                        if (showButtonEnabled) {
                             postMessage({ button: true });
                         }
                     } else if (file.status === 'error') {
-                        if (showButton) {
+                        if (showButtonEnabled) {
                             postMessage({ button: true });
                         }
-                        for (const [key, value] of Object.entries(fileList)) {
-                            if (value.uid === file.uid) {
-                                fileList.splice(key, 1);
-                                if (file.response?.message) {
-                                    message.error(localeValue(file.response.message));
-                                } else {
-                                    message.error(localeValue(':upload_failed'));
-                                }
+                        const targetIndex = fileList.findIndex(v => v?.uid === file.uid);
+                        if (targetIndex !== -1) {
+                            fileList.splice(targetIndex, 1);
+                            if (file.response?.message) {
+                                message.error(localeValue(file.response.message));
+                            } else {
+                                message.error(localeValue(':upload_failed'));
                             }
                         }
                     }
@@ -108,212 +111,219 @@ const Form = props => {
         />
     );
 
-    let layout = 'horizontal';
-    let showButton = false;
+    const { layout, showButton, mainColumns } = useMemo(() => {
+        let layout = 'horizontal';
+        let showButton = false;
 
-    if (notEmpty(global.config.field)) {
-        for (const fieldValue of Object.values(global.config.field)) {
-            if (['textarea', 'code', 'jsonCode', 'richText', 'group', 'formList', 'formSet'].indexOf(fieldValue.type) !== -1) {
-                layout = 'vertical';
-                break;
+        if (notEmpty(global.config.field)) {
+            for (const fieldValue of Object.values(global.config.field)) {
+                if (['textarea', 'code', 'jsonCode', 'richText', 'group', 'formList', 'formSet'].indexOf(fieldValue.type) !== -1) {
+                    layout = 'vertical';
+                    break;
+                }
             }
         }
-    }
 
-    const columnsBuilder = (columnObj) => {
-        const columns = [];
-        if (notEmpty(columnObj)) {
-            for (const [fieldKey, fieldValue] of Object.entries(columnObj)) {
-                const column = {
-                    dataIndex: fieldKey,
-                    title: fieldValue.locale ? localeValue(fieldValue.title) : fieldValue.title,
-                    valueType: fieldValue.type,
-                    fieldProps: {},
-                    formItemProps: { rules: [] },
-                    proFieldProps: {}
-                };
+        const columnsBuilder = (columnObj) => {
+            const columns = [];
+            if (notEmpty(columnObj)) {
+                for (const [fieldKey, fieldValue] of Object.entries(columnObj)) {
+                    const column = {
+                        dataIndex: fieldKey,
+                        title: fieldValue.locale ? localeValue(fieldValue.title) : fieldValue.title,
+                        valueType: fieldValue.type,
+                        fieldProps: {},
+                        formItemProps: { rules: [] },
+                        proFieldProps: {}
+                    };
 
-                if (layout === 'vertical') {
-                    column.colProps = fieldValue.grid ?? { span: 24 };
-                } else {
-                    column.colProps = { span: 24 };
-                    column.formItemProps.labelCol = { sm: 6 };
-                    column.formItemProps.wrapperCol = fieldValue.grid ?? { sm: 14 };
-                }
+                    if (layout === 'vertical') {
+                        column.colProps = fieldValue.grid ?? { span: 24 };
+                    } else {
+                        column.colProps = { span: 24 };
+                        column.formItemProps.labelCol = { sm: 6 };
+                        column.formItemProps.wrapperCol = fieldValue.grid ?? { sm: 14 };
+                    }
 
-                if (fieldValue.button) {
-                    column.title = <Space>
-                        {column.title}
-                        <Button
-                            autoInsertSpace={false}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                const params = {};
-                                for (const param of Object.values(fieldValue.buttonParams)) {
-                                    params[param] = formRef?.current?.getFieldValue(param);
-                                }
-                                ajax(message, fieldValue.buttonUrl, params).then(result => {
-                                    if (result && result.error === 0) {
-                                        message.success(localeValue(':success'));
-                                        formRef?.current?.setFieldsValue(result.data);
+                    if (fieldValue.button) {
+                        column.title = <Space>
+                            {column.title}
+                            <Button
+                                autoInsertSpace={false}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    const params = {};
+                                    for (const param of Object.values(fieldValue.buttonParams)) {
+                                        params[param] = formRef?.current?.getFieldValue(param);
                                     }
-                                });
-                            }}
-                            size='small'
-                        >{fieldValue.button}</Button>
-                    </Space>;
-                }
-
-                if (fieldValue.value !== undefined && fieldValue.value !== '') {
-                    if (fieldValue.type === 'upload' || fieldValue.type === 'uploadDragger') {
-                        if (typeof fieldValue.value === 'string') {
-                            fieldValue.value = [fieldValue.value];
-                        }
-                        column.initialValue = [];
-                        if (notEmpty(fieldValue.value)) {
-                            let basicUrl = fieldValue?.typeProps?.basicUrl ?? window.location.origin;
-                            for (const value of Object.values(fieldValue.value)) {
-                                if (value) {
-                                    let fileUrl = value;
-                                    if (fileUrl.substring(0, 4) !== 'http') {
-                                        fileUrl = basicUrl + (fileUrl[0] === '/' ? '' : '/') + fileUrl;
-                                    }
-                                    column.initialValue.push({
-                                        status: 'done',
-                                        name: value,
-                                        url: fileUrl,
+                                    ajax(message, fieldValue.buttonUrl, params).then(result => {
+                                        if (result && result.error === 0) {
+                                            message.success(localeValue(':success'));
+                                            formRef?.current?.setFieldsValue(result.data);
+                                        }
                                     });
-                                }
+                                }}
+                                size='small'
+                            >{fieldValue.button}</Button>
+                        </Space>;
+                    }
+
+                    if (fieldValue.value !== undefined && fieldValue.value !== '') {
+                        if (fieldValue.type === 'upload' || fieldValue.type === 'uploadDragger') {
+                            if (typeof fieldValue.value === 'string') {
+                                fieldValue.value = [fieldValue.value];
                             }
-                        }
-                    } else if (fieldValue.type === 'switch') {
-                        column.initialValue = !!parseInt(fieldValue.value);
-                    } else {
-                        column.initialValue = numberToString(fieldValue.value);
-                    }
-                }
-
-                if (fieldValue.required) {
-                    column.formItemProps.rules.push({ required: true });
-                }
-
-                if (fieldValue.rules) {
-                    if (Array.isArray(fieldValue.rules)) {
-                        column.formItemProps.rules = [...column.formItemProps.rules, ...fieldValue.rules];
-                    } else {
-                        column.formItemProps.rules.push(fieldValue.rules);
-                    }
-                }
-
-                if (['group', 'formList', 'formSet'].indexOf(fieldValue.type) !== -1) {
-                    if (fieldValue.sub) {
-                        if (fieldValue.type === 'formList') {
-                            column.columns = [{ valueType: 'group', columns: columnsBuilder(fieldValue.sub) }];
-                        } else {
-                            column.columns = columnsBuilder(fieldValue.sub);
-                        }
-                    }
-                } else {
-                    if (fieldValue.enum) {
-                        if (fieldValue.locale) {
-                            column.valueEnum = {};
-                            for (const [enumKey, enumValue] of Object.entries(fieldValue.enum)) {
-                                if (typeof enumValue === 'string') {
-                                    column.valueEnum[enumKey] = localeValue(enumValue);
-                                } else {
-                                    column.valueEnum[enumKey] = enumValue;
-                                    if (enumValue.text) {
-                                        column.valueEnum[enumKey].text = localeValue(enumValue.text);
+                            column.initialValue = [];
+                            if (notEmpty(fieldValue.value)) {
+                                let basicUrl = fieldValue?.typeProps?.basicUrl ?? window.location.origin;
+                                for (const value of Object.values(fieldValue.value)) {
+                                    if (value) {
+                                        let fileUrl = value;
+                                        if (fileUrl.substring(0, 4) !== 'http') {
+                                            fileUrl = basicUrl + (fileUrl[0] === '/' ? '' : '/') + fileUrl;
+                                        }
+                                        column.initialValue.push({
+                                            status: 'done',
+                                            name: value,
+                                            url: fileUrl,
+                                        });
                                     }
                                 }
                             }
+                        } else if (fieldValue.type === 'switch') {
+                            column.initialValue = !!parseInt(fieldValue.value);
                         } else {
-                            column.valueEnum = fieldValue.enum;
+                            column.initialValue = numberToString(fieldValue.value);
                         }
                     }
 
-                    if (fieldValue.options) {
-                        column.fieldProps.options = fieldValue.options;
+                    if (fieldValue.required) {
+                        column.formItemProps.rules.push({ required: true });
                     }
 
-                    if (fieldValue.tooltip) {
-                        column.tooltip = fieldValue.tooltip;
+                    if (fieldValue.rules) {
+                        if (Array.isArray(fieldValue.rules)) {
+                            column.formItemProps.rules = [...column.formItemProps.rules, ...fieldValue.rules];
+                        } else {
+                            column.formItemProps.rules.push(fieldValue.rules);
+                        }
                     }
 
-                    if (fieldValue.type === 'upload') {
-                        column.render = (dom, entity, index, action, schema) => <UploadWrapper schema={schema} />;
-                        column.formItemRender = (schema) => <UploadWrapper schema={schema} />;
-                    } else if (fieldValue.type === 'uploadDragger') {
-                        column.render = (dom, entity, index, action, schema) => <UploadWrapper schema={schema} dragger={true} />;
-                        column.formItemRender = (schema) => <UploadWrapper schema={schema} dragger={true} />;
-                    } else if (fieldValue.type === 'richText') {
-                        column.render = (dom, entity, index, action, schema) => <EditorWrapper schema={schema} />;
-                        column.formItemRender = (schema, config, form) => <EditorWrapper schema={schema} form={form} />;
-                    } else if (fieldValue.type === 'color') {
-                        column.fieldProps.showText = true;
-                        column.fieldProps.style = { display: 'inline-flex' };
-                    }
-
-                    if (fieldValue.placeholder) {
-                        column.fieldProps.placeholder = fieldValue.placeholder;
-                    }
-
-                    if (fieldValue.disabled) {
-                        column.fieldProps.disabled = fieldValue.disabled;
-                    }
-
-                    if (fieldValue.request) {
-                        column.dependencies = fieldValue.requestParams;
-                        column.request = async (params) => {
-                            const result = await ajax(message, fieldValue.request, params);
-                            return result?.data?.list ?? [];
-                        };
-                    }
-
-                    if (fieldValue.typeProps) {
-                        column.fieldProps = { ...column.fieldProps, ...fieldValue.typeProps };
-                    }
-
-                    if (fieldValue.confirm) {
-                        column.formItemProps.rules.push(({ getFieldValue }) => ({
-                            validator: (rule, value) => {
-                                if (!value || getFieldValue(fieldValue.confirm) === value) {
-                                    return Promise.resolve();
-                                }
-                                const fieldTitle = localeValue(columnObj[fieldValue.confirm].title);
-                                const confirmField = localeValue(':confirm_field').replace('{{field}}', fieldTitle);
-                                return Promise.reject(new Error(confirmField));
+                    if (['group', 'formList', 'formSet'].indexOf(fieldValue.type) !== -1) {
+                        if (fieldValue.sub) {
+                            if (fieldValue.type === 'formList') {
+                                column.columns = [{ valueType: 'group', columns: columnsBuilder(fieldValue.sub) }];
+                            } else {
+                                column.columns = columnsBuilder(fieldValue.sub);
                             }
-                        }));
-                    }
-
-                    if (fieldValue.hide) {
-                        column.formItemProps.hidden = fieldValue.hide;
-                    }
-
-                    if (fieldValue.readonly) {
-                        column.proFieldProps.readonly = fieldValue.readonly;
+                        }
                     } else {
-                        showButton = true;
-                    }
-                }
+                        if (fieldValue.enum) {
+                            if (fieldValue.locale) {
+                                column.valueEnum = {};
+                                for (const [enumKey, enumValue] of Object.entries(fieldValue.enum)) {
+                                    if (typeof enumValue === 'string') {
+                                        column.valueEnum[enumKey] = localeValue(enumValue);
+                                    } else {
+                                        column.valueEnum[enumKey] = enumValue;
+                                        if (enumValue.text) {
+                                            column.valueEnum[enumKey].text = localeValue(enumValue.text);
+                                        }
+                                    }
+                                }
+                            } else {
+                                column.valueEnum = fieldValue.enum;
+                            }
+                        }
 
-                if (notEmpty(fieldValue.if)) {
-                    columns.push({
-                        valueType: 'dependency',
-                        name: ifKeys(fieldValue.if),
-                        columns: (record) => {
-                            return ifResult(fieldValue.if, record) ? [column] : [];
-                        },
-                    });
-                } else {
-                    columns.push(column);
+                        if (fieldValue.options) {
+                            column.fieldProps.options = fieldValue.options;
+                        }
+
+                        if (fieldValue.tooltip) {
+                            column.tooltip = fieldValue.tooltip;
+                        }
+
+                        if (fieldValue.type === 'upload') {
+                            column.render = (dom, entity, index, action, schema) => <UploadWrapper schema={schema} showButtonEnabled={showButton} />;
+                            column.formItemRender = (schema) => <UploadWrapper schema={schema} showButtonEnabled={showButton} />;
+                        } else if (fieldValue.type === 'uploadDragger') {
+                            column.render = (dom, entity, index, action, schema) => <UploadWrapper schema={schema} dragger={true} showButtonEnabled={showButton} />;
+                            column.formItemRender = (schema) => <UploadWrapper schema={schema} dragger={true} showButtonEnabled={showButton} />;
+                        } else if (fieldValue.type === 'richText') {
+                            column.render = (dom, entity, index, action, schema) => <EditorWrapper schema={schema} />;
+                            column.formItemRender = (schema, config, form) => <EditorWrapper schema={schema} form={form} />;
+                        } else if (fieldValue.type === 'color') {
+                            column.fieldProps.showText = true;
+                            column.fieldProps.style = { display: 'inline-flex' };
+                        }
+
+                        if (fieldValue.placeholder) {
+                            column.fieldProps.placeholder = fieldValue.placeholder;
+                        }
+
+                        if (fieldValue.disabled) {
+                            column.fieldProps.disabled = fieldValue.disabled;
+                        }
+
+                        if (fieldValue.request) {
+                            column.dependencies = fieldValue.requestParams;
+                            column.request = async (params) => {
+                                const result = await ajax(message, fieldValue.request, params);
+                                return result?.data?.list ?? [];
+                            };
+                        }
+
+                        if (fieldValue.typeProps) {
+                            column.fieldProps = { ...column.fieldProps, ...fieldValue.typeProps };
+                        }
+
+                        if (fieldValue.confirm) {
+                            column.formItemProps.rules.push(({ getFieldValue }) => ({
+                                validator: (rule, value) => {
+                                    if (!value || getFieldValue(fieldValue.confirm) === value) {
+                                        return Promise.resolve();
+                                    }
+                                    const fieldTitle = localeValue(columnObj[fieldValue.confirm].title);
+                                    const confirmField = localeValue(':confirm_field').replace('{{field}}', fieldTitle);
+                                    return Promise.reject(new Error(confirmField));
+                                }
+                            }));
+                        }
+
+                        if (fieldValue.hide) {
+                            column.formItemProps.hidden = fieldValue.hide;
+                        }
+
+                        if (fieldValue.readonly) {
+                            column.proFieldProps.readonly = fieldValue.readonly;
+                        } else {
+                            showButton = true;
+                        }
+                    }
+
+                    if (notEmpty(fieldValue.if)) {
+                        columns.push({
+                            valueType: 'dependency',
+                            name: ifKeys(fieldValue.if),
+                            columns: (record) => {
+                                return ifResult(fieldValue.if, record) ? [column] : [];
+                            },
+                        });
+                    } else {
+                        columns.push(column);
+                    }
                 }
             }
-        }
-        return columns;
-    }
-    const mainColumns = columnsBuilder(global.config.field);
+            return columns;
+        };
+
+        return {
+            layout,
+            showButton,
+            mainColumns: columnsBuilder(global.config.field),
+        };
+    }, [global.config.field]);
 
     const getMessage = useCallback(event => {
         if (event.origin === window.location.origin) {
@@ -401,7 +411,7 @@ const Form = props => {
                 backgroundColor: token.colorBgElevated,
                 padding: 24,
                 height: 'auto',
-                minHeight: '100vh',
+                minHeight: inIframe() ? undefined : '100vh',
                 width: '100%'
             }}
             submitter={inIframe() || !showButton ? false : {

@@ -20,7 +20,7 @@ const ajax = async (message, url, data) => {
             if (response.headers.get('Content-Type')?.indexOf('application/json') !== -1) {
                 return response.json();
             } else {
-                throw new Error(response.statusText);
+                throw new Error(response.status + ' ' + response.statusText);
             }
         })
         .then(result => {
@@ -51,7 +51,7 @@ const ifKeys = (ifKeyValue) => {
             }
         }
     }
-    return result;
+    return [...new Set(result)];
 }
 
 const ifResult = (ifKeyValue, values) => {
@@ -115,6 +115,9 @@ const localeInit = i18nNew => {
 };
 
 const localeValue = key => {
+    if (typeof key !== 'string') {
+        return key;
+    }
     return (key[0] === ':' && i18n[key] !== undefined) ? i18n[key] : key;
 };
 

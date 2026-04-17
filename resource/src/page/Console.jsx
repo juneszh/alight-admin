@@ -11,7 +11,11 @@ const { useToken } = theme;
 const plots = lazy(() => import('../lib/Plots.js'));
 
 const Console = props => {
-    localeInit(props.locale);
+    const localeInitedRef = useRef(false);
+    if (!localeInitedRef.current) {
+        localeInit(props.locale);
+        localeInitedRef.current = true;
+    }
     const { token } = useToken();
     const { message, modal } = App.useApp();
 
@@ -21,15 +25,16 @@ const Console = props => {
     const [noticeCount, setNoticeCount] = useState(0);
     const [noticeList, setNoticeList] = useState([]);
     const [noticeLoad, setNoticeLoad] = useState(false);
-    const [isLight] = useState(localStorage.getItem('alight-dark') ? false : true);
-
-    const chartDataInit = {};
-    if (notEmpty(global.config.chart)) {
-        for (const [chartKey, chartValue] of Object.entries(global.config.chart)) {
-            chartDataInit[chartKey] = chartValue.config.data ?? [];
+    const [isLight] = useState(() => !localStorage.getItem('alight-dark'));
+    const [chartData, setChartData] = useState(() => {
+        const chartDataInit = {};
+        if (notEmpty(global.config.chart)) {
+            for (const [chartKey, chartValue] of Object.entries(global.config.chart)) {
+                chartDataInit[chartKey] = chartValue.config.data ?? [];
+            }
         }
-    }
-    const [chartData, setChartData] = useState(chartDataInit);
+        return chartDataInit;
+    });
 
     const getProfile = () => {
         ajax(message, global.path + '/console/user').then(result => {
@@ -55,7 +60,7 @@ const Console = props => {
         if (!noticeList[index].read) {
             const newList = noticeList.map((v, i) => {
                 if (i === index) {
-                    v.read = true;
+                    return { ...v, read: true };
                 }
                 return v;
             });
@@ -113,14 +118,14 @@ const Console = props => {
     };
 
     const chartComponent = (key, component, config) => {
-        config.data = chartData[key];
+        const plotConfig = { ...config, data: chartData[key] };
         let subComponent;
         if (component.substring(0, 4) === 'Tiny') {
             subComponent = component.substring(4);
             component = 'Tiny';
         }
         const Plots = subComponent ? plots[component][subComponent] : plots[component];
-        return <Plots {...config} />;
+        return <Plots {...plotConfig} />;
     };
 
     const ChartList = () => {

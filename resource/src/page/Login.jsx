@@ -30,7 +30,11 @@ const SubmitButton = props => {
 };
 
 const Login = props => {
-    localeInit(props.locale);
+    const localeInitedRef = useRef(false);
+    if (!localeInitedRef.current) {
+        localeInit(props.locale);
+        localeInitedRef.current = true;
+    }
     const { token } = useToken();
     const { message } = App.useApp();
 
@@ -39,12 +43,12 @@ const Login = props => {
     const [load, setLoad] = useState(false);
 
     const captchaPath = global.path + '/captcha?t=';
-    const [captcha, setCaptcha] = useState(captchaPath + (new Date()).getTime());
+    const [captcha, setCaptcha] = useState(captchaPath + Date.now());
     const buildCaptcha = () => {
-        setCaptcha(captchaPath + (new Date()).getTime());
+        setCaptcha(captchaPath + Date.now());
     };
 
-    const isLight = localStorage.getItem('alight-dark') ? false : true;
+    const [isLight] = useState(() => !localStorage.getItem('alight-dark'));
     const ref = useRef(undefined)
     const [turnstile, setTurnstile] = useState(global.config.sitekey ? true : false);
     const setToken = (value) => {
@@ -55,24 +59,7 @@ const Login = props => {
 
     const onFinish = (values) => {
         setLoad(true);
-        ajax(message, global.path + '/login', values).then(result => {
-            if (result.error === 0) {
-                window.location.replace(global.path + '/');
-            } else {
-                buildCaptcha();
-                if (turnstile) {
-                    ref.current?.reset();
-                    form.setFieldsValue({
-                        token: ''
-                    });
-                } else {
-                    form.setFieldsValue({
-                        captcha: ''
-                    });
-                }
-                setLoad(false);
-            }
-        }).catch(() => {
+        const resetVerify = () => {
             buildCaptcha();
             if (turnstile) {
                 ref.current?.reset();
@@ -85,6 +72,15 @@ const Login = props => {
                 });
             }
             setLoad(false);
+        };
+        ajax(message, global.path + '/login', values).then(result => {
+            if (result.error === 0) {
+                window.location.replace(global.path + '/');
+            } else {
+                resetVerify();
+            }
+        }).catch(() => {
+            resetVerify();
         });
     };
 

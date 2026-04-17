@@ -1,19 +1,21 @@
-import { useCallback, useImperativeHandle, useRef, useState } from 'react';
+import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Modal } from 'antd';
 import Draggable from 'react-draggable';
 import { localeValue } from './Util.js';
 
 
-let modalCallback = {};
-
 const ModelKit = ({ ref }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalHeight, setModalHeight] = useState(400);
+    const [animateHeight, setAnimateHeight] = useState(false);
     const [modalWidth, setModalWidth] = useState(816);
     const [modalConfig, setModalConfig] = useState({ title: '', url: '' });
     const [okDisabled, setOkDisabled] = useState(true);
     const [okLoading, setOkLoading] = useState(false);
     const iframeRef = useRef(undefined);
+    const iframeTimerRef = useRef(undefined);
+    const currentHeightRef = useRef(400);
+    const modalCallbackRef = useRef({});
     const [lastModal, setLastModal] = useState('form');
     const [draggleDisabled, setDraggleDisabled] = useState(true);
     const [draggleBounds, setDraggleBounds] = useState({
@@ -30,17 +32,19 @@ const ModelKit = ({ ref }) => {
     }));
 
     const modalShow = (button, params, callbackObj) => {
-        modalCallback = callbackObj;
-        window.addEventListener('message', getMessage);
+        modalCallbackRef.current = callbackObj ?? {};
         setModalConfig({
             title: params?._title ? params?._title : localeValue(button.title),
             url: button.url + (params ? (button.url.indexOf('?') !== -1 ? '&' : '?') + new URLSearchParams(params).toString() : ''),
         });
         if (lastModal !== button.action) {
             if (button.action === 'form') {
+                setAnimateHeight(false);
                 setModalHeight(400);
+                currentHeightRef.current = 400;
                 setModalWidth(816);
             } else {
+                setAnimateHeight(false);
                 setModalHeight('100vh');
                 setModalWidth('100vw');
             }
@@ -56,16 +60,16 @@ const ModelKit = ({ ref }) => {
             if (event.data.error !== undefined) {
                 modalHide();
                 if (event.data.error === 0) {
-                    if (modalCallback?.done !== undefined) {
-                        modalCallback.done(event.data);
+                    if (modalCallbackRef.current?.done !== undefined) {
+                        modalCallbackRef.current.done(event.data);
                     }
                 } else {
-                    if (modalCallback?.fail !== undefined) {
-                        modalCallback.fail(event.data);
+                    if (modalCallbackRef.current?.fail !== undefined) {
+                        modalCallbackRef.current.fail(event.data);
                     }
                 }
-                if (modalCallback?.always !== undefined) {
-                    modalCallback.always(event.data);
+                if (modalCallbackRef.current?.always !== undefined) {
+                    modalCallbackRef.current.always(event.data);
                 }
             } else if (event.data.button !== undefined) {
                 if (event.data.button) {
@@ -80,10 +84,13 @@ const ModelKit = ({ ref }) => {
     }, []);
 
     const modalHide = () => {
-        window.removeEventListener('message', getMessage);
+        if (iframeTimerRef.current) {
+            clearInterval(iframeTimerRef.current);
+            iframeTimerRef.current = undefined;
+        }
         setModalOpen(false);
-        if (modalCallback?.close !== undefined) {
-            modalCallback.close();
+        if (modalCallbackRef.current?.close !== undefined) {
+            modalCallbackRef.current.close();
         }
     };
 
@@ -106,22 +113,48 @@ const ModelKit = ({ ref }) => {
         });
     };
 
-    const ifrmeLoad = () => {
+    const iframeLoad = () => {
         let iFrameHeightLast = 0;
-        const iFrameTimer = setInterval(() => {
+        if (iframeTimerRef.current) {
+            clearInterval(iframeTimerRef.current);
+        }
+        iframeTimerRef.current = setInterval(() => {
             const iFrameHeight = iframeRef.current?.contentWindow.document.body.scrollHeight;
             if (iFrameHeight > 0) {
                 if (iFrameHeight === iFrameHeightLast) {
-                    clearInterval(iFrameTimer);
-                } else if (iFrameHeight > 400) {
-                    setModalHeight(Math.ceil(iFrameHeight / 100) * 100);
+                    clearInterval(iframeTimerRef.current);
+                    iframeTimerRef.current = undefined;
                 } else {
-                    setModalHeight(400);
+                    const nextHeight = iFrameHeight > 400 ? Math.ceil(iFrameHeight / 100) * 100 : 400;
+                    const needAnimate = Math.abs(nextHeight - currentHeightRef.current) >= 24;
+                    setAnimateHeight(needAnimate);
+                    setModalHeight(nextHeight);
+                    currentHeightRef.current = nextHeight;
                 }
                 iFrameHeightLast = iFrameHeight;
             }
         }, 200);
     };
+
+    useEffect(() => {
+        return () => {
+            if (iframeTimerRef.current) {
+                clearInterval(iframeTimerRef.current);
+            }
+            window.removeEventListener('message', getMessage);
+        };
+    }, [getMessage]);
+
+    useEffect(() => {
+        if (modalOpen) {
+            window.addEventListener('message', getMessage);
+        } else {
+            window.removeEventListener('message', getMessage);
+        }
+        return () => {
+            window.removeEventListener('message', getMessage);
+        };
+    }, [getMessage, modalOpen]);
 
     return (
         <Modal
@@ -154,7 +187,7 @@ const ModelKit = ({ ref }) => {
             onOk={modalSubmit}
             open={modalOpen}
             style={{ transition: 'width .6s ease' }}
-            styles={{ body: { display: 'flex', height: modalHeight, maxHeight: 'calc(96vh - 116px)', padding: 0, transition: 'height .6s ease' } }}
+            styles={{ body: { display: 'flex', height: modalHeight, maxHeight: 'calc(96vh - 116px)', padding: 0, transition: animateHeight ? 'height .6s ease' : 'none' } }}
             width={modalWidth}
         >
             <iframe
@@ -162,7 +195,7 @@ const ModelKit = ({ ref }) => {
                 src={modalConfig.url}
                 style={{ border: 'none', borderRadius: 8, flex: '1 1 auto', overflow: 'auto' }}
                 title='modalFrame'
-                onLoad={ifrmeLoad}
+                onLoad={iframeLoad}
             />
         </Modal>
     );
